@@ -31,6 +31,9 @@ export function createApiClient(testApp: TestApp, cookie?: string) {
     get: (path: string) => request(path),
     post: (path: string, body?: unknown) =>
       request(path, { method: "POST", body }),
+    patch: (path: string, body?: unknown) =>
+      request(path, { method: "PATCH", body }),
+    delete: (path: string) => request(path, { method: "DELETE" }),
   }
 }
 

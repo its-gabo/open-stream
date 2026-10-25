@@ -2,6 +2,7 @@ import { createAuthModule } from "./auth/auth.module"
 import type { AppConfig } from "./config/app.config"
 import { createDatabase } from "./db/database"
 import { createEmailModule } from "./email/email.module"
+import { createOrganizationsModule } from "./organizations/organizations.module"
 import { createOutboxModule } from "./outbox/outbox.module"
 
 /**
@@ -17,6 +18,12 @@ export function createAppModule(config: AppConfig) {
     config,
     outboxService: outbox.outboxService,
   })
+  const organizations = createOrganizationsModule({
+    db: database.db,
+    config,
+    outboxService: outbox.outboxService,
+    authTokenService: auth.authTokenService,
+  })
 
   return {
     config,
@@ -24,6 +31,7 @@ export function createAppModule(config: AppConfig) {
     ...outbox,
     ...email,
     ...auth,
+    ...organizations,
     async close() {
       email.emailSenderService.close()
       await database.close()

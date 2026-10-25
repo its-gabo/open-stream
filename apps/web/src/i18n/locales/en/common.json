@@ -18,6 +18,20 @@
     },
     "verification_token": {
       "missing": "Missing verification token"
+    },
+    "organization_name": {
+      "required": "Enter the organization name",
+      "max_length": "Use at most {{max}} characters"
+    },
+    "organization_slug": {
+      "invalid": "Use 2–63 lowercase letters, digits and single hyphens; some addresses are reserved"
+    },
+    "organization_confirmation": {
+      "name_mismatch": "Type the organization name exactly",
+      "phrase_mismatch": "Type the phrase exactly"
+    },
+    "organization_transfer": {
+      "recipient": "Choose the new Owner"
     }
   },
   "pages": {
@@ -86,10 +100,8 @@
         "error_title": "Verification failed"
       }
     },
-    "home": {
-      "title": "Welcome, {{name}}",
-      "signed_in_as": "Signed in as {{email}}",
-      "sign_out": "Sign out"
+    "placeholder": {
+      "description": "This workspace is ready for the next stage of the product. The feature will appear here when it is available."
     }
   },
   "api": {
@@ -99,7 +111,21 @@
       "auth.forgot_password.success": "If the account exists, a password reset email has been sent.",
       "auth.reset_password.success": "Password reset successfully.",
       "auth.verify_email.success": "Your account has been verified. You can now sign in.",
-      "auth.sign_out.success": "Signed out successfully."
+      "auth.sign_out.success": "Signed out successfully.",
+      "organization.create.success": "Organization created.",
+      "organization.update.success": "Organization updated.",
+      "organization.leave.success": "You left the organization.",
+      "organization.ownership_transfer.success": "Ownership transferred.",
+      "organization.invitation.create.success": "Invitation sent.",
+      "organization.invitation.resend.success": "Invitation resent.",
+      "organization.invitation.cancel.success": "Invitation canceled.",
+      "organization.invitation.accept.success": "Welcome to the organization!",
+      "organization.invitation.decline.success": "Invitation declined.",
+      "organization.member.remove.success": "Member removed.",
+      "organization.deletion.schedule.success": "Organization deletion scheduled.",
+      "organization.deletion.cancel.success": "Organization deletion canceled.",
+      "organization.deletion_action.cancel.success": "Organization deletion canceled.",
+      "organization.deletion_action.delete.success": "Organization permanently deleted."
     },
     "error": {
       "fallback": "Oops something went wrong..",
@@ -113,7 +139,24 @@
       "common.request_failed": "The request could not be completed.",
       "common.internal_error": "Something went wrong on our side. Please try again later.",
       "common.not_found": "The requested resource could not be found.",
-      "common.origin_not_allowed": "This request was blocked for security reasons. Please reload the page and try again."
+      "common.origin_not_allowed": "This request was blocked for security reasons. Please reload the page and try again.",
+      "organization.not_found": "The organization could not be found.",
+      "organization.pending_deletion": "This organization is pending deletion.",
+      "organization.forbidden": "Only the organization owner can do this.",
+      "organization.membership_limit_reached": "The organization limit has been reached.",
+      "organization.slug_taken": "This address is already in use.",
+      "organization.confirmation_mismatch": "The confirmation does not match.",
+      "organization.leave.fail": "Transfer ownership before leaving the organization.",
+      "organization.ownership_transfer.fail": "Ownership can only be transferred to a member.",
+      "organization.member.remove.fail": "The member could not be found.",
+      "organization.invitation.already_member": "This person is already a member.",
+      "organization.invitation.already_pending": "This email already has a pending invitation.",
+      "organization.invitation.not_found": "The invitation could not be found.",
+      "organization.invitation.unavailable": "This invitation is no longer available.",
+      "organization.invitation.email_mismatch": "This invitation was sent to another email address.",
+      "organization.invitation.expired": "This invitation has expired.",
+      "organization.deletion.cancel.fail": "This organization is not scheduled for deletion.",
+      "organization.deletion_action.fail": "This link is invalid or expired, or you are not the owner."
     }
   },
   "errors": {
@@ -122,5 +165,182 @@
       "description": "We could not reach OpenStream. Check your connection and try again.",
       "retry": "Try again"
     }
+  },
+  "common": {
+    "cancel": "Cancel"
+  },
+  "navigation": {
+    "workspace": "Main menu",
+    "dashboard": "Dashboard",
+    "settings": "Settings"
+  },
+  "organizations": {
+    "roles": {
+      "owner": "Owner",
+      "member": "Member"
+    },
+    "status": {
+      "pending_deletion": "Pending deletion"
+    },
+    "fields": {
+      "name": "Organization name",
+      "name_placeholder": "Acme Europe",
+      "slug": "Workspace URL",
+      "slug_placeholder": "acme-europe"
+    },
+    "gateway": {
+      "navigation_label": "Organizations"
+    },
+    "create": {
+      "title": "Create organization",
+      "form_title": "Organization details",
+      "form_description": "Choose the name and URL of this workspace.",
+      "submit": "Create organization",
+      "limit_title": "Membership limit reached",
+      "limit_description": "You already belong to {{count}} organizations. Leave one before creating another.",
+      "back_to_workspace": "Return to your workspace",
+      "slug_later": "You can change the workspace URL later in the organization settings."
+    },
+    "switcher": {
+      "select": "Select organization",
+      "no_current": "No current workspace",
+      "organizations": "Your organizations",
+      "create": "Create organization",
+      "deletes_on": "Deletes {{date}}",
+      "limit_reached": "{{count}}-membership limit reached"
+    },
+    "invitations": {
+      "title": "Inbox",
+      "inbox_title": "Inbox",
+      "tabs_label": "Inbox categories",
+      "general_tab": "General",
+      "invitations_tab": "Invitations",
+      "general_empty_title": "No notifications yet",
+      "general_empty_description": "General updates about your account and organizations will appear here.",
+      "pending_count": "{{count}} pending",
+      "view_inbox": "View inbox",
+      "notification_title": "You’re invited to join {{organization}}",
+      "expires": "Expires {{date}}",
+      "back_to_workspace": "Back to workspace",
+      "accepted": "You joined {{organization}}. The remaining invitations are still available.",
+      "open": "Open organization",
+      "error_title": "Invitations are unavailable",
+      "error_description": "We could not load this inbox. Try again in a moment.",
+      "mismatch_title": "This invitation belongs to another account",
+      "mismatch_description": "Sign in with the email address that received the invitation. Organization details stay hidden until the email matches.",
+      "sign_out_continue": "Sign out and continue",
+      "empty_title": "No pending invitations",
+      "empty_description": "There are no active invitations for your verified email.",
+      "create_organization": "Create an organization",
+      "accept": "Accept",
+      "decline": "Decline"
+    },
+    "settings": {
+      "eyebrow": "Organization settings",
+      "organization_tab": "Organization profile",
+      "team_tab": "Team",
+      "organization_title": "Organization profile",
+      "organization_description": "Manage the organization name and workspace URL.",
+      "team_title": "Team and invitations",
+      "team_description": "Review current members and manage access to this organization."
+    },
+    "profile": {
+      "title": "Organization profile",
+      "description": "These details identify the organization throughout OpenStream.",
+      "readonly_description": "Members can view organization details. Only the Owner can edit them.",
+      "save": "Save changes",
+      "slug_change_title": "Change the workspace URL?",
+      "slug_change_description": "Existing links using the current slug will stop working.",
+      "slug_change_warning": "The old URL becomes available for another organization immediately. OpenStream does not create a redirect.",
+      "confirm_slug_change": "Change URL"
+    },
+    "team": {
+      "members": "Current members",
+      "members_description": "The roster shows each member's name, email, and role.",
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "actions": "Actions",
+      "remove": "Remove",
+      "remove_dialog_title": "Remove this member?",
+      "remove_dialog_description": "{{name}} ({{email}}) will lose access immediately.",
+      "leave_title": "Leave this organization",
+      "leave_description": "Your access is revoked immediately and this frees one membership slot.",
+      "leave": "Leave organization",
+      "leave_dialog_title": "Leave organization?",
+      "leave_dialog_description": "You will immediately lose access to {{organization}}.",
+      "invitations": "Invitations",
+      "invitations_description": "Invite Members and manage pending or recently expired invitations.",
+      "invitations_empty": "No pending or expired invitations.",
+      "invite_email": "Email address",
+      "invite_email_placeholder": "teammate@company.com",
+      "invite": "Send invitation",
+      "status": "Status",
+      "expires": "Expires",
+      "pending": "Pending",
+      "expired": "Expired",
+      "resend": "Resend",
+      "cancel": "Cancel",
+      "error_title": "Team unavailable",
+      "error_description": "We could not load the organization roster."
+    },
+    "danger": {
+      "title": "Danger zone",
+      "description": "Sensitive changes take effect immediately or disable the organization.",
+      "transfer_title": "Transfer ownership",
+      "transfer_description": "Choose an existing Member. They become Owner immediately and you become a Member.",
+      "transfer_action": "Transfer ownership",
+      "transfer_dialog_title": "Transfer organization ownership",
+      "transfer_dialog_description": "Select the new Owner and type the exact organization name to confirm.",
+      "transfer_recipient": "New Owner",
+      "transfer_recipient_placeholder": "Choose a Member",
+      "confirm_name": "Type the exact organization name",
+      "transfer_warning": "The role change is atomic and does not require the recipient to accept.",
+      "transfer_confirm": "Transfer ownership",
+      "delete_title": "Delete organization",
+      "delete_description": "Disable the organization now and permanently delete every scoped record after four days.",
+      "delete_action": "Schedule deletion",
+      "delete_dialog_title": "Schedule permanent deletion",
+      "delete_dialog_description": "This action disables the organization immediately. Both confirmation values are case-sensitive.",
+      "delete_email_explanation": "The Owner receives an email with “Cancel deletion” and “Delete instantly” actions. Both links require the authenticated current Owner.",
+      "confirm_phrase": "Type “{{phrase}}”",
+      "delete_confirm": "Disable and schedule deletion",
+      "transfer_recipient_search_placeholder": "Search Members...",
+      "transfer_recipient_empty": "No Member found."
+    },
+    "pending": {
+      "title": "{{organization}} is pending deletion",
+      "description": "Normal organization use and membership changes are frozen during the four-day recovery window.",
+      "deadline": "Scheduled permanent deletion",
+      "restore_title": "Restore this organization",
+      "restore_description": "Canceling reactivates the workspace and invalidates both email action links.",
+      "cancel": "Cancel deletion",
+      "cancel_dialog_title": "Cancel scheduled deletion?",
+      "cancel_dialog_description": "{{organization}} will become active immediately and both email action links will be invalidated.",
+      "cancel_confirm": "Restore organization",
+      "owner_only": "Only the current Owner can cancel deletion."
+    },
+    "deletion_action": {
+      "title": "Organization deletion action",
+      "description": "Your authenticated Owner session and the single-use email token are both being verified.",
+      "pending": "Applying the requested action…",
+      "cancel_success_title": "Deletion canceled",
+      "cancel_success": "The organization is active again and both email links are now invalid.",
+      "delete_success_title": "Organization deleted",
+      "delete_success": "The organization and all organization-scoped data were permanently deleted.",
+      "error_title": "Action could not be completed",
+      "error_description": "The link is invalid, expired, already used, or this account is not the current Owner.",
+      "continue": "Continue to {{app}}"
+    },
+    "not_found": {
+      "title": "Organization unavailable",
+      "description": "This URL is no longer valid or your account does not have access.",
+      "continue": "Resolve another workspace"
+    }
+  },
+  "account": {
+    "menu": "Account menu",
+    "sign_out": "Sign out",
+    "signing_out": "Signing out..."
   }
 }

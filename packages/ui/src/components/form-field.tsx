@@ -3,6 +3,7 @@ import { match } from "ts-pattern"
 
 import { Label } from "@workspace/ui/components/label"
 import { PasswordField } from "@workspace/ui/components/password-field"
+import { SearchableSelect } from "@workspace/ui/components/searchable-select"
 import { TextField } from "@workspace/ui/components/text-field"
 
 import type { Control, FieldError, FieldValues, Path } from "react-hook-form"
@@ -36,6 +37,21 @@ function FormField<T extends FieldValues>({
                 placeholder={formField.placeholder}
                 invalid={isInvalid}
                 field={field}
+              />
+            ))
+            .with("select", () => (
+              <SearchableSelect
+                id={formField.name}
+                name={formField.name}
+                value={typeof field.value === "string" ? field.value : ""}
+                options={formField.options ?? []}
+                placeholder={formField.placeholder}
+                searchPlaceholder={formField.searchPlaceholder}
+                emptyMessage={formField.emptyMessage}
+                invalid={isInvalid}
+                onBlur={field.onBlur}
+                onValueChange={field.onChange}
+                triggerRef={field.ref}
               />
             ))
             .with("email", "text", undefined, (type) => (

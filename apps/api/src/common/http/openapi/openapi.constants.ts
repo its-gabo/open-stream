@@ -4,6 +4,7 @@ export const OPENAPI_DOCUMENT_PATH = "/openapi.json"
 
 export const OPENAPI_TAGS = {
   AUTH: "Auth",
+  ORGANIZATIONS: "Organizations",
 } as const
 
 export const OPENAPI_DOCUMENTATION: GenerateSpecOptions["documentation"] = {
@@ -17,6 +18,10 @@ export const OPENAPI_DOCUMENTATION: GenerateSpecOptions["documentation"] = {
     {
       name: OPENAPI_TAGS.AUTH,
       description: "Accounts, sessions and passwords",
+    },
+    {
+      name: OPENAPI_TAGS.ORGANIZATIONS,
+      description: "Organizations, their teams, invitations and deletion",
     },
   ],
 }

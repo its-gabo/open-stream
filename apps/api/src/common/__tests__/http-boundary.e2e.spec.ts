@@ -92,12 +92,31 @@ describe("HTTP boundary (e2e)", () => {
 
     expect(response.status).toBe(200)
     expect(operationIds.sort()).toEqual([
+      "acceptOrganizationInvitation",
+      "cancelOrganizationDeletion",
+      "cancelOrganizationDeletionByToken",
+      "cancelOrganizationInvitation",
+      "createOrganization",
+      "declineOrganizationInvitation",
+      "deleteOrganizationByToken",
+      "getOrganization",
+      "getOrganizationContext",
+      "getOrganizationTeam",
       "getSession",
+      "inviteOrganizationMember",
+      "leaveOrganization",
+      "removeOrganizationMember",
       "requestPasswordReset",
+      "resendOrganizationInvitation",
       "resetPassword",
+      "scheduleOrganizationDeletion",
+      "selectOrganization",
       "signInWithEmail",
       "signOut",
       "signUpWithEmail",
+      "suggestOrganizationSlug",
+      "transferOrganizationOwnership",
+      "updateOrganization",
       "verifyEmail",
     ])
   })

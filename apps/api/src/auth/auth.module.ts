@@ -20,6 +20,7 @@ export function createAuthModule(dependencies: AuthModuleDependencies) {
   const authEmailService = new AuthEmailService(config)
 
   return {
+    authTokenService,
     authCookieService: new AuthCookieService(config),
     authRegistrationService: new AuthRegistrationService(
       authRepository,

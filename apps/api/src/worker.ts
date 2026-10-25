@@ -5,6 +5,7 @@ const workerModule = createWorkerModule(readConfig())
 
 workerModule.outboxRelayService.startPolling()
 workerModule.outboxConsumerService.startConsuming()
+workerModule.organizationSweeperService.startSweeping()
 
 console.log("Outbox worker started")
 

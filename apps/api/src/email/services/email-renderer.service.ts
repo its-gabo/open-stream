@@ -1,4 +1,5 @@
 import {
+  OrganizationNotificationEmail,
   ResetPasswordEmail,
   WelcomeVerifyEmail,
   type EmailContent,
@@ -32,6 +33,10 @@ export class EmailRendererService {
       .with(
         { template: EMAIL_TEMPLATES.RESET_PASSWORD },
         ({ props }) => new ResetPasswordEmail(props)
+      )
+      .with(
+        { template: EMAIL_TEMPLATES.ORGANIZATION_NOTIFICATION },
+        ({ props }) => new OrganizationNotificationEmail(props)
       )
       .exhaustive()
   }

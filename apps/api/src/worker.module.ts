@@ -17,6 +17,7 @@ export function createWorkerModule(config: AppConfig) {
     ...appModule,
     ...outboxWorker,
     async close() {
+      await appModule.organizationSweeperService.stopSweeping()
       await outboxWorker.outboxRelayService.stopPolling()
       await outboxWorker.outboxConsumerService.stopConsuming()
       await outboxWorker.outboxQueue.close()

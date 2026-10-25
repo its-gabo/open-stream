@@ -10,6 +10,14 @@
  * ---------------------------------------------------------------
  */
 
+export interface AcceptOrganizationInvitationParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  invitationId: string
+}
+
 export type ApiEmptyData = object
 
 export interface ApiErrorResponse {
@@ -101,6 +109,325 @@ export interface AuthUser {
   name: string
 }
 
+export interface CancelOrganizationDeletionParams {
+  organizationSlug: string
+}
+
+export interface CancelOrganizationInvitationParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  invitationId: string
+  organizationSlug: string
+}
+
+export interface DeclineOrganizationInvitationParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  invitationId: string
+}
+
+export interface GetOrganizationParams {
+  organizationSlug: string
+}
+
+export interface GetOrganizationTeamParams {
+  organizationSlug: string
+}
+
+export interface InviteOrganizationMemberParams {
+  organizationSlug: string
+}
+
+export interface LeaveOrganizationParams {
+  organizationSlug: string
+}
+
+export interface OrganizationContext {
+  membershipLimit: {
+    /**
+     * @exclusiveMin 0
+     * @max 9007199254740991
+     */
+    maximum: number
+    reached: boolean
+    /**
+     * @min 0
+     * @max 9007199254740991
+     */
+    used: number
+  }
+  memberships: {
+    /**
+     * @format uuid
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+    membershipId: string
+    organization: OrganizationSummary
+    role: OrganizationRole
+  }[]
+  pendingInvitations: {
+    /**
+     * @format date-time
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+    expiresAt: string
+    /**
+     * @format uuid
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+    invitationId: string
+    organization: OrganizationSummary
+  }[]
+}
+
+export interface OrganizationContextSuccessResponse {
+  code: string
+  data: OrganizationContext
+  message: string
+}
+
+export interface OrganizationCreateBody {
+  /**
+   * @minLength 1
+   * @maxLength 120
+   */
+  name: string
+  slug: string
+}
+
+export interface OrganizationCreateSuccessResponse {
+  code: string
+  data: {
+    membership: OrganizationMembership
+    organization: OrganizationSummary
+  }
+  message: string
+}
+
+export interface OrganizationDeletionActionBody {
+  /** @pattern ^[a-f0-9]{64}$ */
+  token: string
+}
+
+export interface OrganizationDeletionScheduleBody {
+  /** @maxLength 100 */
+  confirmationPhrase: string
+  /** @maxLength 120 */
+  organizationName: string
+}
+
+export interface OrganizationDetail {
+  /**
+   * @format date-time
+   * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+   */
+  createdAt: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  id: string
+  name: string
+  scheduledDeletionAt: string | null
+  slug: string
+  status: OrganizationStatus
+  /**
+   * @format date-time
+   * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+   */
+  updatedAt: string
+}
+
+export interface OrganizationEmptySuccessResponse {
+  code: string
+  data: ApiEmptyData
+  message: string
+}
+
+export interface OrganizationGetSuccessResponse {
+  code: string
+  data: {
+    membership: OrganizationMembership
+    organization: OrganizationDetail
+  }
+  message: string
+}
+
+export interface OrganizationInvitationCreateBody {
+  email: string
+}
+
+export interface OrganizationInvitationSuccessResponse {
+  code: string
+  data: {
+    invitation: OrganizationTeamInvitation
+  }
+  message: string
+}
+
+export interface OrganizationMembership {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  membershipId: string
+  role: OrganizationRole
+}
+
+export interface OrganizationOwnershipTransferBody {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  membershipId: string
+  /** @maxLength 120 */
+  organizationName: string
+}
+
+export type OrganizationRole = "owner" | "member"
+
+export interface OrganizationSlugSuggestionSuccessResponse {
+  code: string
+  data: {
+    slug: string
+  }
+  message: string
+}
+
+export type OrganizationStatus = "active" | "pending_deletion"
+
+export interface OrganizationSummary {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  id: string
+  name: string
+  scheduledDeletionAt: string | null
+  slug: string
+  status: OrganizationStatus
+}
+
+export interface OrganizationSummarySuccessResponse {
+  code: string
+  data: {
+    organization: OrganizationSummary
+  }
+  message: string
+}
+
+export interface OrganizationTeam {
+  invitations: OrganizationTeamInvitation[]
+  members: OrganizationTeamMember[]
+}
+
+export interface OrganizationTeamInvitation {
+  /**
+   * @format date-time
+   * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+   */
+  createdAt: string
+  /**
+   * @format email
+   * @pattern ^(?:[A-Za-z0-9_'+\-]+\.)*[A-Za-z0-9_'+\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
+   */
+  email: string
+  /**
+   * @format date-time
+   * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+   */
+  expiresAt: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  invitationId: string
+  status: OrganizationTeamInvitationStatus
+}
+
+export type OrganizationTeamInvitationStatus = "pending" | "expired"
+
+export interface OrganizationTeamMember {
+  /**
+   * @format email
+   * @pattern ^(?:[A-Za-z0-9_'+\-]+\.)*[A-Za-z0-9_'+\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
+   */
+  email: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  membershipId: string
+  name: string
+  role: OrganizationRole
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  userId: string
+}
+
+export interface OrganizationTeamSuccessResponse {
+  code: string
+  data: OrganizationTeam
+  message: string
+}
+
+export interface OrganizationUpdateBody {
+  /**
+   * @minLength 1
+   * @maxLength 120
+   */
+  name?: string
+  slug?: string
+}
+
+export interface RemoveOrganizationMemberParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  membershipId: string
+  organizationSlug: string
+}
+
+export interface ResendOrganizationInvitationParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  invitationId: string
+  organizationSlug: string
+}
+
+export interface ScheduleOrganizationDeletionParams {
+  organizationSlug: string
+}
+
+export interface SelectOrganizationParams {
+  organizationSlug: string
+}
+
+export interface SuggestOrganizationSlugParams {
+  /**
+   * @minLength 1
+   * @maxLength 120
+   */
+  name: string
+}
+
+export interface TransferOrganizationOwnershipParams {
+  organizationSlug: string
+}
+
+export interface UpdateOrganizationParams {
+  organizationSlug: string
+}
+
 export interface VerifyEmailParams {
   /** @pattern ^[a-f0-9]{64}$ */
   token: string
@@ -152,13 +479,12 @@ export interface HttpResponse<
 
 type CancelToken = Symbol | string | number
 
-export enum ContentType {
-  Json = "application/json",
-  JsonApi = "application/vnd.api+json",
-  FormData = "multipart/form-data",
-  UrlEncoded = "application/x-www-form-urlencoded",
-  Text = "text/plain",
-}
+export type ContentType =
+  | "application/json"
+  | "application/vnd.api+json"
+  | "multipart/form-data"
+  | "application/x-www-form-urlencoded"
+  | "text/plain"
 
 export class HttpClient<SecurityDataType = unknown> {
   public baseUrl: string = ""
@@ -217,19 +543,19 @@ export class HttpClient<SecurityDataType = unknown> {
   }
 
   private contentFormatters: Record<ContentType, (input: any) => any> = {
-    [ContentType.Json]: (input: any) =>
+    ["application/json"]: (input: any) =>
       input !== null && (typeof input === "object" || typeof input === "string")
         ? JSON.stringify(input)
         : input,
-    [ContentType.JsonApi]: (input: any) =>
+    ["application/vnd.api+json"]: (input: any) =>
       input !== null && (typeof input === "object" || typeof input === "string")
         ? JSON.stringify(input)
         : input,
-    [ContentType.Text]: (input: any) =>
+    ["text/plain"]: (input: any) =>
       input !== null && typeof input !== "string"
         ? JSON.stringify(input)
         : input,
-    [ContentType.FormData]: (input: any) => {
+    ["multipart/form-data"]: (input: any) => {
       if (input instanceof FormData) {
         return input
       }
@@ -247,7 +573,8 @@ export class HttpClient<SecurityDataType = unknown> {
         return formData
       }, new FormData())
     },
-    [ContentType.UrlEncoded]: (input: any) => this.toQueryString(input),
+    ["application/x-www-form-urlencoded"]: (input: any) =>
+      this.toQueryString(input),
   }
 
   protected mergeRequestParams(
@@ -309,7 +636,7 @@ export class HttpClient<SecurityDataType = unknown> {
       {}
     const requestParams = this.mergeRequestParams(params, secureParams)
     const queryString = query && this.toQueryString(query)
-    const payloadFormatter = this.contentFormatters[type || ContentType.Json]
+    const payloadFormatter = this.contentFormatters[type || "application/json"]
     const responseFormat = format || requestParams.format
 
     return this.customFetch(
@@ -318,7 +645,7 @@ export class HttpClient<SecurityDataType = unknown> {
         ...requestParams,
         headers: {
           ...(requestParams.headers || {}),
-          ...(type && type !== ContentType.FormData
+          ...(type && type !== "multipart/form-data"
             ? { "Content-Type": type }
             : {}),
         },
@@ -386,7 +713,7 @@ export class OpenStreamApi<
         path: `/api/v1/auth/sign-up/email`,
         method: "POST",
         body: data,
-        type: ContentType.Json,
+        type: "application/json",
         format: "json",
         ...params,
       }),
@@ -404,7 +731,7 @@ export class OpenStreamApi<
         path: `/api/v1/auth/sign-in/email`,
         method: "POST",
         body: data,
-        type: ContentType.Json,
+        type: "application/json",
         format: "json",
         ...params,
       }),
@@ -457,7 +784,7 @@ export class OpenStreamApi<
         path: `/api/v1/auth/forgot-password`,
         method: "POST",
         body: data,
-        type: ContentType.Json,
+        type: "application/json",
         format: "json",
         ...params,
       }),
@@ -475,7 +802,7 @@ export class OpenStreamApi<
         path: `/api/v1/auth/reset-password`,
         method: "POST",
         body: data,
-        type: ContentType.Json,
+        type: "application/json",
         format: "json",
         ...params,
       }),
@@ -493,6 +820,386 @@ export class OpenStreamApi<
         path: `/api/v1/auth/verify-email`,
         method: "GET",
         query: query,
+        format: "json",
+        ...params,
+      }),
+  }
+  organizations = {
+    /**
+     * No description
+     *
+     * @tags Organizations
+     * @name GetOrganizationContext
+     * @summary List the user's organizations, pending invitations and membership limit
+     * @request GET:/api/v1/organizations/context
+     */
+    getOrganizationContext: (params: RequestParams = {}) =>
+      this.request<OrganizationContextSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/context`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Organizations
+     * @name SuggestOrganizationSlug
+     * @summary Suggest a free organization address for a name
+     * @request GET:/api/v1/organizations/slug-suggestion
+     */
+    suggestOrganizationSlug: (
+      query: SuggestOrganizationSlugParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<OrganizationSlugSuggestionSuccessResponse, ApiErrorResponse>(
+        {
+          path: `/api/v1/organizations/slug-suggestion`,
+          method: "GET",
+          query: query,
+          format: "json",
+          ...params,
+        }
+      ),
+
+    /**
+     * No description
+     *
+     * @tags Organizations
+     * @name CreateOrganization
+     * @summary Create an organization owned by the user
+     * @request POST:/api/v1/organizations
+     */
+    createOrganization: (
+      data: OrganizationCreateBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<OrganizationCreateSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations`,
+        method: "POST",
+        body: data,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Organizations
+     * @name GetOrganization
+     * @summary Read an organization and the user's membership in it
+     * @request GET:/api/v1/organizations/{organizationSlug}
+     */
+    getOrganization: (
+      { organizationSlug }: GetOrganizationParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<OrganizationGetSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Organizations
+     * @name UpdateOrganization
+     * @summary Rename the organization or change its address
+     * @request PATCH:/api/v1/organizations/{organizationSlug}
+     */
+    updateOrganization: (
+      { organizationSlug }: UpdateOrganizationParams,
+      data: OrganizationUpdateBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<OrganizationSummarySuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}`,
+        method: "PATCH",
+        body: data,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Organizations
+     * @name SelectOrganization
+     * @summary Remember the organization as the user's current one
+     * @request POST:/api/v1/organizations/{organizationSlug}/select
+     */
+    selectOrganization: (
+      { organizationSlug }: SelectOrganizationParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<OrganizationEmptySuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/select`,
+        method: "POST",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Organizations
+     * @name LeaveOrganization
+     * @summary Leave the organization (members only)
+     * @request DELETE:/api/v1/organizations/{organizationSlug}/members/me
+     */
+    leaveOrganization: (
+      { organizationSlug }: LeaveOrganizationParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<OrganizationEmptySuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/members/me`,
+        method: "DELETE",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Organizations
+     * @name TransferOrganizationOwnership
+     * @summary Make a member the owner; the current owner becomes a member
+     * @request POST:/api/v1/organizations/{organizationSlug}/ownership-transfer
+     */
+    transferOrganizationOwnership: (
+      { organizationSlug }: TransferOrganizationOwnershipParams,
+      data: OrganizationOwnershipTransferBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<OrganizationEmptySuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/ownership-transfer`,
+        method: "POST",
+        body: data,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Organizations
+     * @name GetOrganizationTeam
+     * @summary List members, and open invitations for the owner
+     * @request GET:/api/v1/organizations/{organizationSlug}/team
+     */
+    getOrganizationTeam: (
+      { organizationSlug }: GetOrganizationTeamParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<OrganizationTeamSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/team`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Organizations
+     * @name InviteOrganizationMember
+     * @summary Invite an email address to join as a member
+     * @request POST:/api/v1/organizations/{organizationSlug}/team/invitations
+     */
+    inviteOrganizationMember: (
+      { organizationSlug }: InviteOrganizationMemberParams,
+      data: OrganizationInvitationCreateBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<OrganizationInvitationSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/team/invitations`,
+        method: "POST",
+        body: data,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Organizations
+     * @name ResendOrganizationInvitation
+     * @summary Send a pending or expired invitation again with a new expiry
+     * @request POST:/api/v1/organizations/{organizationSlug}/team/invitations/{invitationId}/resend
+     */
+    resendOrganizationInvitation: (
+      { organizationSlug, invitationId }: ResendOrganizationInvitationParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<OrganizationInvitationSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/team/invitations/${invitationId}/resend`,
+        method: "POST",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Organizations
+     * @name CancelOrganizationInvitation
+     * @summary Cancel a pending or expired invitation
+     * @request DELETE:/api/v1/organizations/{organizationSlug}/team/invitations/{invitationId}
+     */
+    cancelOrganizationInvitation: (
+      { organizationSlug, invitationId }: CancelOrganizationInvitationParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<OrganizationEmptySuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/team/invitations/${invitationId}`,
+        method: "DELETE",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Organizations
+     * @name RemoveOrganizationMember
+     * @summary Remove a member from the organization
+     * @request DELETE:/api/v1/organizations/{organizationSlug}/team/members/{membershipId}
+     */
+    removeOrganizationMember: (
+      { organizationSlug, membershipId }: RemoveOrganizationMemberParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<OrganizationEmptySuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/team/members/${membershipId}`,
+        method: "DELETE",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Organizations
+     * @name ScheduleOrganizationDeletion
+     * @summary Disable the organization now and delete it after the grace period
+     * @request POST:/api/v1/organizations/{organizationSlug}/deletion
+     */
+    scheduleOrganizationDeletion: (
+      { organizationSlug }: ScheduleOrganizationDeletionParams,
+      data: OrganizationDeletionScheduleBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<OrganizationSummarySuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/deletion`,
+        method: "POST",
+        body: data,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Organizations
+     * @name CancelOrganizationDeletion
+     * @summary Cancel the scheduled deletion and reactivate the organization
+     * @request DELETE:/api/v1/organizations/{organizationSlug}/deletion
+     */
+    cancelOrganizationDeletion: (
+      { organizationSlug }: CancelOrganizationDeletionParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<OrganizationEmptySuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/deletion`,
+        method: "DELETE",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Organizations
+     * @name AcceptOrganizationInvitation
+     * @summary Join the organization of an invitation
+     * @request POST:/api/v1/invitations/{invitationId}/accept
+     */
+    acceptOrganizationInvitation: (
+      { invitationId }: AcceptOrganizationInvitationParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<OrganizationSummarySuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/invitations/${invitationId}/accept`,
+        method: "POST",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Organizations
+     * @name DeclineOrganizationInvitation
+     * @summary Decline an invitation
+     * @request POST:/api/v1/invitations/{invitationId}/decline
+     */
+    declineOrganizationInvitation: (
+      { invitationId }: DeclineOrganizationInvitationParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<OrganizationEmptySuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/invitations/${invitationId}/decline`,
+        method: "POST",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Organizations
+     * @name CancelOrganizationDeletionByToken
+     * @summary Cancel a scheduled deletion with the emailed link
+     * @request POST:/api/v1/organization-deletion-actions/cancel
+     */
+    cancelOrganizationDeletionByToken: (
+      data: OrganizationDeletionActionBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<OrganizationEmptySuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organization-deletion-actions/cancel`,
+        method: "POST",
+        body: data,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Organizations
+     * @name DeleteOrganizationByToken
+     * @summary Permanently delete a scheduled organization right away
+     * @request POST:/api/v1/organization-deletion-actions/delete
+     */
+    deleteOrganizationByToken: (
+      data: OrganizationDeletionActionBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<OrganizationEmptySuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organization-deletion-actions/delete`,
+        method: "POST",
+        body: data,
+        type: "application/json",
         format: "json",
         ...params,
       }),

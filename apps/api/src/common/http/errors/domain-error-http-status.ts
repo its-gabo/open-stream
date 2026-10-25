@@ -12,4 +12,6 @@ export const mapDomainErrorKindToHttpStatus = (
     .with(DOMAIN_ERROR_KINDS.UNAUTHENTICATED, () => 401 as const)
     .with(DOMAIN_ERROR_KINDS.FORBIDDEN, () => 403 as const)
     .with(DOMAIN_ERROR_KINDS.INVALID_INPUT, () => 422 as const)
+    .with(DOMAIN_ERROR_KINDS.GONE, () => 410 as const)
+    .with(DOMAIN_ERROR_KINDS.LOCKED, () => 423 as const)
     .exhaustive()

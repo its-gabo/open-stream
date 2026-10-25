@@ -6,6 +6,7 @@ import {
 import { authConfigSchema } from "./auth-config.schema"
 import { databaseConfigSchema } from "./database-config.schema"
 import { emailConfigSchema } from "./email-config.schema"
+import { organizationsConfigSchema } from "./organizations-config.schema"
 import { outboxConfigSchema } from "./outbox-config.schema"
 import { serverConfigSchema } from "./server-config.schema"
 
@@ -15,6 +16,7 @@ const environmentSchema = z.object({
   ...authConfigSchema.shape,
   ...emailConfigSchema.shape,
   ...outboxConfigSchema.shape,
+  ...organizationsConfigSchema.shape,
 })
 
 /**

@@ -1,4 +1,5 @@
 import type {
+  OrganizationNotificationEmailProps,
   ResetPasswordEmailProps,
   WelcomeVerifyEmailProps,
 } from "@workspace/email-templates"
@@ -17,6 +18,10 @@ export type SendEmailPayload = {
   | {
       template: typeof EMAIL_TEMPLATES.RESET_PASSWORD
       props: ResetPasswordEmailProps
+    }
+  | {
+      template: typeof EMAIL_TEMPLATES.ORGANIZATION_NOTIFICATION
+      props: OrganizationNotificationEmailProps
     }
 )
 

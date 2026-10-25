@@ -18,6 +18,20 @@
     },
     "verification_token": {
       "missing": "Brakuje tokenu weryfikacyjnego"
+    },
+    "organization_name": {
+      "required": "Wpisz nazwę organizacji",
+      "max_length": "Użyj maksymalnie {{max}} znaków"
+    },
+    "organization_slug": {
+      "invalid": "Użyj 2–63 małych liter, cyfr i pojedynczych myślników; niektóre adresy są zarezerwowane"
+    },
+    "organization_confirmation": {
+      "name_mismatch": "Wpisz dokładną nazwę organizacji",
+      "phrase_mismatch": "Wpisz dokładnie podaną frazę"
+    },
+    "organization_transfer": {
+      "recipient": "Wybierz nowego Właściciela"
     }
   },
   "pages": {
@@ -86,10 +100,8 @@
         "error_title": "Weryfikacja nie powiodła się"
       }
     },
-    "home": {
-      "title": "Witaj, {{name}}",
-      "signed_in_as": "Zalogowano jako {{email}}",
-      "sign_out": "Wyloguj się"
+    "placeholder": {
+      "description": "Ta przestrzeń jest gotowa na kolejny etap produktu. Funkcja pojawi się tutaj, gdy będzie dostępna."
     }
   },
   "api": {
@@ -99,7 +111,21 @@
       "auth.forgot_password.success": "Jeśli konto istnieje, wysłaliśmy wiadomość do resetu hasła.",
       "auth.reset_password.success": "Hasło zostało zresetowane.",
       "auth.verify_email.success": "Twoje konto zostało zweryfikowane. Możesz się teraz zalogować.",
-      "auth.sign_out.success": "Wylogowano pomyślnie."
+      "auth.sign_out.success": "Wylogowano pomyślnie.",
+      "organization.create.success": "Organizacja utworzona.",
+      "organization.update.success": "Organizacja zaktualizowana.",
+      "organization.leave.success": "Opuszczono organizację.",
+      "organization.ownership_transfer.success": "Własność przekazana.",
+      "organization.invitation.create.success": "Zaproszenie wysłane.",
+      "organization.invitation.resend.success": "Zaproszenie wysłane ponownie.",
+      "organization.invitation.cancel.success": "Zaproszenie anulowane.",
+      "organization.invitation.accept.success": "Witaj w organizacji!",
+      "organization.invitation.decline.success": "Zaproszenie odrzucone.",
+      "organization.member.remove.success": "Członek usunięty.",
+      "organization.deletion.schedule.success": "Zaplanowano usunięcie organizacji.",
+      "organization.deletion.cancel.success": "Anulowano usunięcie organizacji.",
+      "organization.deletion_action.cancel.success": "Anulowano usunięcie organizacji.",
+      "organization.deletion_action.delete.success": "Organizacja została trwale usunięta."
     },
     "error": {
       "fallback": "Ups, coś poszło nie tak..",
@@ -113,7 +139,24 @@
       "common.request_failed": "Nie udało się zrealizować żądania.",
       "common.internal_error": "Wystąpił błąd po naszej stronie. Spróbuj ponownie później.",
       "common.not_found": "Nie znaleziono żądanego zasobu.",
-      "common.origin_not_allowed": "Żądanie zostało zablokowane ze względów bezpieczeństwa. Odśwież stronę i spróbuj ponownie."
+      "common.origin_not_allowed": "Żądanie zostało zablokowane ze względów bezpieczeństwa. Odśwież stronę i spróbuj ponownie.",
+      "organization.not_found": "Nie znaleziono organizacji.",
+      "organization.pending_deletion": "Ta organizacja oczekuje na usunięcie.",
+      "organization.forbidden": "Tylko właściciel organizacji może to zrobić.",
+      "organization.membership_limit_reached": "Osiągnięto limit organizacji.",
+      "organization.slug_taken": "Ten adres jest już zajęty.",
+      "organization.confirmation_mismatch": "Potwierdzenie się nie zgadza.",
+      "organization.leave.fail": "Przekaż własność, zanim opuścisz organizację.",
+      "organization.ownership_transfer.fail": "Własność można przekazać tylko członkowi.",
+      "organization.member.remove.fail": "Nie znaleziono członka.",
+      "organization.invitation.already_member": "Ta osoba jest już członkiem.",
+      "organization.invitation.already_pending": "Na ten adres wysłano już oczekujące zaproszenie.",
+      "organization.invitation.not_found": "Nie znaleziono zaproszenia.",
+      "organization.invitation.unavailable": "To zaproszenie nie jest już dostępne.",
+      "organization.invitation.email_mismatch": "To zaproszenie wysłano na inny adres e-mail.",
+      "organization.invitation.expired": "To zaproszenie wygasło.",
+      "organization.deletion.cancel.fail": "Ta organizacja nie jest zaplanowana do usunięcia.",
+      "organization.deletion_action.fail": "Link jest nieprawidłowy lub wygasł albo nie jesteś właścicielem."
     }
   },
   "errors": {
@@ -122,5 +165,182 @@
       "description": "Nie udało się połączyć z OpenStream. Sprawdź połączenie i spróbuj ponownie.",
       "retry": "Spróbuj ponownie"
     }
+  },
+  "common": {
+    "cancel": "Anuluj"
+  },
+  "navigation": {
+    "workspace": "Menu główne",
+    "dashboard": "Panel",
+    "settings": "Ustawienia"
+  },
+  "organizations": {
+    "roles": {
+      "owner": "Właściciel",
+      "member": "Członek"
+    },
+    "status": {
+      "pending_deletion": "Oczekuje na usunięcie"
+    },
+    "fields": {
+      "name": "Nazwa organizacji",
+      "name_placeholder": "Acme Polska",
+      "slug": "Adres przestrzeni",
+      "slug_placeholder": "acme-polska"
+    },
+    "gateway": {
+      "navigation_label": "Organizacje"
+    },
+    "create": {
+      "title": "Utwórz organizację",
+      "form_title": "Dane organizacji",
+      "form_description": "Wybierz nazwę i adres URL tej przestrzeni.",
+      "submit": "Utwórz organizację",
+      "limit_title": "Osiągnięto limit członkostw",
+      "limit_description": "Należysz już do {{count}} organizacji. Opuść jedną z nich, zanim utworzysz następną.",
+      "back_to_workspace": "Wróć do przestrzeni",
+      "slug_later": "Adres przestrzeni możesz później zmienić w ustawieniach organizacji."
+    },
+    "switcher": {
+      "select": "Wybierz organizację",
+      "no_current": "Brak bieżącej przestrzeni",
+      "organizations": "Twoje organizacje",
+      "create": "Utwórz organizację",
+      "deletes_on": "Usunięcie: {{date}}",
+      "limit_reached": "Osiągnięto limit członkostw ({{count}})"
+    },
+    "invitations": {
+      "title": "Skrzynka",
+      "inbox_title": "Skrzynka",
+      "tabs_label": "Kategorie skrzynki",
+      "general_tab": "Ogólne",
+      "invitations_tab": "Zaproszenia",
+      "general_empty_title": "Brak powiadomień",
+      "general_empty_description": "Ogólne informacje dotyczące Twojego konta i organizacji pojawią się tutaj.",
+      "pending_count": "Oczekujące: {{count}}",
+      "view_inbox": "Otwórz skrzynkę",
+      "notification_title": "Masz zaproszenie do {{organization}}",
+      "expires": "Wygasa {{date}}",
+      "back_to_workspace": "Wróć do przestrzeni",
+      "accepted": "Dołączono do {{organization}}. Pozostałe zaproszenia są nadal dostępne.",
+      "open": "Otwórz organizację",
+      "error_title": "Zaproszenia są niedostępne",
+      "error_description": "Nie udało się wczytać skrzynki. Spróbuj ponownie za chwilę.",
+      "mismatch_title": "To zaproszenie należy do innego konta",
+      "mismatch_description": "Zaloguj się adresem e-mail, na który wysłano zaproszenie. Dane organizacji pozostają ukryte, dopóki adresy nie będą zgodne.",
+      "sign_out_continue": "Wyloguj się i kontynuuj",
+      "empty_title": "Brak oczekujących zaproszeń",
+      "empty_description": "Dla Twojego zweryfikowanego adresu nie ma aktywnych zaproszeń.",
+      "create_organization": "Utwórz organizację",
+      "accept": "Przyjmij",
+      "decline": "Odrzuć"
+    },
+    "settings": {
+      "eyebrow": "Ustawienia organizacji",
+      "organization_tab": "Profil organizacji",
+      "team_tab": "Zespół",
+      "organization_title": "Profil organizacji",
+      "organization_description": "Zarządzaj nazwą organizacji i adresem przestrzeni.",
+      "team_title": "Zespół i zaproszenia",
+      "team_description": "Przeglądaj członków i zarządzaj dostępem do organizacji."
+    },
+    "profile": {
+      "title": "Profil organizacji",
+      "description": "Te dane identyfikują organizację w całym OpenStream.",
+      "readonly_description": "Członkowie mogą przeglądać dane organizacji. Edytować może je tylko Właściciel.",
+      "save": "Zapisz zmiany",
+      "slug_change_title": "Zmienić adres przestrzeni?",
+      "slug_change_description": "Istniejące linki ze starym slugiem przestaną działać.",
+      "slug_change_warning": "Stary adres natychmiast stanie się dostępny dla innej organizacji. OpenStream nie utworzy przekierowania.",
+      "confirm_slug_change": "Zmień adres"
+    },
+    "team": {
+      "members": "Obecni członkowie",
+      "members_description": "Lista pokazuje imię i nazwisko, e-mail oraz rolę każdego członka.",
+      "name": "Imię i nazwisko",
+      "email": "E-mail",
+      "role": "Rola",
+      "actions": "Akcje",
+      "remove": "Usuń",
+      "remove_dialog_title": "Usunąć tego członka?",
+      "remove_dialog_description": "{{name}} ({{email}}) natychmiast utraci dostęp.",
+      "leave_title": "Opuść organizację",
+      "leave_description": "Dostęp zostanie natychmiast cofnięty, a jedno miejsce członkostwa zwolnione.",
+      "leave": "Opuść organizację",
+      "leave_dialog_title": "Opuścić organizację?",
+      "leave_dialog_description": "Natychmiast utracisz dostęp do {{organization}}.",
+      "invitations": "Zaproszenia",
+      "invitations_description": "Zapraszaj Członków oraz zarządzaj oczekującymi i niedawno wygasłymi zaproszeniami.",
+      "invitations_empty": "Brak oczekujących lub wygasłych zaproszeń.",
+      "invite_email": "Adres e-mail",
+      "invite_email_placeholder": "osoba@firma.pl",
+      "invite": "Wyślij zaproszenie",
+      "status": "Status",
+      "expires": "Wygasa",
+      "pending": "Oczekuje",
+      "expired": "Wygasło",
+      "resend": "Wyślij ponownie",
+      "cancel": "Anuluj",
+      "error_title": "Zespół jest niedostępny",
+      "error_description": "Nie udało się wczytać listy członków organizacji."
+    },
+    "danger": {
+      "title": "Strefa niebezpieczna",
+      "description": "Wrażliwe zmiany działają natychmiast lub wyłączają organizację.",
+      "transfer_title": "Przenieś własność",
+      "transfer_description": "Wybierz obecnego Członka. Natychmiast zostanie Właścicielem, a Ty Członkiem.",
+      "transfer_action": "Przenieś własność",
+      "transfer_dialog_title": "Przenieś własność organizacji",
+      "transfer_dialog_description": "Wybierz nowego Właściciela i wpisz dokładną nazwę organizacji.",
+      "transfer_recipient": "Nowy Właściciel",
+      "transfer_recipient_placeholder": "Wybierz Członka",
+      "confirm_name": "Wpisz dokładną nazwę organizacji",
+      "transfer_warning": "Zmiana ról jest atomowa i nie wymaga akceptacji odbiorcy.",
+      "transfer_confirm": "Przenieś własność",
+      "delete_title": "Usuń organizację",
+      "delete_description": "Wyłącz organizację teraz i trwale usuń wszystkie jej dane po czterech dniach.",
+      "delete_action": "Zaplanuj usunięcie",
+      "delete_dialog_title": "Zaplanuj trwałe usunięcie",
+      "delete_dialog_description": "Ta akcja natychmiast wyłączy organizację. Obie wartości potwierdzenia uwzględniają wielkość liter.",
+      "delete_email_explanation": "Właściciel otrzyma e-mail z akcjami „Anuluj usunięcie” i „Usuń natychmiast”. Oba linki wymagają sesji aktualnego Właściciela.",
+      "confirm_phrase": "Wpisz „{{phrase}}”",
+      "delete_confirm": "Wyłącz i zaplanuj usunięcie",
+      "transfer_recipient_search_placeholder": "Szukaj Członków...",
+      "transfer_recipient_empty": "Nie znaleziono Członka."
+    },
+    "pending": {
+      "title": "{{organization}} oczekuje na usunięcie",
+      "description": "Zwykłe użycie organizacji i zmiany członkostwa są zablokowane podczas czterodniowego okna odzyskiwania.",
+      "deadline": "Zaplanowane trwałe usunięcie",
+      "restore_title": "Przywróć organizację",
+      "restore_description": "Anulowanie ponownie aktywuje przestrzeń i unieważnia oba linki z e-maila.",
+      "cancel": "Anuluj usunięcie",
+      "cancel_dialog_title": "Anulować zaplanowane usunięcie?",
+      "cancel_dialog_description": "{{organization}} zostanie natychmiast ponownie aktywowana, a oba linki z e-maila zostaną unieważnione.",
+      "cancel_confirm": "Przywróć organizację",
+      "owner_only": "Tylko aktualny Właściciel może anulować usunięcie."
+    },
+    "deletion_action": {
+      "title": "Akcja usunięcia organizacji",
+      "description": "Weryfikujemy sesję Właściciela oraz jednorazowy token z e-maila.",
+      "pending": "Wykonywanie żądanej akcji…",
+      "cancel_success_title": "Usunięcie anulowane",
+      "cancel_success": "Organizacja jest ponownie aktywna, a oba linki z e-maila są nieważne.",
+      "delete_success_title": "Organizacja usunięta",
+      "delete_success": "Organizacja i wszystkie jej dane zostały trwale usunięte.",
+      "error_title": "Nie udało się wykonać akcji",
+      "error_description": "Link jest nieprawidłowy, wygasł, został już użyty albo to konto nie jest aktualnym Właścicielem.",
+      "continue": "Przejdź do {{app}}"
+    },
+    "not_found": {
+      "title": "Organizacja jest niedostępna",
+      "description": "Ten adres nie jest już prawidłowy albo Twoje konto nie ma dostępu.",
+      "continue": "Wybierz inną przestrzeń"
+    }
+  },
+  "account": {
+    "menu": "Menu konta",
+    "sign_out": "Wyloguj się",
+    "signing_out": "Wylogowywanie..."
   }
 }

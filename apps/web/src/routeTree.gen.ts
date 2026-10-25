@@ -12,11 +12,19 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as GuestRouteImport } from './routes/_guest'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedOrganizationSlugRouteImport } from './routes/_authenticated/$organizationSlug'
+import { Route as AuthenticatedInboxRouteImport } from './routes/_authenticated/inbox'
+import { Route as AuthenticatedOrganizationDeletionRouteImport } from './routes/_authenticated/organization-deletion'
 import { Route as GuestForgotPasswordRouteImport } from './routes/_guest/forgot-password'
 import { Route as GuestResetPasswordRouteImport } from './routes/_guest/reset-password'
 import { Route as GuestSignInRouteImport } from './routes/_guest/sign-in'
 import { Route as GuestSignUpRouteImport } from './routes/_guest/sign-up'
 import { Route as GuestVerifyEmailRouteImport } from './routes/_guest/verify-email'
+import { Route as AuthenticatedOrganizationSlugIndexRouteImport } from './routes/_authenticated/$organizationSlug/index'
+import { Route as AuthenticatedOrganizationsNewRouteImport } from './routes/_authenticated/organizations/new'
+import { Route as AuthenticatedOrganizationSlugSettingsIndexRouteImport } from './routes/_authenticated/$organizationSlug/settings/index'
+import { Route as AuthenticatedOrganizationSlugSettingsOrganizationRouteImport } from './routes/_authenticated/$organizationSlug/settings/organization'
+import { Route as AuthenticatedOrganizationSlugSettingsTeamRouteImport } from './routes/_authenticated/$organizationSlug/settings/team'
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
@@ -31,6 +39,23 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedOrganizationSlugRoute =
+  AuthenticatedOrganizationSlugRouteImport.update({
+    id: '/$organizationSlug',
+    path: '/$organizationSlug',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedInboxRoute = AuthenticatedInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedOrganizationDeletionRoute =
+  AuthenticatedOrganizationDeletionRouteImport.update({
+    id: '/organization-deletion',
+    path: '/organization-deletion',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const GuestForgotPasswordRoute = GuestForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
@@ -56,61 +81,137 @@ const GuestVerifyEmailRoute = GuestVerifyEmailRouteImport.update({
   path: '/verify-email',
   getParentRoute: () => GuestRoute,
 } as any)
+const AuthenticatedOrganizationSlugIndexRoute =
+  AuthenticatedOrganizationSlugIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedOrganizationSlugRoute,
+  } as any)
+const AuthenticatedOrganizationsNewRoute =
+  AuthenticatedOrganizationsNewRouteImport.update({
+    id: '/organizations/new',
+    path: '/organizations/new',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedOrganizationSlugSettingsIndexRoute =
+  AuthenticatedOrganizationSlugSettingsIndexRouteImport.update({
+    id: '/settings/',
+    path: '/settings/',
+    getParentRoute: () => AuthenticatedOrganizationSlugRoute,
+  } as any)
+const AuthenticatedOrganizationSlugSettingsOrganizationRoute =
+  AuthenticatedOrganizationSlugSettingsOrganizationRouteImport.update({
+    id: '/settings/organization',
+    path: '/settings/organization',
+    getParentRoute: () => AuthenticatedOrganizationSlugRoute,
+  } as any)
+const AuthenticatedOrganizationSlugSettingsTeamRoute =
+  AuthenticatedOrganizationSlugSettingsTeamRouteImport.update({
+    id: '/settings/team',
+    path: '/settings/team',
+    getParentRoute: () => AuthenticatedOrganizationSlugRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
+  '/$organizationSlug': typeof AuthenticatedOrganizationSlugRouteWithChildren
+  '/inbox': typeof AuthenticatedInboxRoute
+  '/organization-deletion': typeof AuthenticatedOrganizationDeletionRoute
   '/forgot-password': typeof GuestForgotPasswordRoute
   '/reset-password': typeof GuestResetPasswordRoute
   '/sign-in': typeof GuestSignInRoute
   '/sign-up': typeof GuestSignUpRoute
   '/verify-email': typeof GuestVerifyEmailRoute
+  '/organizations/new': typeof AuthenticatedOrganizationsNewRoute
+  '/$organizationSlug/': typeof AuthenticatedOrganizationSlugIndexRoute
+  '/$organizationSlug/settings/organization': typeof AuthenticatedOrganizationSlugSettingsOrganizationRoute
+  '/$organizationSlug/settings/team': typeof AuthenticatedOrganizationSlugSettingsTeamRoute
+  '/$organizationSlug/settings/': typeof AuthenticatedOrganizationSlugSettingsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof AuthenticatedIndexRoute
+  '/inbox': typeof AuthenticatedInboxRoute
+  '/organization-deletion': typeof AuthenticatedOrganizationDeletionRoute
   '/forgot-password': typeof GuestForgotPasswordRoute
   '/reset-password': typeof GuestResetPasswordRoute
   '/sign-in': typeof GuestSignInRoute
   '/sign-up': typeof GuestSignUpRoute
   '/verify-email': typeof GuestVerifyEmailRoute
+  '/organizations/new': typeof AuthenticatedOrganizationsNewRoute
+  '/$organizationSlug': typeof AuthenticatedOrganizationSlugIndexRoute
+  '/$organizationSlug/settings/organization': typeof AuthenticatedOrganizationSlugSettingsOrganizationRoute
+  '/$organizationSlug/settings/team': typeof AuthenticatedOrganizationSlugSettingsTeamRoute
+  '/$organizationSlug/settings': typeof AuthenticatedOrganizationSlugSettingsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/_guest': typeof GuestRouteWithChildren
+  '/_authenticated/$organizationSlug': typeof AuthenticatedOrganizationSlugRouteWithChildren
+  '/_authenticated/inbox': typeof AuthenticatedInboxRoute
+  '/_authenticated/organization-deletion': typeof AuthenticatedOrganizationDeletionRoute
   '/_guest/forgot-password': typeof GuestForgotPasswordRoute
   '/_guest/reset-password': typeof GuestResetPasswordRoute
   '/_guest/sign-in': typeof GuestSignInRoute
   '/_guest/sign-up': typeof GuestSignUpRoute
   '/_guest/verify-email': typeof GuestVerifyEmailRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/organizations/new': typeof AuthenticatedOrganizationsNewRoute
+  '/_authenticated/$organizationSlug/': typeof AuthenticatedOrganizationSlugIndexRoute
+  '/_authenticated/$organizationSlug/settings/organization': typeof AuthenticatedOrganizationSlugSettingsOrganizationRoute
+  '/_authenticated/$organizationSlug/settings/team': typeof AuthenticatedOrganizationSlugSettingsTeamRoute
+  '/_authenticated/$organizationSlug/settings/': typeof AuthenticatedOrganizationSlugSettingsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/$organizationSlug'
+    | '/inbox'
+    | '/organization-deletion'
     | '/forgot-password'
     | '/reset-password'
     | '/sign-in'
     | '/sign-up'
     | '/verify-email'
+    | '/organizations/new'
+    | '/$organizationSlug/'
+    | '/$organizationSlug/settings/organization'
+    | '/$organizationSlug/settings/team'
+    | '/$organizationSlug/settings/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/inbox'
+    | '/organization-deletion'
     | '/forgot-password'
     | '/reset-password'
     | '/sign-in'
     | '/sign-up'
     | '/verify-email'
+    | '/organizations/new'
+    | '/$organizationSlug'
+    | '/$organizationSlug/settings/organization'
+    | '/$organizationSlug/settings/team'
+    | '/$organizationSlug/settings'
   id:
     | '__root__'
     | '/_authenticated'
     | '/_guest'
+    | '/_authenticated/$organizationSlug'
+    | '/_authenticated/inbox'
+    | '/_authenticated/organization-deletion'
     | '/_guest/forgot-password'
     | '/_guest/reset-password'
     | '/_guest/sign-in'
     | '/_guest/sign-up'
     | '/_guest/verify-email'
     | '/_authenticated/'
+    | '/_authenticated/organizations/new'
+    | '/_authenticated/$organizationSlug/'
+    | '/_authenticated/$organizationSlug/settings/organization'
+    | '/_authenticated/$organizationSlug/settings/team'
+    | '/_authenticated/$organizationSlug/settings/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -139,6 +240,27 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/$organizationSlug': {
+      id: '/_authenticated/$organizationSlug'
+      path: '/$organizationSlug'
+      fullPath: '/$organizationSlug'
+      preLoaderRoute: typeof AuthenticatedOrganizationSlugRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/inbox': {
+      id: '/_authenticated/inbox'
+      path: '/inbox'
+      fullPath: '/inbox'
+      preLoaderRoute: typeof AuthenticatedInboxRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/organization-deletion': {
+      id: '/_authenticated/organization-deletion'
+      path: '/organization-deletion'
+      fullPath: '/organization-deletion'
+      preLoaderRoute: typeof AuthenticatedOrganizationDeletionRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_guest/forgot-password': {
@@ -176,15 +298,84 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GuestVerifyEmailRouteImport
       parentRoute: typeof GuestRoute
     }
+    '/_authenticated/$organizationSlug/': {
+      id: '/_authenticated/$organizationSlug/'
+      path: '/'
+      fullPath: '/$organizationSlug/'
+      preLoaderRoute: typeof AuthenticatedOrganizationSlugIndexRouteImport
+      parentRoute: typeof AuthenticatedOrganizationSlugRoute
+    }
+    '/_authenticated/organizations/new': {
+      id: '/_authenticated/organizations/new'
+      path: '/organizations/new'
+      fullPath: '/organizations/new'
+      preLoaderRoute: typeof AuthenticatedOrganizationsNewRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/$organizationSlug/settings/': {
+      id: '/_authenticated/$organizationSlug/settings/'
+      path: '/settings'
+      fullPath: '/$organizationSlug/settings/'
+      preLoaderRoute: typeof AuthenticatedOrganizationSlugSettingsIndexRouteImport
+      parentRoute: typeof AuthenticatedOrganizationSlugRoute
+    }
+    '/_authenticated/$organizationSlug/settings/organization': {
+      id: '/_authenticated/$organizationSlug/settings/organization'
+      path: '/settings/organization'
+      fullPath: '/$organizationSlug/settings/organization'
+      preLoaderRoute: typeof AuthenticatedOrganizationSlugSettingsOrganizationRouteImport
+      parentRoute: typeof AuthenticatedOrganizationSlugRoute
+    }
+    '/_authenticated/$organizationSlug/settings/team': {
+      id: '/_authenticated/$organizationSlug/settings/team'
+      path: '/settings/team'
+      fullPath: '/$organizationSlug/settings/team'
+      preLoaderRoute: typeof AuthenticatedOrganizationSlugSettingsTeamRouteImport
+      parentRoute: typeof AuthenticatedOrganizationSlugRoute
+    }
   }
 }
 
+interface AuthenticatedOrganizationSlugRouteChildren {
+  AuthenticatedOrganizationSlugIndexRoute: typeof AuthenticatedOrganizationSlugIndexRoute
+  AuthenticatedOrganizationSlugSettingsOrganizationRoute: typeof AuthenticatedOrganizationSlugSettingsOrganizationRoute
+  AuthenticatedOrganizationSlugSettingsTeamRoute: typeof AuthenticatedOrganizationSlugSettingsTeamRoute
+  AuthenticatedOrganizationSlugSettingsIndexRoute: typeof AuthenticatedOrganizationSlugSettingsIndexRoute
+}
+
+const AuthenticatedOrganizationSlugRouteChildren: AuthenticatedOrganizationSlugRouteChildren =
+  {
+    AuthenticatedOrganizationSlugIndexRoute:
+      AuthenticatedOrganizationSlugIndexRoute,
+    AuthenticatedOrganizationSlugSettingsOrganizationRoute:
+      AuthenticatedOrganizationSlugSettingsOrganizationRoute,
+    AuthenticatedOrganizationSlugSettingsTeamRoute:
+      AuthenticatedOrganizationSlugSettingsTeamRoute,
+    AuthenticatedOrganizationSlugSettingsIndexRoute:
+      AuthenticatedOrganizationSlugSettingsIndexRoute,
+  }
+
+const AuthenticatedOrganizationSlugRouteWithChildren =
+  AuthenticatedOrganizationSlugRoute._addFileChildren(
+    AuthenticatedOrganizationSlugRouteChildren,
+  )
+
 interface AuthenticatedRouteChildren {
+  AuthenticatedOrganizationSlugRoute: typeof AuthenticatedOrganizationSlugRouteWithChildren
+  AuthenticatedInboxRoute: typeof AuthenticatedInboxRoute
+  AuthenticatedOrganizationDeletionRoute: typeof AuthenticatedOrganizationDeletionRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedOrganizationsNewRoute: typeof AuthenticatedOrganizationsNewRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedOrganizationSlugRoute:
+    AuthenticatedOrganizationSlugRouteWithChildren,
+  AuthenticatedInboxRoute: AuthenticatedInboxRoute,
+  AuthenticatedOrganizationDeletionRoute:
+    AuthenticatedOrganizationDeletionRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedOrganizationsNewRoute: AuthenticatedOrganizationsNewRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

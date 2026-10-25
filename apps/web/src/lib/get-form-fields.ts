@@ -14,6 +14,9 @@ export const getFormFields = <T extends ZodRawShape>(
       placeholder: meta?.placeholder,
       type: meta?.type,
       autoComplete: meta?.autoComplete,
+      options: meta?.options,
+      searchPlaceholder: meta?.searchPlaceholder,
+      emptyMessage: meta?.emptyMessage,
     }
   })
 }

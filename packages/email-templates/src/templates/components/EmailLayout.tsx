@@ -21,23 +21,31 @@ import { EmailSeparator } from "./EmailSeparator"
 
 import type { ReactNode } from "react"
 
+type EmailAction = { label: string; url: string }
+
 type EmailLayoutProps = {
   preview: string
   icon: ReactNode
   title: string
   intro: ReactNode
-  action: { label: string; url: string }
-  notice: ReactNode
+  action?: EmailAction
+  /** Rendered as a plain link next to the main call to action. */
+  secondaryAction?: EmailAction
+  notice?: ReactNode
   footerNotice: ReactNode
 }
 
-/** Shared shell of every transactional email: brand, icon, call to action and fallback link. */
+/**
+ * Shared shell of every transactional email: brand, icon, optional call to
+ * action and its fallback link. Notifications without an action omit both.
+ */
 export function EmailLayout({
   preview,
   icon,
   title,
   intro,
   action,
+  secondaryAction,
   notice,
   footerNotice,
 }: EmailLayoutProps) {
@@ -126,76 +134,98 @@ export function EmailLayout({
                   {intro}
                 </Text>
 
-                <Section style={{ marginBottom: "20px" }}>
-                  <Button
-                    href={action.url}
+                {action && (
+                  <Section style={{ marginBottom: "20px" }}>
+                    <Button
+                      href={action.url}
+                      style={{
+                        backgroundColor: EMAIL_STYLES.primary,
+                        color: EMAIL_STYLES.primaryForeground,
+                        borderRadius: EMAIL_STYLES.radius,
+                        fontSize: "14px",
+                        fontWeight: 500,
+                        textDecoration: "none",
+                        padding: "12px 16px",
+                      }}
+                    >
+                      {action.label}
+                    </Button>
+                    {secondaryAction && (
+                      <Link
+                        href={secondaryAction.url}
+                        style={{
+                          color: EMAIL_STYLES.primary,
+                          fontSize: "14px",
+                          fontWeight: 500,
+                          marginLeft: "16px",
+                          textDecoration: "underline",
+                        }}
+                      >
+                        {secondaryAction.label}
+                      </Link>
+                    )}
+                  </Section>
+                )}
+
+                {(notice || action) && (
+                  <EmailSeparator
+                    color={EMAIL_STYLES.border}
+                    marginTop={24}
+                    marginBottom={24}
+                  />
+                )}
+
+                {notice && (
+                  <Section style={{ marginBottom: "18px" }}>
+                    <Text
+                      className="m-0"
+                      style={{
+                        color: EMAIL_STYLES.mutedForeground,
+                        fontSize: "13px",
+                        lineHeight: "1.6",
+                        fontWeight: 400,
+                      }}
+                    >
+                      {notice}
+                    </Text>
+                  </Section>
+                )}
+
+                {action && (
+                  <Section
+                    className="p-5"
                     style={{
-                      backgroundColor: EMAIL_STYLES.primary,
-                      color: EMAIL_STYLES.primaryForeground,
+                      backgroundColor: EMAIL_STYLES.muted,
                       borderRadius: EMAIL_STYLES.radius,
-                      fontSize: "14px",
-                      fontWeight: 500,
-                      textDecoration: "none",
-                      padding: "12px 16px",
                     }}
                   >
-                    {action.label}
-                  </Button>
-                </Section>
-
-                <EmailSeparator
-                  color={EMAIL_STYLES.border}
-                  marginTop={24}
-                  marginBottom={24}
-                />
-
-                <Section style={{ marginBottom: "18px" }}>
-                  <Text
-                    className="m-0"
-                    style={{
-                      color: EMAIL_STYLES.mutedForeground,
-                      fontSize: "13px",
-                      lineHeight: "1.6",
-                      fontWeight: 400,
-                    }}
-                  >
-                    {notice}
-                  </Text>
-                </Section>
-
-                <Section
-                  className="p-5"
-                  style={{
-                    backgroundColor: EMAIL_STYLES.muted,
-                    borderRadius: EMAIL_STYLES.radius,
-                  }}
-                >
-                  <Text
-                    className="m-0"
-                    style={{
-                      color: EMAIL_STYLES.mutedForeground,
-                      fontSize: "13px",
-                      lineHeight: "1.6",
-                      fontWeight: 300,
-                    }}
-                  >
-                    If the button above doesn&apos;t work, copy and paste this
-                    link into your browser:
-                  </Text>
-                  <Link
-                    href={action.url}
-                    className="mt-2 block break-all"
-                    style={{
-                      color: EMAIL_STYLES.primary,
-                      fontFamily: EMAIL_FONTS.MONO,
-                      fontSize: "12px",
-                      fontWeight: 400,
-                      textDecoration: "none",
-                    }}
-                  >
-                    {action.url}
-                  </Link>
-                </Section>
+                    <Text
+                      className="m-0"
+                      style={{
+                        color: EMAIL_STYLES.mutedForeground,
+                        fontSize: "13px",
+                        lineHeight: "1.6",
+                        fontWeight: 300,
+                      }}
+                    >
+                      If the button above doesn&apos;t work, copy and paste this
+                      link into your browser:
+                    </Text>
+                    <Link
+                      href={action.url}
+                      className="mt-2 block break-all"
+                      style={{
+                        color: EMAIL_STYLES.primary,
+                        fontFamily: EMAIL_FONTS.MONO,
+                        fontSize: "12px",
+                        fontWeight: 400,
+                        textDecoration: "none",
+                      }}
+                    >
+                      {action.url}
+                    </Link>
+                  </Section>
+                )}
               </Section>
 
               <EmailSeparator

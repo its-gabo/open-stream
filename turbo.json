@@ -8,17 +8,50 @@
       "outputs": ["dist/**"]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": [
+        "^lint",
+        "@workspace/shared#build",
+        "@workspace/email-templates#build"
+      ]
     },
     "format": {
       "dependsOn": ["^format"]
     },
     "typecheck": {
-      "dependsOn": ["^typecheck"]
+      "dependsOn": [
+        "^typecheck",
+        "@workspace/shared#build",
+        "@workspace/email-templates#build"
+      ]
+    },
+    "test": {
+      "cache": false,
+      "dependsOn": [
+        "@workspace/shared#build",
+        "@workspace/email-templates#build"
+      ]
     },
     "dev": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "dependsOn": [
+        "@workspace/shared#build",
+        "@workspace/email-templates#build"
+      ]
+    },
+    "dev:worker": {
+      "cache": false,
+      "persistent": true,
+      "dependsOn": [
+        "@workspace/shared#build",
+        "@workspace/email-templates#build"
+      ]
+    },
+    "@workspace/shared#build": {
+      "outputs": ["dist/**"]
+    },
+    "@workspace/email-templates#build": {
+      "outputs": ["dist/**"]
     }
   }
 }

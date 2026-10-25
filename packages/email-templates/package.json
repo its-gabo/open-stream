@@ -1,0 +1,38 @@
+{
+  "name": "@workspace/email-templates",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev:email": "email dev -p 3002 --dir ./src/templates",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@react-email/components": "1.0.12",
+    "lucide-react": "1.61.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@react-email/preview-server": "5.2.10",
+    "@types/node": "22",
+    "@types/react": "19",
+    "@types/react-dom": "19",
+    "react-email": "6.11.3",
+    "tsup": "8.5.1"
+  }
+}

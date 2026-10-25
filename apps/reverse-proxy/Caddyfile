@@ -1,0 +1,13 @@
+app.openstream.localhost {
+	handle /api/* {
+		reverse_proxy localhost:3001
+	}
+
+	handle {
+		reverse_proxy localhost:3000
+	}
+}
+
+mailbox.openstream.localhost {
+	reverse_proxy localhost:8025
+}

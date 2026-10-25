@@ -1,0 +1,2 @@
+[test]
+preload = ["./test/setup/test-database.setup.ts"]

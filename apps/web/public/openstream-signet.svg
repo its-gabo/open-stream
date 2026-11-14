@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="OS symbol">
+  <defs>
+    <mask id="os-cut" maskUnits="userSpaceOnUse" x="0" y="0" width="200" height="200">
+      <rect width="200" height="200" fill="#fff"/>
+      <g fill="#000" stroke="#000" stroke-width="14" stroke-linejoin="round">
+        <path d="M100 20 A40 40 0 0 0 100 100 Z"/>
+        <path d="M100 100 A40 40 0 0 1 100 180 Z"/>
+      </g>
+    </mask>
+  </defs>
+  <rect x="64" y="29" width="72" height="142" rx="36" fill="none" stroke="#16181D" stroke-width="18" mask="url(#os-cut)"/>
+  <g fill="#16181D">
+    <path d="M100 20 A40 40 0 0 0 100 100 Z"/>
+    <path d="M100 100 A40 40 0 0 1 100 180 Z"/>
+  </g>
+</svg>

@@ -1,5 +1,3 @@
-import { LockOpenIcon } from "lucide-react"
-
 import { EmailLayout } from "./components/EmailLayout"
 import { EMAIL_BRAND_NAME } from "./theme/email-styles"
 
@@ -19,7 +17,6 @@ export default function ResetPasswordEmail({
   return (
     <EmailLayout
       preview={`Reset your ${EMAIL_BRAND_NAME} password.`}
-      icon={<LockOpenIcon size={24} strokeWidth={2} />}
       title="Reset Your Password"
       intro={`Hi ${name}, we received a request to reset your password. Use the button below to set a new one.`}
       action={{ label: "Reset Password", url: resetUrl }}

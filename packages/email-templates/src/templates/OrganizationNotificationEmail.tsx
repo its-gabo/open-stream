@@ -1,13 +1,3 @@
-import {
-  CircleCheckIcon,
-  CrownIcon,
-  DoorOpenIcon,
-  Trash2Icon,
-  TriangleAlertIcon,
-  UserMinusIcon,
-  UserPlusIcon,
-} from "lucide-react"
-
 import { EmailLayout } from "./components/EmailLayout"
 import { EMAIL_BRAND_NAME } from "./theme/email-styles"
 
@@ -65,8 +55,6 @@ type OrganizationEmailContent = Omit<
   "footerNotice"
 >
 
-const ICON_PROPS = { size: 24, strokeWidth: 2 } as const
-
 const formatDeletionDate = (isoDate: string) =>
   `${new Intl.DateTimeFormat("en-US", {
     dateStyle: "long",
@@ -83,7 +71,6 @@ function getContent(
     case ORGANIZATION_EMAIL_KINDS.INVITATION:
       return {
         preview: `${props.inviterName} invited you to ${organizationName}.`,
-        icon: <UserPlusIcon {...ICON_PROPS} />,
         title: `Join ${organizationName}`,
         intro: `${props.inviterName} invited you to join ${organizationName} on ${EMAIL_BRAND_NAME}. Sign in or create an account with this email address to accept the invitation.`,
         action: { label: "Review Invitation", url: props.invitationUrl },
@@ -92,42 +79,36 @@ function getContent(
     case ORGANIZATION_EMAIL_KINDS.INVITATION_ACCEPTED:
       return {
         preview: `${props.memberName} joined ${organizationName}.`,
-        icon: <CircleCheckIcon {...ICON_PROPS} />,
         title: "Invitation Accepted",
         intro: `${props.memberName} accepted your invitation and is now a member of ${organizationName}.`,
       }
     case ORGANIZATION_EMAIL_KINDS.MEMBER_REMOVED:
       return {
         preview: `Your access to ${organizationName} was removed.`,
-        icon: <UserMinusIcon {...ICON_PROPS} />,
         title: "Organization Access Removed",
         intro: `The owner of ${organizationName} removed you from the organization. You no longer have access to it.`,
       }
     case ORGANIZATION_EMAIL_KINDS.MEMBER_LEFT:
       return {
         preview: `${props.memberName} left ${organizationName}.`,
-        icon: <DoorOpenIcon {...ICON_PROPS} />,
         title: "A Member Left",
         intro: `${props.memberName} left ${organizationName} and no longer has access to it.`,
       }
     case ORGANIZATION_EMAIL_KINDS.OWNERSHIP_RECEIVED:
       return {
         preview: `You are now the owner of ${organizationName}.`,
-        icon: <CrownIcon {...ICON_PROPS} />,
         title: "You Are Now the Owner",
         intro: `${props.previousOwnerName} transferred ownership of ${organizationName} to you. You can now manage its settings, team and deletion.`,
       }
     case ORGANIZATION_EMAIL_KINDS.OWNERSHIP_HANDED_OVER:
       return {
         preview: `${props.newOwnerName} now owns ${organizationName}.`,
-        icon: <CrownIcon {...ICON_PROPS} />,
         title: "Ownership Transferred",
         intro: `${props.newOwnerName} is now the owner of ${organizationName}. You remain a member of the organization.`,
       }
     case ORGANIZATION_EMAIL_KINDS.DELETION_SCHEDULED:
       return {
         preview: `${organizationName} is scheduled for deletion.`,
-        icon: <TriangleAlertIcon {...ICON_PROPS} />,
         title: "Organization Deletion Scheduled",
         intro: `${organizationName} is disabled now and will be permanently deleted on ${formatDeletionDate(props.scheduledFor)}. You can cancel the deletion or delete it right away.`,
         action: { label: "Cancel Deletion", url: props.cancelUrl },
@@ -138,14 +119,12 @@ function getContent(
     case ORGANIZATION_EMAIL_KINDS.DELETION_CANCELED:
       return {
         preview: `${organizationName} is active again.`,
-        icon: <CircleCheckIcon {...ICON_PROPS} />,
         title: "Organization Deletion Canceled",
         intro: `${organizationName} is active again. The links from the deletion email can no longer be used.`,
       }
     case ORGANIZATION_EMAIL_KINDS.DELETED:
       return {
         preview: `${organizationName} was permanently deleted.`,
-        icon: <Trash2Icon {...ICON_PROPS} />,
         title: "Organization Deleted",
         intro: `${organizationName} and all of its data have been permanently deleted.`,
       }

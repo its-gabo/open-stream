@@ -1,5 +1,3 @@
-import { MailCheckIcon } from "lucide-react"
-
 import { EmailLayout } from "./components/EmailLayout"
 import { EMAIL_BRAND_NAME } from "./theme/email-styles"
 
@@ -19,7 +17,6 @@ export default function WelcomeVerifyEmail({
   return (
     <EmailLayout
       preview={`Verify your ${EMAIL_BRAND_NAME} email address.`}
-      icon={<MailCheckIcon size={24} strokeWidth={2} />}
       title="Verify Your Email Address"
       intro={`Welcome, ${name}! Thank you for signing up for ${EMAIL_BRAND_NAME}. To complete your registration and start using your account, please verify your email address.`}
       action={{ label: "Verify Email Address", url: verificationUrl }}

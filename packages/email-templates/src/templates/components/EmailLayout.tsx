@@ -5,16 +5,20 @@ import {
   Head,
   Heading,
   Html,
+  Img,
   Link,
   Preview,
   Section,
   Tailwind,
   Text,
 } from "@react-email/components"
+import { useContext } from "react"
 
+import { EmailBrandContext } from "../theme/email-brand-context"
 import {
   EMAIL_BRAND_NAME,
   EMAIL_FONTS,
+  EMAIL_LOGO_SIZE,
   EMAIL_STYLES,
 } from "../theme/email-styles"
 import { EmailSeparator } from "./EmailSeparator"
@@ -25,7 +29,6 @@ type EmailAction = { label: string; url: string }
 
 type EmailLayoutProps = {
   preview: string
-  icon: ReactNode
   title: string
   intro: ReactNode
   action?: EmailAction
@@ -36,12 +39,11 @@ type EmailLayoutProps = {
 }
 
 /**
- * Shared shell of every transactional email: brand, icon, optional call to
+ * Shared shell of every transactional email: brand, optional call to
  * action and its fallback link. Notifications without an action omit both.
  */
 export function EmailLayout({
   preview,
-  icon,
   title,
   intro,
   action,
@@ -49,6 +51,8 @@ export function EmailLayout({
   notice,
   footerNotice,
 }: EmailLayoutProps) {
+  const { logoUrl } = useContext(EmailBrandContext)
+
   return (
     <Html>
       <Head>
@@ -74,38 +78,16 @@ export function EmailLayout({
           >
             <Section className="p-12">
               <Section className="mb-12">
-                <Heading
-                  className="m-0 tracking-tight"
-                  style={{
-                    fontFamily: EMAIL_FONTS.HEADING,
-                    color: EMAIL_STYLES.primary,
-                    fontSize: "28px",
-                    fontWeight: 700,
-                    lineHeight: "1.2",
-                  }}
-                >
-                  {EMAIL_BRAND_NAME}
-                </Heading>
+                <Img
+                  src={logoUrl}
+                  alt={EMAIL_BRAND_NAME}
+                  width={EMAIL_LOGO_SIZE.width}
+                  height={EMAIL_LOGO_SIZE.height}
+                  style={{ display: "block" }}
+                />
               </Section>
 
               <Section>
-                <Section style={{ marginBottom: "18px" }}>
-                  <div
-                    style={{
-                      width: "48px",
-                      height: "48px",
-                      borderRadius: "9999px",
-                      backgroundColor: EMAIL_STYLES.primarySoft,
-                      color: EMAIL_STYLES.primary,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    {icon}
-                  </div>
-                </Section>
-
                 <Heading
                   as="h2"
                   className="m-0"

@@ -7,7 +7,7 @@ type EmailSeparatorProps = {
 }
 
 export function EmailSeparator({
-  color = "#e4e4e7",
+  color = "#e5e5e5",
   marginTop = 0,
   marginBottom = 0,
 }: EmailSeparatorProps) {

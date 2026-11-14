@@ -1,7 +1,6 @@
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema"
 import { Button } from "@workspace/ui/components/button"
 import { FormFieldRenderer } from "@workspace/ui/components/form-field-renderer"
-import { InfoIcon } from "lucide-react"
 import { useEffect } from "react"
 import { useForm, useWatch } from "react-hook-form"
 import { useTranslation } from "react-i18next"
@@ -69,11 +68,7 @@ export function OrganizationCreateForm({
         errors={form.formState.errors}
         fields={getFormFields(schema)}
       />
-      <div className="flex items-start gap-2 rounded-lg border bg-muted/30 px-3 py-2.5 text-xs leading-5 text-muted-foreground">
-        <InfoIcon className="mt-0.5 size-4 shrink-0" />
-        <span>{t("organizations.create.slug_later")}</span>
-      </div>
-      <div className="flex justify-end border-t pt-5">
+      <div className="-mx-5 flex justify-end border-t px-5 pt-5 sm:-mx-6 sm:px-6">
         <Button type="submit" disabled={isCreatePending}>
           {t("organizations.create.submit")}
           <SubmitButtonIcon isPending={isCreatePending} />

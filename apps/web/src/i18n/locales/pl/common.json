@@ -198,8 +198,7 @@
       "submit": "Utwórz organizację",
       "limit_title": "Osiągnięto limit członkostw",
       "limit_description": "Należysz już do {{count}} organizacji. Opuść jedną z nich, zanim utworzysz następną.",
-      "back_to_workspace": "Wróć do przestrzeni",
-      "slug_later": "Adres przestrzeni możesz później zmienić w ustawieniach organizacji."
+      "back_to_workspace": "Wróć do przestrzeni"
     },
     "switcher": {
       "select": "Wybierz organizację",

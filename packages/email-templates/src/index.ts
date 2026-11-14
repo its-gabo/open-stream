@@ -4,11 +4,13 @@ import ResetPasswordEmailTemplate from "./templates/ResetPasswordEmail"
 import WelcomeVerifyEmailTemplate from "./templates/WelcomeVerifyEmail"
 
 export type { EmailContent } from "./email-content.types"
+export type { EmailBrand } from "./templates/theme/email-brand-context"
 export type { OrganizationNotificationEmailProps } from "./templates/OrganizationNotificationEmail"
 export type { ResetPasswordEmailProps } from "./templates/ResetPasswordEmail"
 export type { WelcomeVerifyEmailProps } from "./templates/WelcomeVerifyEmail"
 
 export { ORGANIZATION_EMAIL_KINDS } from "./templates/OrganizationNotificationEmail"
+export { EMAIL_LOGO_PATH } from "./templates/theme/email-styles"
 
 export const WelcomeVerifyEmail = emailTemplateFactory(
   WelcomeVerifyEmailTemplate

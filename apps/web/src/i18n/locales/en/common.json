@@ -198,8 +198,7 @@
       "submit": "Create organization",
       "limit_title": "Membership limit reached",
       "limit_description": "You already belong to {{count}} organizations. Leave one before creating another.",
-      "back_to_workspace": "Return to your workspace",
-      "slug_later": "You can change the workspace URL later in the organization settings."
+      "back_to_workspace": "Return to your workspace"
     },
     "switcher": {
       "select": "Select organization",

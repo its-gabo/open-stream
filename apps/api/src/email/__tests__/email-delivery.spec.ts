@@ -11,6 +11,8 @@ import {
 import type { EmailSenderService } from "../services/email-sender.service"
 import type { RenderedEmail, SendEmailPayload } from "../types/email.types"
 
+const EMAIL_BRAND = { logoUrl: "https://app.openstream.test/logo.png" }
+
 const RESET_URL = "https://app.openstream.test/reset-password?token=abc"
 
 const RESET_EMAIL: SendEmailPayload = {
@@ -36,7 +38,7 @@ describe("Email delivery", () => {
     const { sendEmail, sender } = createRecordingSender()
 
     await new EmailDeliveryService(
-      new EmailRendererService(),
+      new EmailRendererService(EMAIL_BRAND),
       sender
     ).deliverEmail(RESET_EMAIL)
 
@@ -45,6 +47,7 @@ describe("Email delivery", () => {
     expect(sentEmail.recipient).toBe(RESET_EMAIL.recipient)
     expect(sentEmail.subject).toBe(RESET_EMAIL.subject)
     expect(sentEmail.html).toContain(`href="${RESET_URL}"`)
+    expect(sentEmail.html).toContain(`src="${EMAIL_BRAND.logoUrl}"`)
     expect(sentEmail.text).toContain(RESET_URL)
     expect(sentEmail.text).toContain("expire in 30 minutes")
   })
@@ -53,7 +56,7 @@ describe("Email delivery", () => {
     const { sendEmail, sender } = createRecordingSender()
 
     await new EmailDeliveryService(
-      new EmailRendererService(),
+      new EmailRendererService(EMAIL_BRAND),
       sender
     ).deliverEmail({
       ...RESET_EMAIL,
@@ -73,7 +76,7 @@ describe("Email delivery", () => {
       const { sendEmail, sender } = createRecordingSender()
 
       await new EmailDeliveryService(
-        new EmailRendererService(),
+        new EmailRendererService(EMAIL_BRAND),
         sender
       ).deliverEmail({
         recipient: props.email,

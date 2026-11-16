@@ -1,6 +1,7 @@
-import { afterEach, beforeEach, describe, expect, it, spyOn } from "bun:test"
+import { afterEach, beforeEach, describe, expect, it } from "bun:test"
 
 import { createApiClient } from "../../../test/helpers/api-client"
+import { createLogCapture } from "../../../test/helpers/log-capture"
 import { TEST_WEB_ORIGIN, createTestApp } from "../../../test/helpers/test-app"
 import { HTTP_ERROR_RESPONSES } from "../http/errors/http-error.constants"
 import {
@@ -64,19 +65,28 @@ describe("HTTP boundary (e2e)", () => {
       expect(await response.json()).toEqual(HTTP_ERROR_RESPONSES.NOT_FOUND)
     })
 
-    it("hides unexpected failures behind a generic 500", async () => {
-      const consoleError = spyOn(console, "error").mockImplementation(() => {})
+    it("hides unexpected failures behind a generic 500 and logs them", async () => {
+      const logs = createLogCapture()
+      const failingApp = await createTestApp(
+        { LOG_LEVEL: "error" },
+        { logSink: logs.sink }
+      )
 
-      await testApp.close()
+      await failingApp.close()
 
-      const response = await createApiClient(testApp).post(
+      const response = await createApiClient(failingApp).post(
         "/auth/forgot-password",
         { email: "ada@example.test" }
       )
 
       expect(response.status).toBe(500)
       expect(await response.json()).toEqual(HTTP_ERROR_RESPONSES.INTERNAL_ERROR)
-      expect(consoleError).toHaveBeenCalled()
+      expect(
+        logs.linesWith("Unhandled error while processing request")
+      ).toHaveLength(1)
+      expect(
+        logs.linesWith("POST /api/v1/auth/forgot-password", "status=500")
+      ).toHaveLength(1)
     })
   })
 
@@ -96,27 +106,77 @@ describe("HTTP boundary (e2e)", () => {
       "cancelOrganizationDeletion",
       "cancelOrganizationDeletionByToken",
       "cancelOrganizationInvitation",
+      "createLibrary",
+      "createLibraryApiKey",
+      "createLibraryApiPlaybackUrl",
+      "createLibraryApiVideo",
       "createOrganization",
+      "createStorage",
+      "createVideo",
       "declineOrganizationInvitation",
+      "deleteLibraryApiKey",
+      "deleteLibraryApiVideo",
+      "deleteLibraryWebhook",
       "deleteOrganizationByToken",
+      "deleteStorage",
+      "deleteVideo",
+      "getLibrary",
+      "getLibraryApiAccess",
+      "getLibraryApiVideo",
+      "getLibraryApiVideoStatus",
+      "getLibraryEncoding",
+      "getLibraryStorage",
+      "getLibraryWebhook",
       "getOrganization",
       "getOrganizationContext",
       "getOrganizationTeam",
       "getSession",
+      "getStorage",
+      "getVideo",
+      "getVideoHlsFile",
+      "getVideoPoster",
+      "getVideoThumbnail",
       "inviteOrganizationMember",
       "leaveOrganization",
+      "listAccountActivity",
+      "listLibraries",
+      "listLibraryApiVideos",
+      "listLibraryWebhookDeliveries",
+      "listOrganizationActivity",
+      "listStorages",
+      "listVideos",
+      "readLibraryApiVideoHlsFile",
+      "readLibraryApiVideoThumbnail",
       "removeOrganizationMember",
+      "reprocessLibraryApiVideo",
+      "reprocessVideo",
       "requestPasswordReset",
+      "resendLibraryWebhookDelivery",
       "resendOrganizationInvitation",
       "resetPassword",
+      "rollLibraryApiKey",
+      "rollLibraryWebhookSecret",
+      "saveLibraryWebhook",
       "scheduleOrganizationDeletion",
       "selectOrganization",
+      "sendLibraryWebhookTest",
       "signInWithEmail",
       "signOut",
       "signUpWithEmail",
+      "streamLibraryApiVideo",
       "suggestOrganizationSlug",
+      "testSavedStorageConnection",
+      "testStorageConnection",
       "transferOrganizationOwnership",
+      "updateLibrary",
+      "updateLibraryApiKey",
+      "updateLibraryApiVideo",
+      "updateLibraryEncoding",
+      "updateLibrarySecurity",
+      "updateLibraryStorage",
       "updateOrganization",
+      "updateStorage",
+      "updateVideo",
       "verifyEmail",
     ])
   })

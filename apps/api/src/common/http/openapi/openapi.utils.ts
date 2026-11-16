@@ -27,3 +27,14 @@ export const OPENAPI_SPEC_OPTIONS: Partial<GenerateSpecOptions> = {
   documentation: OPENAPI_DOCUMENTATION,
   defaultValidationErrorResponse: false,
 }
+
+/** An OpenAPI response whose body is a file of `mediaType`. */
+export const describeBinaryResponse = (
+  description: string,
+  mediaType: string
+) => ({
+  description,
+  content: {
+    [mediaType]: { schema: { type: "string" as const, format: "binary" } },
+  },
+})

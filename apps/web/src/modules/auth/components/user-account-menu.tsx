@@ -11,7 +11,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu"
-import { ChevronDownIcon, LoaderCircleIcon, LogOutIcon } from "lucide-react"
+import {
+  ChevronDownIcon,
+  LoaderCircleIcon,
+  LogOutIcon,
+  ShieldCheckIcon,
+} from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 import { useAuthSignOutMutation } from "@/api/mutations/auth/useAuthSignOutMutation"
@@ -85,6 +90,12 @@ export function UserAccountMenu({
           </DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={() => void navigate({ to: "/account/activity" })}
+        >
+          <ShieldCheckIcon />
+          {t("account.activity")}
+        </DropdownMenuItem>
         <DropdownMenuItem
           variant="destructive"
           disabled={isSignOutPending}

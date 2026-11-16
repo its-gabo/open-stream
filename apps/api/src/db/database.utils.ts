@@ -18,3 +18,7 @@ export const isUniqueViolation = (error: unknown): boolean => {
     isUniqueViolation(parsed.data.cause)
   )
 }
+
+/** A case-insensitive `contains` pattern for ILIKE, with LIKE wildcards in the search matched literally. */
+export const toContainsPattern = (search: string) =>
+  `%${search.replace(/[\\%_]/g, (character) => `\\${character}`)}%`

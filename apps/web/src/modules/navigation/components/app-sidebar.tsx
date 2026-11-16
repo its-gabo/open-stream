@@ -1,4 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router"
+import { ORGANIZATION_ROLES } from "@workspace/shared"
 import {
   Sidebar,
   SidebarContent,
@@ -16,10 +17,11 @@ import {
 import { useTranslation } from "react-i18next"
 
 import { APP_NAVIGATION } from "../navigation.constants"
+import { isNavigationItemActive } from "../navigation.utils"
 import { AppBrand } from "./app-brand"
 
+import { useOrganizationQuery } from "@/api/queries/organizations/useOrganizationQuery"
 import { OrganizationSwitcher } from "@/modules/organizations/components/organization-switcher"
-import { buildOrganizationPath } from "@/modules/organizations/organizations.utils"
 
 type AppSidebarProps = {
   organizationSlug: string
@@ -29,6 +31,11 @@ export function AppSidebar({ organizationSlug }: AppSidebarProps) {
   const { t } = useTranslation()
   const { pathname } = useLocation()
   const { isMobile, setOpenMobile } = useSidebar()
+  const { data: organizationData } = useOrganizationQuery(organizationSlug)
+  const isOwner = organizationData?.membership.role === ORGANIZATION_ROLES.OWNER
+  const navigationItems = APP_NAVIGATION.filter(
+    (item) => isOwner || !item.isOwnerOnly
+  )
 
   const closeMobileSidebar = () => {
     if (isMobile) setOpenMobile(false)
@@ -45,28 +52,23 @@ export function AppSidebar({ organizationSlug }: AppSidebarProps) {
           <SidebarGroupLabel>{t("navigation.workspace")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="gap-1">
-              {APP_NAVIGATION.map((item) => {
-                const itemPath = buildOrganizationPath(
-                  organizationSlug,
-                  item.path
-                )
-
-                return (
-                  <SidebarMenuItem key={item.path}>
-                    <SidebarMenuButton
-                      render={
-                        <Link to={item.to} params={{ organizationSlug }} />
-                      }
-                      isActive={pathname === itemPath}
-                      tooltip={t(item.labelKey)}
-                      onClick={closeMobileSidebar}
-                    >
-                      <item.icon />
-                      <span>{t(item.labelKey)}</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                )
-              })}
+              {navigationItems.map((item) => (
+                <SidebarMenuItem key={item.path}>
+                  <SidebarMenuButton
+                    render={<Link to={item.to} params={{ organizationSlug }} />}
+                    isActive={isNavigationItemActive(
+                      pathname,
+                      organizationSlug,
+                      item.path
+                    )}
+                    tooltip={t(item.labelKey)}
+                    onClick={closeMobileSidebar}
+                  >
+                    <item.icon />
+                    <span>{t(item.labelKey)}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

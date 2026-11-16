@@ -1,6 +1,8 @@
 import { randomUUID } from "node:crypto"
 import { Factory } from "fishery"
 
+import { TEST_REQUEST_SOURCE, activityActorOf } from "../helpers/activity"
+
 import type { OrganizationCreateBody } from "../../src/organizations/dto/organizations.schemas"
 import type { TestApp } from "../helpers/test-app"
 import type { UserCredentials } from "./user.factory"
@@ -38,7 +40,13 @@ export const createOrganizationFactory = (testApp: TestApp) =>
     } = testApp.appModule
 
     const startSession = async (user: UserCredentials) =>
-      (await authSessionService.signInWithEmail(user, null)).session
+      (
+        await authSessionService.signInWithEmail(
+          user,
+          null,
+          TEST_REQUEST_SOURCE
+        )
+      ).session
 
     onCreate(async (organization) => {
       const { owner, members = [] } = transientParams
@@ -47,7 +55,11 @@ export const createOrganizationFactory = (testApp: TestApp) =>
 
       const ownerSession = await startSession(owner)
 
-      await organizationsService.createOrganization(ownerSession, organization)
+      await organizationsService.createOrganization(
+        ownerSession,
+        activityActorOf(ownerSession),
+        organization
+      )
 
       const access = await organizationsService.findAccess(
         ownerSession.userId,
@@ -58,11 +70,15 @@ export const createOrganizationFactory = (testApp: TestApp) =>
         const { invitation } = await organizationTeamService.inviteMember(
           access!,
           ownerSession,
+          activityActorOf(ownerSession),
           { email: member.email }
         )
 
+        const memberSession = await startSession(member)
+
         await organizationInvitationsService.acceptInvitation(
-          await startSession(member),
+          memberSession,
+          activityActorOf(memberSession),
           invitation.invitationId
         )
       }

@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto"
 import { Factory } from "fishery"
 
+import { TEST_REQUEST_SOURCE } from "../helpers/activity"
 import { latestEmailToken } from "../helpers/outbox"
 
 import type { TestApp } from "../helpers/test-app"
@@ -32,11 +33,15 @@ class UserFactory extends Factory<
 export const createUserFactory = (testApp: TestApp) =>
   UserFactory.define(({ onCreate, sequence, transientParams }) => {
     onCreate(async (user) => {
-      await testApp.appModule.authRegistrationService.signUpWithEmail(user)
+      await testApp.appModule.authRegistrationService.signUpWithEmail(
+        user,
+        TEST_REQUEST_SOURCE
+      )
 
       if (transientParams.verified ?? true) {
         await testApp.appModule.authEmailVerificationService.verifyEmail(
-          await latestEmailToken(testApp, user.email)
+          await latestEmailToken(testApp, user.email),
+          TEST_REQUEST_SOURCE
         )
       }
 

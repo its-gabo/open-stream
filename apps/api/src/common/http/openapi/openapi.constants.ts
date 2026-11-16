@@ -5,6 +5,14 @@ export const OPENAPI_DOCUMENT_PATH = "/openapi.json"
 export const OPENAPI_TAGS = {
   AUTH: "Auth",
   ORGANIZATIONS: "Organizations",
+  LIBRARIES: "Libraries",
+  STORAGES: "Storages",
+  LIBRARY_API: "Library API",
+  ACTIVITY: "Activity",
+} as const
+
+export const OPENAPI_SECURITY_SCHEMES = {
+  LIBRARY_API_KEY: "libraryApiKey",
 } as const
 
 export const OPENAPI_DOCUMENTATION: GenerateSpecOptions["documentation"] = {
@@ -23,7 +31,29 @@ export const OPENAPI_DOCUMENTATION: GenerateSpecOptions["documentation"] = {
       name: OPENAPI_TAGS.ORGANIZATIONS,
       description: "Organizations, their teams, invitations and deletion",
     },
+    {
+      name: OPENAPI_TAGS.LIBRARIES,
+      description: "Video libraries, their storage and videos",
+    },
+    {
+      name: OPENAPI_TAGS.STORAGES,
+      description: "S3-compatible buckets libraries store videos in",
+    },
+    {
+      name: OPENAPI_TAGS.LIBRARY_API,
+      description:
+        "Server-to-server access to one library with its API key: videos, tus uploads and playback",
+    },
   ],
+  components: {
+    securitySchemes: {
+      [OPENAPI_SECURITY_SCHEMES.LIBRARY_API_KEY]: {
+        type: "http",
+        scheme: "bearer",
+        description: "The library's API key, from the library's API settings",
+      },
+    },
+  },
 }
 
 export const API_ERROR_RESPONSE_DESCRIPTIONS = {

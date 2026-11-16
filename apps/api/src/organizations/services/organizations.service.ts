@@ -1,10 +1,14 @@
 import {
+  ACTIVITY_ACTIONS,
   ORGANIZATION_FIELD_LIMITS,
   ORGANIZATION_MEMBERSHIP_LIMIT,
   ORGANIZATION_ROLES,
   isValidOrganizationSlug,
   normalizeOrganizationSlug,
 } from "@workspace/shared"
+import type { ActivityLogService } from "../../activity/services/activity-log.service"
+import type { ActivityActor } from "../../activity/types/activity.types"
+import { diffActivityValues } from "../../activity/utils/activity-changes.utils"
 import type { AuthUserSession } from "../../auth/types/auth.types"
 import { DomainError } from "../../common/errors/domain-error"
 import { isUniqueViolation } from "../../db/database.utils"
@@ -20,15 +24,17 @@ import type {
 import { ORGANIZATION_ERRORS } from "../errors/organizations.errors"
 import type { OrganizationsRepository } from "../repository/organizations.repository"
 import type { OrganizationAccess } from "../types/organizations.types"
+import { organizationActivityResource } from "../utils/organization-activity.utils"
 import { lockActiveOrganization } from "../utils/organization-locks.utils"
-
-/** Numbered variants tried after the base slug, e.g. `acme-2` … `acme-99`. */
-const MAX_SLUG_SUFFIX = 99
-const FALLBACK_SLUG = "organization"
+import {
+  FALLBACK_SLUG,
+  MAX_SLUG_SUFFIX,
+} from "../constants/organizations.constants"
 
 export class OrganizationsService {
   constructor(
-    private readonly organizationsRepository: OrganizationsRepository
+    private readonly organizationsRepository: OrganizationsRepository,
+    private readonly activityLogService: ActivityLogService
   ) {}
 
   findAccess(userId: string, slug: string) {
@@ -92,6 +98,7 @@ export class OrganizationsService {
   /** Creates the organization with the caller as its owner and selects it. */
   async createOrganization(
     session: AuthUserSession,
+    actor: ActivityActor,
     input: OrganizationCreateBody
   ) {
     return this.organizationsRepository.transaction(async (transaction) => {
@@ -121,6 +128,17 @@ export class OrganizationsService {
           userId: session.userId,
           role: ORGANIZATION_ROLES.OWNER,
           lastSelectedAt: new Date(),
+        },
+        transaction
+      )
+
+      await this.activityLogService.recordActivity(
+        actor,
+        {
+          organizationId: organization.id,
+          action: ACTIVITY_ACTIONS.ORGANIZATION_CREATED,
+          resource: organizationActivityResource(organization),
+          after: { name: organization.name, slug: organization.slug },
         },
         transaction
       )
@@ -159,23 +177,37 @@ export class OrganizationsService {
 
   async updateOrganization(
     access: OrganizationAccess,
+    actor: ActivityActor,
     input: OrganizationUpdateBody
   ) {
     try {
       return await this.organizationsRepository.transaction(
         async (transaction) => {
-          await lockActiveOrganization(
+          const before = await lockActiveOrganization(
             this.organizationsRepository,
             access.organization.id,
             transaction
           )
-
           const organization =
             await this.organizationsRepository.updateOrganization(
               access.organization.id,
               input,
               transaction
             )
+
+          await this.activityLogService.recordActivity(
+            actor,
+            {
+              organizationId: access.organization.id,
+              action: ACTIVITY_ACTIONS.ORGANIZATION_UPDATED,
+              resource: organizationActivityResource(organization!),
+              ...diffActivityValues(
+                { name: before.name, slug: before.slug },
+                { name: organization!.name, slug: organization!.slug }
+              ),
+            },
+            transaction
+          )
 
           return {
             organization: toOrganizationSummaryDto({

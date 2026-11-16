@@ -1,3 +1,7 @@
+import { ACTIVITY_ACTIONS } from "@workspace/shared"
+import type { ActivityLogService } from "../../activity/services/activity-log.service"
+import type { ActivityRequestSource } from "../../activity/types/activity.types"
+import { activityActorOfUser } from "../../activity/utils/activity-actor.utils"
 import { DomainError } from "../../common/errors/domain-error"
 import { HOUR_MS } from "../../common/time/time.constants"
 import type { AppConfig } from "../../config/app.config"
@@ -10,6 +14,7 @@ import type { AuthRepository } from "../repository/auth.repository"
 import type { AuthActionLinkService } from "./auth-action-link.service"
 import type { AuthEmailService } from "./auth-email.service"
 import type { AuthPasswordService } from "./auth-password.service"
+import { accountActivityResource } from "../utils/auth-activity.utils"
 import type { AuthTokenService } from "./auth-token.service"
 
 export class AuthRegistrationService {
@@ -20,11 +25,12 @@ export class AuthRegistrationService {
     private readonly authTokenService: AuthTokenService,
     private readonly authActionLinkService: AuthActionLinkService,
     private readonly authEmailService: AuthEmailService,
+    private readonly activityLogService: ActivityLogService,
     private readonly config: AppConfig
   ) {}
 
   /** Creates an unverified account and queues the verification email in the same transaction. */
-  async signUpWithEmail(input: AuthSignUpBody) {
+  async signUpWithEmail(input: AuthSignUpBody, source: ActivityRequestSource) {
     const passwordHash = await this.authPasswordService.hashPassword(
       input.password
     )
@@ -60,6 +66,17 @@ export class AuthRegistrationService {
       await this.outboxService.publishMessage(
         OUTBOX_MESSAGE_TYPES.SEND_EMAIL,
         welcomeEmail,
+        transaction
+      )
+      await this.activityLogService.recordActivity(
+        activityActorOfUser({ userId: user.id, ...user }, source),
+        {
+          organizationId: null,
+          accountUserId: user.id,
+          action: ACTIVITY_ACTIONS.ACCOUNT_SIGNED_UP,
+          resource: accountActivityResource(user),
+          after: { name: user.name, email: user.email },
+        },
         transaction
       )
     })

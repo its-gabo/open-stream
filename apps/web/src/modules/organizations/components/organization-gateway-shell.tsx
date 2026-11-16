@@ -25,7 +25,7 @@ import { AppHeaderActions } from "@/modules/navigation/components/app-header-act
 import { useSidebarStore } from "@/modules/navigation/navigation.store"
 
 type OrganizationGatewayShellProps = {
-  activePage: "inbox" | "new-organization"
+  activePage: "inbox" | "new-organization" | "account-activity"
   children: ReactNode
   hasMemberships: boolean
   preserveDestinationOnSignOut?: boolean
@@ -88,7 +88,7 @@ export function OrganizationGatewayShell({
         <SidebarRail />
       </Sidebar>
 
-      <SidebarInset className="bg-slate-50/70">
+      <SidebarInset className="h-svh bg-slate-50/70">
         <header className="sticky top-0 z-10 flex h-10 shrink-0 items-center gap-2 border-b bg-background/90 px-2 backdrop-blur">
           <SidebarTrigger />
           <Separator orientation="vertical" className="mr-2 h-full" />
@@ -99,8 +99,12 @@ export function OrganizationGatewayShell({
             preserveDestinationOnSignOut={preserveDestinationOnSignOut}
           />
         </header>
-        <div className="flex-1 px-4 py-6 sm:px-6 lg:px-10 lg:py-8">
-          <div className="mx-auto w-full max-w-5xl">{children}</div>
+        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+          <div className="flex flex-1 flex-col px-4 py-6 has-data-[slot=table-scroll-area]:min-h-0 sm:px-6 lg:px-10 lg:py-8">
+            <div className="mx-auto flex w-full max-w-5xl flex-col has-data-[slot=table-scroll-area]:min-h-0">
+              {children}
+            </div>
+          </div>
         </div>
       </SidebarInset>
     </SidebarProvider>

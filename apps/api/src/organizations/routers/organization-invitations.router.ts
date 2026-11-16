@@ -42,6 +42,7 @@ export function createOrganizationInvitationsRouter(
       async (c) => {
         const accepted = await organizationInvitationsService.acceptInvitation(
           c.get("authSession"),
+          c.get("activityActor"),
           c.req.valid("param").invitationId
         )
 
@@ -74,6 +75,7 @@ export function createOrganizationInvitationsRouter(
       async (c) => {
         await organizationInvitationsService.declineInvitation(
           c.get("authSession"),
+          c.get("activityActor"),
           c.req.valid("param").invitationId
         )
 

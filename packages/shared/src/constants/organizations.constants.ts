@@ -34,6 +34,7 @@ export const ORGANIZATION_SLUG_PATTERN =
 
 /** Top-level web app paths and API path segments an organization slug would shadow. */
 export const RESERVED_ORGANIZATION_SLUGS: ReadonlySet<string> = new Set([
+  "account",
   "api",
   "context",
   "forgot-password",

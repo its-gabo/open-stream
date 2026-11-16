@@ -1,3 +1,5 @@
+import type { ActivityLogService } from "../../activity/services/activity-log.service"
+import type { ActivityActor } from "../../activity/types/activity.types"
 import type { Database } from "../../db/database.types"
 import type { OutboxService } from "../../outbox/services/outbox.service"
 import type { AppConfig } from "../../config/app.config"
@@ -24,6 +26,7 @@ export type AuthModuleDependencies = {
   db: Database
   config: AppConfig
   outboxService: OutboxService
+  activityLogService: ActivityLogService
 }
 
 export type AuthPreparedToken = {
@@ -53,5 +56,7 @@ export type AuthResetPasswordEmailPayload = {
 export type AuthenticatedEnv = {
   Variables: {
     authSession: AuthUserSession
+    /** The member, for the organization's activity log. */
+    activityActor: ActivityActor
   }
 }

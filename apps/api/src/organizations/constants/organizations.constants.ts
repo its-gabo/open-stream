@@ -29,3 +29,9 @@ export const ORGANIZATION_EMAIL_SUBJECTS = {
   DELETION_CANCELED: "OpenStream organization deletion canceled",
   DELETED: "OpenStream organization permanently deleted",
 } as const
+
+/** Numbered variants tried after the base slug, e.g. `acme-2` … `acme-99`. */
+export const MAX_SLUG_SUFFIX = 99
+
+/** Suggested when a name has nothing usable in a slug. */
+export const FALLBACK_SLUG = "organization"

@@ -23,9 +23,10 @@ import { AppHeaderActions } from "@/modules/navigation/components/app-header-act
 import { AppSidebar } from "@/modules/navigation/components/app-sidebar"
 import { APP_NAVIGATION } from "@/modules/navigation/navigation.constants"
 import { useSidebarStore } from "@/modules/navigation/navigation.store"
+import { isNavigationItemActive } from "@/modules/navigation/navigation.utils"
+import { VideoUploadsPanel } from "@/modules/libraries/components/video-uploads-panel"
 import { OrganizationPendingDeletionScreen } from "@/modules/organizations/components/organization-pending-deletion-screen"
 import { organizationQueryKey } from "@/modules/organizations/organizations.query-keys"
-import { buildOrganizationPath } from "@/modules/organizations/organizations.utils"
 
 export const Route = createFileRoute("/_authenticated/$organizationSlug")({
   component: OrganizationLayoutRoute,
@@ -42,14 +43,9 @@ function OrganizationLayoutRoute() {
   const isSidebarOpen = useSidebarStore((state) => state.isOpen)
   const setIsSidebarOpen = useSidebarStore((state) => state.setIsOpen)
 
-  const settingsPath = buildOrganizationPath(organizationSlug, "settings/")
-  const currentItem =
-    APP_NAVIGATION.find(
-      (item) => buildOrganizationPath(organizationSlug, item.path) === pathname
-    ) ??
-    (pathname.startsWith(settingsPath)
-      ? APP_NAVIGATION.find((item) => item.path.startsWith("settings/"))
-      : undefined)
+  const currentItem = APP_NAVIGATION.find((item) =>
+    isNavigationItemActive(pathname, organizationSlug, item.path)
+  )
 
   const handleResolveOrganization = () => {
     queryClient.removeQueries({
@@ -63,7 +59,7 @@ function OrganizationLayoutRoute() {
   return (
     <SidebarProvider open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
       <AppSidebar organizationSlug={organizationSlug} />
-      <SidebarInset className="bg-slate-50/70">
+      <SidebarInset className="h-svh bg-slate-50/70">
         <header className="sticky top-0 z-10 flex h-10 shrink-0 items-center gap-2 border-b bg-background/90 px-2 backdrop-blur">
           <SidebarTrigger />
           <Separator orientation="vertical" className="mr-2 h-full" />
@@ -72,7 +68,7 @@ function OrganizationLayoutRoute() {
           </p>
           <AppHeaderActions />
         </header>
-        <div className="flex flex-1 flex-col">
+        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
           {match({ isOrganizationPending, organizationData: data })
             .with({ isOrganizationPending: true }, () => (
               <div className="space-y-4 p-6 lg:p-10">
@@ -114,6 +110,7 @@ function OrganizationLayoutRoute() {
               <Outlet />
             ))}
         </div>
+        <VideoUploadsPanel organizationSlug={organizationSlug} />
       </SidebarInset>
     </SidebarProvider>
   )

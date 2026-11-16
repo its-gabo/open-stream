@@ -14,7 +14,8 @@ import type {
 export function createOutboxWorkerModule(
   dependencies: OutboxWorkerModuleDependencies
 ) {
-  const { config, outboxRepository, outboxMessageHandlers } = dependencies
+  const { config, logger, outboxRepository, outboxMessageHandlers } =
+    dependencies
 
   const outboxQueue = new Queue<OutboxMessagePayload>(OUTBOX_QUEUE_NAME, {
     connection: { url: config.REDIS_URL, enableOfflineQueue: false },
@@ -31,10 +32,12 @@ export function createOutboxWorkerModule(
     outboxRelayService: new OutboxRelayService(
       outboxRepository,
       outboxQueue,
+      logger.child("outbox"),
       config
     ),
     outboxConsumerService: new OutboxConsumerService(
       outboxMessageHandlers,
+      logger.child("outbox"),
       config
     ),
   }

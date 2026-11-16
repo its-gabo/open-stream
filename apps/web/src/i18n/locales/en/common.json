@@ -32,6 +32,44 @@
     },
     "organization_transfer": {
       "recipient": "Choose the new Owner"
+    },
+    "library_name": {
+      "required": "Enter a library name.",
+      "max_length": "Use at most {{max}} characters."
+    },
+    "video_title": {
+      "max_length": "Use at most {{max}} characters."
+    },
+    "storage": {
+      "endpoint": "Enter the full URL of the S3 endpoint, starting with https://.",
+      "region": "Enter the bucket's region.",
+      "bucket": "Use 3–63 lowercase letters, digits, dots or hyphens.",
+      "path_template": "Use only the listed variables, include {videoId}, and separate folders with /.",
+      "access_key_id": "Enter the access key ID.",
+      "secret_access_key": "Enter the secret access key.",
+      "name": "Enter a storage name.",
+      "name_max_length": "Use at most {{max}} characters.",
+      "credentials": "Enter the access key ID and the secret access key.",
+      "credentials_pair": "Enter both keys to replace them, or leave both empty to keep the saved ones."
+    },
+    "playback_hosts": {
+      "invalid": "Enter a host like example.com or *.example.com, without https:// or a path.",
+      "too_many": "Use at most {{max}} hosts.",
+      "duplicate": "This site is already listed."
+    },
+    "api_key_name": {
+      "required": "Enter a name for the key.",
+      "max_length": "Use at most {{max}} characters."
+    },
+    "api_key_scopes": {
+      "required": "Choose at least one permission."
+    },
+    "transcode_qualities": {
+      "required": "Choose at least one quality."
+    },
+    "webhook_url": {
+      "required": "Enter the URL to send events to",
+      "invalid": "Enter a full http:// or https:// URL without a username or password"
     }
   },
   "pages": {
@@ -125,7 +163,30 @@
       "organization.deletion.schedule.success": "Organization deletion scheduled.",
       "organization.deletion.cancel.success": "Organization deletion canceled.",
       "organization.deletion_action.cancel.success": "Organization deletion canceled.",
-      "organization.deletion_action.delete.success": "Organization permanently deleted."
+      "organization.deletion_action.delete.success": "Organization permanently deleted.",
+      "library.create.success": "Library created.",
+      "library.update.success": "Library updated.",
+      "library.storage.update.success": "Library storage changed.",
+      "video.delete.success": "Video deleted.",
+      "storage.create.success": "Storage created.",
+      "storage.update.success": "Storage updated.",
+      "storage.delete.success": "Storage deleted.",
+      "library.api_key.create.success": "API key created.",
+      "library.api_key.delete.success": "API key revoked.",
+      "library.security.update.success": "Security settings saved.",
+      "library.api_key.update.success": "API key updated.",
+      "library.api_key.roll.success": "API key has a new secret.",
+      "library.encoding.update.success": "Transcoding qualities saved.",
+      "video.reprocess.success": "The video will be processed again.",
+      "library.webhook.get.success": "Webhook fetched.",
+      "library.webhook.save.success": "Webhook saved.",
+      "library.webhook.delete.success": "Webhook removed.",
+      "library.webhook.secret_roll.success": "Signing secret replaced.",
+      "library.webhook.test.success": "Test event queued. It shows up below once it is sent.",
+      "library.webhook.delivery_list.success": "Deliveries fetched.",
+      "library.webhook.delivery_resend.success": "Delivery queued again.",
+      "video.status.get.success": "Video status fetched.",
+      "activity.list.success": "Activity fetched."
     },
     "error": {
       "fallback": "Oops something went wrong..",
@@ -156,7 +217,38 @@
       "organization.invitation.email_mismatch": "This invitation was sent to another email address.",
       "organization.invitation.expired": "This invitation has expired.",
       "organization.deletion.cancel.fail": "This organization is not scheduled for deletion.",
-      "organization.deletion_action.fail": "This link is invalid or expired, or you are not the owner."
+      "organization.deletion_action.fail": "This link is invalid or expired, or you are not the owner.",
+      "library.not_found": "The library could not be found.",
+      "library.storage.locked": "This library already stores videos, so its storage cannot change.",
+      "library.storage.changed": "The library storage changed meanwhile. Please try again.",
+      "library.storage.unavailable": "The video storage is unavailable. Please try again later.",
+      "video.not_found": "The video could not be found.",
+      "video.upload.already_uploaded": "This video already has a file.",
+      "video.upload.not_found": "The upload could not be found. Please start it again.",
+      "video.upload.unsupported_tus_version": "Your browser uses an unsupported upload version. Please reload the page.",
+      "video.upload.invalid_request": "The upload was interrupted. Please try again.",
+      "video.upload.file_too_large": "This file is larger than the upload limit.",
+      "video.upload.unsupported_file_type": "Only real MP4 and MOV videos can be uploaded.",
+      "video.upload.offset_mismatch": "The upload got out of sync. Please try again.",
+      "storage.not_found": "The storage could not be found.",
+      "storage.endpoint_not_allowed": "Use a public HTTPS address for the storage endpoint.",
+      "storage.unreachable": "We could not reach the bucket with these settings. Check the endpoint, bucket and keys.",
+      "storage.locked": "Video files are already stored here, so the bucket and path template cannot change.",
+      "storage.in_use": "Libraries still use this storage. Move them to another storage first.",
+      "library.api_key.invalid": "The API key is missing or wrong.",
+      "video.not_ready": "The video has no uploaded file yet.",
+      "video.playback.host_not_allowed": "This video cannot be played on this site.",
+      "video.playback.signature_invalid": "This playback link is invalid or has expired.",
+      "video.playback.range_not_satisfiable": "The requested part of the video does not exist.",
+      "library.api_key.scope_missing": "This API key is not allowed to do this.",
+      "library.api_key.not_found": "The API key could not be found.",
+      "library.api_key.limit_reached": "This library already has the maximum number of API keys.",
+      "video.processing.not_reprocessable": "This video is not uploaded yet or is already being processed.",
+      "video.playback.file_not_found": "This file does not exist for the video.",
+      "library.webhook.not_found": "This library has no webhook.",
+      "library.webhook.url_not_allowed": "The webhook URL must be a public HTTPS address.",
+      "library.webhook.delivery_not_found": "This delivery no longer exists.",
+      "library.webhook.delivery_pending": "This delivery is still being sent."
     }
   },
   "errors": {
@@ -167,12 +259,18 @@
     }
   },
   "common": {
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "copy": "Copy",
+    "copied": "Copied to the clipboard.",
+    "copy_failed": "Could not copy. Select the text and copy it instead."
   },
   "navigation": {
     "workspace": "Main menu",
     "dashboard": "Dashboard",
-    "settings": "Settings"
+    "settings": "Settings",
+    "libraries": "Libraries",
+    "storages": "Storages",
+    "activity": "Activity"
   },
   "organizations": {
     "roles": {
@@ -340,6 +438,540 @@
   "account": {
     "menu": "Account menu",
     "sign_out": "Sign out",
-    "signing_out": "Signing out..."
+    "signing_out": "Signing out...",
+    "activity": "Account activity"
+  },
+  "libraries": {
+    "title": "Libraries",
+    "description": "Libraries group your videos and decide where their files are stored.",
+    "fields": {
+      "name": "Library name",
+      "name_placeholder": "Marketing"
+    },
+    "create": {
+      "trigger": "New library",
+      "title": "Create library",
+      "description": "Videos you upload to this library use the default storage until you assign one of your storages.",
+      "submit": "Create library"
+    },
+    "empty": {
+      "title": "No libraries yet",
+      "owner_description": "Create a library to start uploading videos.",
+      "member_description": "The organization owner has not created a library yet."
+    },
+    "columns": {
+      "name": "Name",
+      "videos": "Videos",
+      "storage": "Storage",
+      "created": "Created"
+    },
+    "storage_kinds": {
+      "default": "Default storage",
+      "custom": "Own storage"
+    },
+    "not_found": {
+      "title": "Library not found",
+      "description": "It may have been removed, or it belongs to another organization.",
+      "back": "Back to libraries"
+    },
+    "tabs": {
+      "videos": "Videos",
+      "storage": "Storage",
+      "api": "API",
+      "encoding": "Encoding",
+      "webhooks": "Webhooks"
+    },
+    "storage": {
+      "current_title": "Where videos are stored",
+      "default_description": "Videos are stored in the default storage under {{template}}.",
+      "custom_description": "Videos are stored in {{name}}: the {{bucket}} bucket at {{endpoint}}, under {{template}}.",
+      "locked_title": "Storage is fixed",
+      "locked_description": "This library already stores video files, so its storage can no longer change.",
+      "choose_title": "Choose a storage",
+      "choose_description": "Pick one of your organization's storages, or connect a new one. One storage can serve several libraries.",
+      "storage_field": "Storage",
+      "create_storage": "New storage",
+      "save": "Use this storage",
+      "owner_only_title": "Only the owner can change storage",
+      "owner_only_description": "Ask the organization owner to change where this library stores videos."
+    },
+    "search_placeholder": "Search libraries",
+    "no_results": {
+      "title": "No matching libraries",
+      "description": "No library name contains \"{{search}}\"."
+    },
+    "switcher": {
+      "label": "Switch library",
+      "search_placeholder": "Search libraries",
+      "empty": "No matching libraries",
+      "video_count_one": "{{count}} video",
+      "video_count_other": "{{count}} videos"
+    },
+    "api": {
+      "owner_only_title": "Only the owner can manage API access",
+      "owner_only_description": "Ask the organization owner for the library's API key.",
+      "security": {
+        "title": "Playback security",
+        "description": "Decide which sites may play this library's videos. Uploading always needs the API key.",
+        "hosts_label": "Allowed sites",
+        "hosts_hint": "A site is a host such as example.com, or *.example.com for all of its subdomains. With no sites, every site may play the videos; once you add one, players that hide the page they run on are blocked.",
+        "signed_label": "Require signed URLs",
+        "signed_hint": "Videos play only through expiring URLs your server creates with the API key.",
+        "save": "Save security settings",
+        "add_host": "Add site",
+        "remove_host": "Remove {{host}}",
+        "no_hosts": "Every site may play this library’s videos.",
+        "host_placeholder": "example.com"
+      },
+      "usage": {
+        "title": "Using the API",
+        "description": "Call the API from your server, never from a web page: the key gives access to the library.",
+        "steps": {
+          "create": {
+            "label": "Create",
+            "description": "Create the video, then upload its file to it."
+          },
+          "upload": {
+            "label": "Upload",
+            "description": "Send the file in resumable chunks with tus."
+          },
+          "status": {
+            "label": "Wait",
+            "description": "Poll the status until processing is ready, or add a webhook instead."
+          },
+          "sign": {
+            "label": "Sign",
+            "description": "Only when the library requires signed URLs: get expiring playback URLs."
+          },
+          "play": {
+            "label": "Play",
+            "description": "Play the HLS playlist in your page once processing is ready; it needs no key."
+          }
+        },
+        "setup": "Set these once on your server"
+      },
+      "keys": {
+        "title": "API keys",
+        "description": "Your servers use the library ID and an API key to work with this library. Give each integration its own key with only the permissions it needs, and never put a key in a web page or app.",
+        "library_id": "Library ID",
+        "api_url": "API URL",
+        "create": "New API key",
+        "limit_reached": "A library can have at most {{max}} keys.",
+        "empty": "This library has no API keys yet.",
+        "columns": {
+          "name": "Name",
+          "access": "Permissions",
+          "last_used": "Last used",
+          "actions": "Actions"
+        },
+        "never_used": "Never",
+        "edit": "Edit",
+        "roll": "New secret",
+        "delete": "Revoke",
+        "roll_title": "Give \"{{name}}\" a new secret?",
+        "roll_description": "The current secret stops working immediately, and so do the playback URLs signed with it. The key keeps its name and permissions.",
+        "delete_title": "Revoke \"{{name}}\"?",
+        "delete_description": "The key stops working immediately, and the playback URLs signed with it stop working too. Other keys are not affected."
+      },
+      "key_form": {
+        "create_title": "New API key",
+        "edit_title": "Edit API key",
+        "description": "Name the key after what uses it, and allow only what that integration needs.",
+        "name": "Name",
+        "name_placeholder": "Website backend",
+        "scopes": "Permissions",
+        "create": "Create key",
+        "save": "Save changes"
+      },
+      "presets": {
+        "read_only": "Read only",
+        "upload_only": "Upload only",
+        "full_access": "Full access"
+      },
+      "scopes": {
+        "videos_read": {
+          "label": "Read videos",
+          "description": "List videos and read their details and upload state."
+        },
+        "videos_upload": {
+          "label": "Upload videos",
+          "description": "Create videos and upload their files with tus."
+        },
+        "videos_manage": {
+          "label": "Manage videos",
+          "description": "Rename and delete videos."
+        },
+        "playback_sign": {
+          "label": "Sign playback URLs",
+          "description": "Create expiring playback URLs. Its URLs stop working if this permission is removed."
+        }
+      },
+      "secret": {
+        "title": "Copy the secret now",
+        "description": "For your security it is shown only once. If you lose it, give the key a new secret.",
+        "label": "Secret",
+        "done": "I have copied it"
+      }
+    },
+    "encoding": {
+      "title": "Transcoding qualities",
+      "description": "Uploaded videos are transcoded to HLS in these qualities, so they play smoothly on any connection and device.",
+      "qualities": "Qualities",
+      "quality_details": "{{width}}×{{height}} · {{bitrate}} kb/s",
+      "hint": "Videos are never upscaled: qualities above a video's own size are skipped, and portrait videos use their short side. Changes apply to new uploads; process earlier videos again to apply them there.",
+      "save": "Save qualities",
+      "owner_only_title": "Only the owner can change encoding",
+      "owner_only_description": "Ask the organization owner to change which qualities this library transcodes to."
+    },
+    "webhooks": {
+      "owner_only_title": "Only the owner can manage webhooks",
+      "owner_only_description": "Ask the organization owner to set up a webhook for this library.",
+      "title": "Webhook",
+      "description": "OpenStream sends a signed POST request to your URL whenever a video is created, renamed, uploaded, processed or deleted, so your servers don’t have to poll.",
+      "url_label": "Endpoint URL",
+      "create": "Add webhook",
+      "save": "Save URL",
+      "signing_secret": "Signing secret",
+      "send_test": "Send test event",
+      "roll": "New signing secret",
+      "delete": "Remove webhook",
+      "events_title": "Events",
+      "events": {
+        "video_created": "A video was created, from the dashboard or the API.",
+        "video_updated": "A video was renamed.",
+        "video_deleted": "A video was deleted. Its files are removed from storage shortly after.",
+        "video_uploaded": "The whole file arrived and passed the checks.",
+        "video_upload_failed": "The file was rejected, e.g. it is not really an MP4 or MOV.",
+        "video_processing_queued": "The video is waiting for a worker: just uploaded, or sent to be processed again.",
+        "video_processing_started": "Transcoding started. Sent once, not again on retries.",
+        "video_processing_ready": "HLS, poster and storyboard are ready to play.",
+        "video_processing_failed": "Transcoding failed on every attempt, or the file has no picture.",
+        "webhook_test": "Sent when you click \"Send test event\" on this page."
+      },
+      "secret_title": "Copy the signing secret now",
+      "secret_description": "Your server uses it to check that requests come from OpenStream. It is shown only once; if you lose it, give the webhook a new secret.",
+      "roll_title": "Give the webhook a new signing secret?",
+      "roll_description": "Deliveries are signed with the new secret right away, so update your server first or it will reject them.",
+      "delete_title": "Remove the webhook?",
+      "delete_description": "No more events are sent, and the record of past deliveries is deleted.",
+      "deliveries": {
+        "title": "Recent deliveries",
+        "description": "Events sent to the webhook in the last 30 days, newest first.",
+        "empty": "Nothing has been sent yet. Send a test event to check your endpoint.",
+        "columns": {
+          "event": "Event",
+          "status": "Status",
+          "response": "Last response",
+          "created": "Created",
+          "actions": "Actions"
+        },
+        "succeeded": "Delivered",
+        "failed": "Failed",
+        "pending": "Sending",
+        "retrying": "Retrying",
+        "attempts_one": "{{count}} attempt",
+        "attempts_other": "{{count}} attempts",
+        "resend": "Resend"
+      },
+      "event_groups": {
+        "videos": "Videos",
+        "uploads": "Uploads",
+        "processing": "Processing",
+        "testing": "Testing"
+      },
+      "example_title": "Example request body",
+      "example_description": "Every video event carries the video’s status as its data, the same shape the status endpoint returns. This is a video.processing.ready event.",
+      "receiving_title": "Receiving events",
+      "receiving": {
+        "verify": "Check the <code>webhook-signature</code> header with the signing secret. Requests follow the Standard Webhooks specification, so its libraries can do it for you.",
+        "deduplicate": "Use <code>webhook-id</code> to skip events you have already handled; a retry or resend keeps the same id.",
+        "answer": "Answer with any <code>2xx</code> status within 10 seconds. Anything else is retried with growing delays for about an hour."
+      },
+      "more_actions": "More webhook actions",
+      "edit_url": "Change URL",
+      "added_on": "Added {{date}}",
+      "empty": "No webhook yet. Add your endpoint’s URL to start receiving events.",
+      "url_dialog": {
+        "create_title": "Add a webhook",
+        "edit_title": "Change the webhook URL",
+        "description": "OpenStream POSTs every event to this URL. In production it must be a public HTTPS address."
+      }
+    }
+  },
+  "videos": {
+    "description": "Upload MP4 or MOV files, or create a video now and add its file later.",
+    "fields": {
+      "title": "Title",
+      "title_placeholder": "Leave empty to use the file name",
+      "file": "Video file"
+    },
+    "create": {
+      "trigger": "Add video",
+      "title": "Add video",
+      "description": "Choose a file to upload it right away, or enter a title to create the video and upload its file later.",
+      "submit_upload": "Upload",
+      "submit_draft": "Create video",
+      "title_or_file_required": "Enter a title or choose a file.",
+      "file_hint": "MP4 or MOV, up to {{size}}.",
+      "unsupported_file": "Only MP4 and MOV files can be uploaded.",
+      "file_too_large": "This file is larger than the upload limit.",
+      "file_dropzone": "Drop a video here or click to browse",
+      "file_remove": "Remove file"
+    },
+    "columns": {
+      "title": "Title",
+      "state": "Status",
+      "created": "Created"
+    },
+    "status": {
+      "draft": "Waiting for a file",
+      "uploaded": "Uploaded",
+      "failed": "Upload failed"
+    },
+    "failure_reasons": {
+      "invalid_file_type": "The file is not a real MP4 or MOV video."
+    },
+    "upload_state": {
+      "uploading": "Uploading {{percentage}}%",
+      "paused": "Paused at {{percentage}}%",
+      "paused_hint": "Choose the same file again to resume.",
+      "progress": "{{uploaded}} of {{total}}"
+    },
+    "actions": {
+      "cancel_upload": "Cancel upload",
+      "resume_upload": "Resume upload",
+      "upload_file": "Upload file",
+      "delete": "Delete video",
+      "reprocess": "Process again"
+    },
+    "delete": {
+      "title": "Delete video?",
+      "description": "\"{{title}}\" and its file will be deleted permanently.",
+      "confirm": "Delete video"
+    },
+    "empty": {
+      "title": "No videos yet",
+      "description": "Add a video to upload its file to this library."
+    },
+    "uploads_panel": {
+      "title": "Uploads",
+      "completed": "Done",
+      "failed": "Failed",
+      "dismiss": "Dismiss"
+    },
+    "processing": {
+      "pending": "Waiting to process",
+      "processing": "Processing",
+      "ready": "Ready",
+      "failed": "Processing failed",
+      "failure_reasons": {
+        "no_video_stream": "The file has no picture.",
+        "transcoding_failed": "The file could not be transcoded. It may be damaged."
+      }
+    },
+    "details": {
+      "not_playable": "The video plays here once it is uploaded and processed.",
+      "fields": {
+        "duration": "Duration",
+        "resolution": "Resolution",
+        "qualities": "Qualities",
+        "file_name": "File",
+        "format": "Format",
+        "size": "Size",
+        "created": "Created",
+        "uploaded": "Uploaded",
+        "processed": "Processed"
+      }
+    },
+    "player": {
+      "failed": "The video could not be played. Try again in a moment.",
+      "unsupported": "This browser cannot play HLS video.",
+      "quality_auto": "Auto",
+      "label": "Video player",
+      "play": "Play",
+      "pause": "Pause",
+      "mute": "Mute",
+      "unmute": "Unmute",
+      "volume": "Volume",
+      "seek": "Seek",
+      "settings": "Settings",
+      "quality": "Quality",
+      "quality_auto_playing": "Auto ({{height}}p)",
+      "speed": "Speed",
+      "speed_normal": "Normal",
+      "picture_in_picture": "Picture in picture",
+      "fullscreen": "Fullscreen",
+      "exit_fullscreen": "Exit fullscreen"
+    }
+  },
+  "pagination": {
+    "label": "Pagination",
+    "range": "{{from}}–{{to}} of {{total}}",
+    "previous": "Previous",
+    "next": "Next",
+    "load_more": "Load more"
+  },
+  "storages": {
+    "title": "Storages",
+    "description": "Connect S3-compatible buckets once and assign them to any library.",
+    "search_placeholder": "Search by name, bucket or endpoint",
+    "owner_only_title": "Only the owner can manage storages",
+    "owner_only_description": "Storages hold access keys, so only the organization owner can see and change them.",
+    "empty": {
+      "title": "No storages yet",
+      "description": "Connect a bucket to store library videos outside the default storage."
+    },
+    "no_results": {
+      "title": "No matching storages",
+      "description": "No storage name, bucket or endpoint contains \"{{search}}\"."
+    },
+    "columns": {
+      "name": "Name",
+      "bucket": "Bucket",
+      "libraries": "Libraries",
+      "actions": "Actions"
+    },
+    "fields": {
+      "name": "Name",
+      "name_placeholder": "Production S3",
+      "endpoint": "Endpoint URL",
+      "region": "Region",
+      "bucket": "Bucket",
+      "addressing_style": "Bucket addressing",
+      "path_template": "Path template",
+      "access_key_id": "Access key ID",
+      "secret_access_key": "Secret access key",
+      "keep_saved_placeholder": "Leave empty to keep the saved key"
+    },
+    "addressing_styles": {
+      "path": "Path style (endpoint/bucket)",
+      "virtual_hosted": "Virtual-hosted style (bucket.endpoint)"
+    },
+    "variables_hint": "Build the folder of each video from these variables. {videoId} is required so every video gets its own folder.",
+    "path_preview": "Example file:",
+    "locked_title": "Bucket and path are fixed",
+    "locked_description": "Video files are already stored here, so only the name and the keys can change.",
+    "connection": {
+      "test": "Test connection",
+      "reachable": "The bucket is reachable.",
+      "unreachable": "The bucket could not be reached with these settings."
+    },
+    "create": {
+      "trigger": "New storage",
+      "title": "Connect a storage",
+      "description": "Any S3-compatible service works, such as AWS S3, Cloudflare R2 or MinIO. We check the bucket can be reached before saving and store the keys encrypted.",
+      "submit": "Save storage"
+    },
+    "edit": {
+      "trigger": "Edit",
+      "title": "Edit storage",
+      "description": "The saved access key ends in {{hint}}. Enter new keys only to replace it.",
+      "submit": "Save changes"
+    },
+    "delete": {
+      "trigger": "Delete",
+      "title": "Delete storage?",
+      "description": "\"{{name}}\" will be removed. Files already in its bucket are not deleted.",
+      "confirm": "Delete storage",
+      "in_use": "Libraries still use this storage."
+    },
+    "select": {
+      "placeholder": "Choose a storage",
+      "search_placeholder": "Search storages",
+      "empty": "No matching storages",
+      "default_description": "Provided by OpenStream"
+    }
+  },
+  "activity": {
+    "owner_only_title": "Only the owner can see the activity log",
+    "owner_only_description": "Ask the organization owner if you need to know who changed something.",
+    "title": "Activity log",
+    "description": "Who changed what in this organization, from the dashboard or with an API key. Expand an entry to see the values before and after.",
+    "search_placeholder": "Search people, keys, names and actions",
+    "resource_type_search": "Search kinds",
+    "toggle_details": "Show details",
+    "resource_types": {
+      "all": "Everything",
+      "organization": "Organization",
+      "invitation": "Invitation",
+      "membership": "Member",
+      "storage": "Storage",
+      "library": "Library",
+      "api_key": "API key",
+      "webhook": "Webhook",
+      "video": "Video",
+      "account": "Account"
+    },
+    "columns": {
+      "action": "What happened",
+      "resource": "Affected",
+      "actor": "By",
+      "when": "When"
+    },
+    "empty": {
+      "title": "No activity yet",
+      "description": "Changes to libraries, videos, storages and the team show up here."
+    },
+    "no_results": {
+      "title": "No matching activity",
+      "description": "Try another search or kind."
+    },
+    "changes": {
+      "field": "Field",
+      "before": "Before",
+      "after": "After",
+      "no_source": "No address recorded"
+    },
+    "actions": {
+      "organization_created": "Created the organization",
+      "organization_updated": "Changed the organization",
+      "organization_deletion_scheduled": "Scheduled the organization's deletion",
+      "organization_deletion_canceled": "Canceled the organization's deletion",
+      "organization_ownership_transferred": "Transferred ownership",
+      "invitation_created": "Invited someone",
+      "invitation_resent": "Resent an invitation",
+      "invitation_canceled": "Canceled an invitation",
+      "invitation_accepted": "Accepted an invitation",
+      "invitation_declined": "Declined an invitation",
+      "membership_removed": "Removed a member",
+      "membership_left": "Left the organization",
+      "storage_created": "Added a storage",
+      "storage_updated": "Changed a storage",
+      "storage_deleted": "Deleted a storage",
+      "library_created": "Created a library",
+      "library_updated": "Renamed a library",
+      "library_storage_changed": "Changed a library's storage",
+      "library_encoding_updated": "Changed a library's qualities",
+      "library_security_updated": "Changed a library's playback security",
+      "api_key_created": "Created an API key",
+      "api_key_updated": "Changed an API key",
+      "api_key_rolled": "Gave an API key a new secret",
+      "api_key_deleted": "Revoked an API key",
+      "webhook_created": "Added a webhook",
+      "webhook_updated": "Changed a webhook's URL",
+      "webhook_deleted": "Removed a webhook",
+      "webhook_secret_rolled": "Gave a webhook a new secret",
+      "webhook_test_sent": "Sent a test event",
+      "webhook_delivery_resent": "Resent a webhook delivery",
+      "video_created": "Created a video",
+      "video_updated": "Renamed a video",
+      "video_deleted": "Deleted a video",
+      "video_uploaded": "Uploaded a video's file",
+      "video_upload_canceled": "Canceled an upload",
+      "video_reprocess_requested": "Asked to process a video again",
+      "account_signed_up": "Created the account",
+      "account_email_verified": "Verified the email address",
+      "account_signed_in": "Signed in",
+      "account_sign_in_failed": "Failed to sign in",
+      "account_signed_out": "Signed out",
+      "account_password_reset_requested": "Asked to reset the password",
+      "account_password_reset": "Reset the password",
+      "organization_deleted": "Deleted the organization"
+    }
+  },
+  "account_activity": {
+    "title": "Account activity",
+    "description": "Sign-ins to your account, failed attempts, password resets, and organizations you owned that were deleted. Expand an entry to see where it came from.",
+    "search_placeholder": "Search actions and emails"
   }
 }

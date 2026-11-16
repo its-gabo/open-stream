@@ -25,12 +25,17 @@ export const REJECTED_ORGANIZATION_BODIES = [
     description: "a reserved slug",
     body: { name: "Settings", slug: "settings" },
   },
+  {
+    description: "the slug of the account pages",
+    body: { name: "Account", slug: "account" },
+  },
 ] as const
 
 export const SLUG_SUGGESTIONS = [
   { name: "Café Ünd Co", slug: "cafe-und-co" },
   { name: "  Studio   42!  ", slug: "studio-42" },
   { name: "Settings", slug: "settings-2" },
+  { name: "Account", slug: "account-2" },
   { name: "A", slug: "a-organization" },
   { name: "!!!", slug: "organization" },
 ] as const

@@ -57,6 +57,7 @@ export function createOrganizationDeletionRouter(
         const scheduled = await organizationDeletionService.scheduleDeletion(
           c.get("organizationAccess"),
           c.get("authSession"),
+          c.get("activityActor"),
           c.req.valid("json")
         )
 
@@ -92,7 +93,8 @@ export function createOrganizationDeletionRouter(
       async (c) => {
         await organizationDeletionService.cancelDeletion(
           c.get("organizationAccess"),
-          c.get("authSession")
+          c.get("authSession"),
+          c.get("activityActor")
         )
 
         return c.json(

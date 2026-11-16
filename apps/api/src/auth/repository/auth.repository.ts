@@ -151,8 +151,14 @@ export class AuthRepository {
     return session ?? null
   }
 
+  /** The user whose session was revoked; null when there was none. */
   async deleteSessionByTokenHash(tokenHash: string) {
-    await this.db.delete(sessions).where(eq(sessions.tokenHash, tokenHash))
+    const [deleted] = await this.db
+      .delete(sessions)
+      .where(eq(sessions.tokenHash, tokenHash))
+      .returning({ userId: sessions.userId })
+
+    return deleted ?? null
   }
 
   async deleteSessionsByUserId(userId: string, transaction: Transaction) {
@@ -160,10 +166,22 @@ export class AuthRepository {
   }
 
   async markEmailVerified(userId: string, transaction: Transaction) {
-    await transaction
+    const [user] = await transaction
       .update(users)
       .set({ emailVerified: true })
       .where(eq(users.id, userId))
+      .returning()
+
+    return user ?? null
+  }
+
+  async findUserById(userId: string, transaction: Transaction) {
+    const [user] = await transaction
+      .select()
+      .from(users)
+      .where(eq(users.id, userId))
+
+    return user ?? null
   }
 
   async updatePasswordHash(

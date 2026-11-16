@@ -1,5 +1,6 @@
+import type { Logger } from "../../common/logging/logger"
+import { toError } from "../../common/utils/error.utils"
 import type { Queue } from "bullmq"
-import { getErrorStack } from "../../common/utils/error.utils"
 import type { AppConfig } from "../../config/app.config"
 import type { OutboxRepository } from "../repository/outbox.repository"
 
@@ -15,6 +16,7 @@ export class OutboxRelayService {
   constructor(
     private readonly outboxRepository: OutboxRepository,
     private readonly outboxQueue: Queue,
+    private readonly logger: Logger,
     private readonly config: AppConfig
   ) {}
 
@@ -23,7 +25,9 @@ export class OutboxRelayService {
       this.currentRelay = this.currentRelay
         .then(() => this.relayPendingMessages())
         .catch((error) =>
-          console.error("Outbox relay failed", getErrorStack(error))
+          this.logger.error("Relaying messages failed", {
+            error: toError(error),
+          })
         )
     }, this.config.OUTBOX_POLL_INTERVAL_MS)
   }

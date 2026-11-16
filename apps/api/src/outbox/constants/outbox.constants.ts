@@ -1,5 +1,8 @@
 export const OUTBOX_MESSAGE_TYPES = {
   SEND_EMAIL: "email.send",
+  PROCESS_VIDEO: "video.process",
+  DELIVER_WEBHOOK: "webhook.deliver",
+  CLEAN_UP_STORAGE: "storage.clean_up",
 } as const
 
 export const OUTBOX_QUEUE_NAME = "outbox"

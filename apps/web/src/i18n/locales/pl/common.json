@@ -32,6 +32,44 @@
     },
     "organization_transfer": {
       "recipient": "Wybierz nowego Właściciela"
+    },
+    "library_name": {
+      "required": "Podaj nazwę biblioteki.",
+      "max_length": "Użyj maksymalnie {{max}} znaków."
+    },
+    "video_title": {
+      "max_length": "Użyj maksymalnie {{max}} znaków."
+    },
+    "storage": {
+      "endpoint": "Podaj pełny adres URL endpointu S3, zaczynający się od https://.",
+      "region": "Podaj region bucketu.",
+      "bucket": "Użyj 3–63 małych liter, cyfr, kropek lub myślników.",
+      "path_template": "Używaj tylko podanych zmiennych, dodaj {videoId} i oddzielaj foldery znakiem /.",
+      "access_key_id": "Podaj identyfikator klucza dostępu.",
+      "secret_access_key": "Podaj tajny klucz dostępu.",
+      "name": "Podaj nazwę magazynu.",
+      "name_max_length": "Użyj maksymalnie {{max}} znaków.",
+      "credentials": "Podaj identyfikator klucza dostępu i tajny klucz dostępu.",
+      "credentials_pair": "Podaj oba klucze, aby je zastąpić, albo zostaw oba puste, aby zachować zapisane."
+    },
+    "playback_hosts": {
+      "invalid": "Podaj host, np. example.com lub *.example.com, bez https:// i ścieżki.",
+      "too_many": "Użyj maksymalnie {{max}} hostów.",
+      "duplicate": "Ta strona jest już na liście."
+    },
+    "api_key_name": {
+      "required": "Podaj nazwę klucza.",
+      "max_length": "Użyj maksymalnie {{max}} znaków."
+    },
+    "api_key_scopes": {
+      "required": "Wybierz co najmniej jedno uprawnienie."
+    },
+    "transcode_qualities": {
+      "required": "Wybierz co najmniej jedną jakość."
+    },
+    "webhook_url": {
+      "required": "Podaj adres URL, na który mają trafiać zdarzenia",
+      "invalid": "Podaj pełny adres http:// lub https:// bez nazwy użytkownika i hasła"
     }
   },
   "pages": {
@@ -125,7 +163,30 @@
       "organization.deletion.schedule.success": "Zaplanowano usunięcie organizacji.",
       "organization.deletion.cancel.success": "Anulowano usunięcie organizacji.",
       "organization.deletion_action.cancel.success": "Anulowano usunięcie organizacji.",
-      "organization.deletion_action.delete.success": "Organizacja została trwale usunięta."
+      "organization.deletion_action.delete.success": "Organizacja została trwale usunięta.",
+      "library.create.success": "Utworzono bibliotekę.",
+      "library.update.success": "Zaktualizowano bibliotekę.",
+      "library.storage.update.success": "Zmieniono magazyn biblioteki.",
+      "video.delete.success": "Usunięto film.",
+      "storage.create.success": "Utworzono magazyn.",
+      "storage.update.success": "Zaktualizowano magazyn.",
+      "storage.delete.success": "Usunięto magazyn.",
+      "library.api_key.create.success": "Utworzono klucz API.",
+      "library.api_key.delete.success": "Unieważniono klucz API.",
+      "library.security.update.success": "Zapisano ustawienia bezpieczeństwa.",
+      "library.api_key.update.success": "Zaktualizowano klucz API.",
+      "library.api_key.roll.success": "Klucz API ma nowy sekret.",
+      "library.encoding.update.success": "Zapisano jakości transkodowania.",
+      "video.reprocess.success": "Film zostanie przetworzony ponownie.",
+      "library.webhook.get.success": "Pobrano webhook.",
+      "library.webhook.save.success": "Zapisano webhook.",
+      "library.webhook.delete.success": "Usunięto webhook.",
+      "library.webhook.secret_roll.success": "Zmieniono sekret podpisu.",
+      "library.webhook.test.success": "Zdarzenie testowe czeka na wysłanie. Pojawi się poniżej po wysłaniu.",
+      "library.webhook.delivery_list.success": "Pobrano dostarczenia.",
+      "library.webhook.delivery_resend.success": "Dostarczenie zostanie wysłane ponownie.",
+      "video.status.get.success": "Pobrano status filmu.",
+      "activity.list.success": "Pobrano aktywność."
     },
     "error": {
       "fallback": "Ups, coś poszło nie tak..",
@@ -156,7 +217,38 @@
       "organization.invitation.email_mismatch": "To zaproszenie wysłano na inny adres e-mail.",
       "organization.invitation.expired": "To zaproszenie wygasło.",
       "organization.deletion.cancel.fail": "Ta organizacja nie jest zaplanowana do usunięcia.",
-      "organization.deletion_action.fail": "Link jest nieprawidłowy lub wygasł albo nie jesteś właścicielem."
+      "organization.deletion_action.fail": "Link jest nieprawidłowy lub wygasł albo nie jesteś właścicielem.",
+      "library.not_found": "Nie znaleziono biblioteki.",
+      "library.storage.locked": "Ta biblioteka przechowuje już filmy, więc jej magazynu nie można zmienić.",
+      "library.storage.changed": "Magazyn biblioteki zmienił się w międzyczasie. Spróbuj ponownie.",
+      "library.storage.unavailable": "Magazyn filmów jest niedostępny. Spróbuj ponownie później.",
+      "video.not_found": "Nie znaleziono filmu.",
+      "video.upload.already_uploaded": "Ten film ma już plik.",
+      "video.upload.not_found": "Nie znaleziono przesyłania. Rozpocznij je ponownie.",
+      "video.upload.unsupported_tus_version": "Przeglądarka używa nieobsługiwanej wersji przesyłania. Odśwież stronę.",
+      "video.upload.invalid_request": "Przesyłanie zostało przerwane. Spróbuj ponownie.",
+      "video.upload.file_too_large": "Ten plik przekracza limit przesyłania.",
+      "video.upload.unsupported_file_type": "Można przesyłać tylko prawdziwe filmy MP4 i MOV.",
+      "video.upload.offset_mismatch": "Przesyłanie straciło synchronizację. Spróbuj ponownie.",
+      "storage.not_found": "Nie znaleziono magazynu.",
+      "storage.endpoint_not_allowed": "Użyj publicznego adresu HTTPS jako endpointu magazynu.",
+      "storage.unreachable": "Nie udało się połączyć z bucketem przy tych ustawieniach. Sprawdź endpoint, bucket i klucze.",
+      "storage.locked": "Ten magazyn przechowuje już pliki filmów, więc bucketu i szablonu ścieżki nie można zmienić.",
+      "storage.in_use": "Biblioteki nadal używają tego magazynu. Najpierw przenieś je do innego magazynu.",
+      "library.api_key.invalid": "Brak klucza API lub klucz jest nieprawidłowy.",
+      "video.not_ready": "Film nie ma jeszcze przesłanego pliku.",
+      "video.playback.host_not_allowed": "Tego filmu nie można odtwarzać na tej stronie.",
+      "video.playback.signature_invalid": "Ten link do odtwarzania jest nieprawidłowy lub wygasł.",
+      "video.playback.range_not_satisfiable": "Żądany fragment filmu nie istnieje.",
+      "library.api_key.scope_missing": "Ten klucz API nie ma uprawnień do tej operacji.",
+      "library.api_key.not_found": "Nie znaleziono klucza API.",
+      "library.api_key.limit_reached": "Ta biblioteka ma już maksymalną liczbę kluczy API.",
+      "video.processing.not_reprocessable": "Ten film nie został jeszcze przesłany lub jest właśnie przetwarzany.",
+      "video.playback.file_not_found": "Ten plik nie istnieje dla filmu.",
+      "library.webhook.not_found": "Ta biblioteka nie ma webhooka.",
+      "library.webhook.url_not_allowed": "Adres webhooka musi być publicznym adresem HTTPS.",
+      "library.webhook.delivery_not_found": "To dostarczenie już nie istnieje.",
+      "library.webhook.delivery_pending": "To dostarczenie jest jeszcze wysyłane."
     }
   },
   "errors": {
@@ -167,12 +259,18 @@
     }
   },
   "common": {
-    "cancel": "Anuluj"
+    "cancel": "Anuluj",
+    "copy": "Kopiuj",
+    "copied": "Skopiowano do schowka.",
+    "copy_failed": "Nie udało się skopiować. Zaznacz tekst i skopiuj go ręcznie."
   },
   "navigation": {
     "workspace": "Menu główne",
     "dashboard": "Panel",
-    "settings": "Ustawienia"
+    "settings": "Ustawienia",
+    "libraries": "Biblioteki",
+    "storages": "Magazyny",
+    "activity": "Aktywność"
   },
   "organizations": {
     "roles": {
@@ -340,6 +438,544 @@
   "account": {
     "menu": "Menu konta",
     "sign_out": "Wyloguj się",
-    "signing_out": "Wylogowywanie..."
+    "signing_out": "Wylogowywanie...",
+    "activity": "Aktywność konta"
+  },
+  "libraries": {
+    "title": "Biblioteki",
+    "description": "Biblioteki grupują filmy i określają, gdzie przechowywane są ich pliki.",
+    "fields": {
+      "name": "Nazwa biblioteki",
+      "name_placeholder": "Marketing"
+    },
+    "create": {
+      "trigger": "Nowa biblioteka",
+      "title": "Utwórz bibliotekę",
+      "description": "Filmy przesłane do tej biblioteki trafiają do domyślnego magazynu, dopóki nie przypiszesz jednego z Twoich magazynów.",
+      "submit": "Utwórz bibliotekę"
+    },
+    "empty": {
+      "title": "Brak bibliotek",
+      "owner_description": "Utwórz bibliotekę, aby zacząć przesyłać filmy.",
+      "member_description": "Właściciel organizacji nie utworzył jeszcze biblioteki."
+    },
+    "columns": {
+      "name": "Nazwa",
+      "videos": "Filmy",
+      "storage": "Magazyn",
+      "created": "Utworzono"
+    },
+    "storage_kinds": {
+      "default": "Domyślny magazyn",
+      "custom": "Własny magazyn"
+    },
+    "not_found": {
+      "title": "Nie znaleziono biblioteki",
+      "description": "Mogła zostać usunięta albo należy do innej organizacji.",
+      "back": "Wróć do bibliotek"
+    },
+    "tabs": {
+      "videos": "Filmy",
+      "storage": "Magazyn",
+      "api": "API",
+      "encoding": "Kodowanie",
+      "webhooks": "Webhooki"
+    },
+    "storage": {
+      "current_title": "Gdzie przechowywane są filmy",
+      "default_description": "Filmy są przechowywane w domyślnym magazynie w ścieżce {{template}}.",
+      "custom_description": "Filmy są przechowywane w magazynie {{name}}: bucket {{bucket}} pod adresem {{endpoint}}, w ścieżce {{template}}.",
+      "locked_title": "Magazyn jest ustalony",
+      "locked_description": "Ta biblioteka przechowuje już pliki filmów, więc jej magazynu nie można zmienić.",
+      "choose_title": "Wybierz magazyn",
+      "choose_description": "Wybierz jeden z magazynów organizacji albo podłącz nowy. Jeden magazyn może obsługiwać wiele bibliotek.",
+      "storage_field": "Magazyn",
+      "create_storage": "Nowy magazyn",
+      "save": "Użyj tego magazynu",
+      "owner_only_title": "Tylko właściciel może zmienić magazyn",
+      "owner_only_description": "Poproś właściciela organizacji o zmianę miejsca przechowywania filmów tej biblioteki."
+    },
+    "search_placeholder": "Szukaj bibliotek",
+    "no_results": {
+      "title": "Brak pasujących bibliotek",
+      "description": "Żadna nazwa biblioteki nie zawiera „{{search}}”."
+    },
+    "switcher": {
+      "label": "Przełącz bibliotekę",
+      "search_placeholder": "Szukaj bibliotek",
+      "empty": "Brak pasujących bibliotek",
+      "video_count_one": "{{count}} film",
+      "video_count_few": "{{count}} filmy",
+      "video_count_many": "{{count}} filmów",
+      "video_count_other": "{{count}} filmu"
+    },
+    "api": {
+      "owner_only_title": "Tylko właściciel może zarządzać dostępem do API",
+      "owner_only_description": "Poproś właściciela organizacji o klucz API biblioteki.",
+      "security": {
+        "title": "Bezpieczeństwo odtwarzania",
+        "description": "Zdecyduj, które strony mogą odtwarzać filmy z tej biblioteki. Przesyłanie zawsze wymaga klucza API.",
+        "hosts_label": "Dozwolone strony",
+        "hosts_hint": "Strona to host, np. example.com, albo *.example.com dla wszystkich subdomen. Bez stron każda strona może odtwarzać filmy; po dodaniu pierwszej odtwarzacze ukrywające stronę, na której działają, są blokowane.",
+        "signed_label": "Wymagaj podpisanych adresów",
+        "signed_hint": "Filmy odtwarzają się tylko przez wygasające adresy tworzone przez Twój serwer kluczem API.",
+        "save": "Zapisz ustawienia bezpieczeństwa",
+        "add_host": "Dodaj stronę",
+        "remove_host": "Usuń {{host}}",
+        "no_hosts": "Każda strona może odtwarzać filmy z tej biblioteki.",
+        "host_placeholder": "example.com"
+      },
+      "usage": {
+        "title": "Korzystanie z API",
+        "description": "Wywołuj API ze swojego serwera, nigdy ze strony internetowej: klucz daje dostęp do biblioteki.",
+        "steps": {
+          "create": {
+            "label": "Utwórz",
+            "description": "Utwórz film, a potem prześlij do niego plik."
+          },
+          "upload": {
+            "label": "Prześlij",
+            "description": "Wyślij plik w częściach przez tus, z możliwością wznowienia."
+          },
+          "status": {
+            "label": "Poczekaj",
+            "description": "Sprawdzaj status, aż przetwarzanie się zakończy, albo dodaj webhook."
+          },
+          "sign": {
+            "label": "Podpisz",
+            "description": "Tylko gdy biblioteka wymaga podpisanych adresów: pobierz wygasające adresy odtwarzania."
+          },
+          "play": {
+            "label": "Odtwórz",
+            "description": "Odtwórz playlistę HLS na stronie po zakończeniu przetwarzania; klucz nie jest potrzebny."
+          }
+        },
+        "setup": "Ustaw to raz na swoim serwerze"
+      },
+      "keys": {
+        "title": "Klucze API",
+        "description": "Twoje serwery używają identyfikatora biblioteki i klucza API, aby pracować z tą biblioteką. Daj każdej integracji osobny klucz tylko z potrzebnymi uprawnieniami i nigdy nie umieszczaj klucza na stronie ani w aplikacji.",
+        "library_id": "Identyfikator biblioteki",
+        "api_url": "Adres API",
+        "create": "Nowy klucz API",
+        "limit_reached": "Biblioteka może mieć maksymalnie {{max}} kluczy.",
+        "empty": "Ta biblioteka nie ma jeszcze kluczy API.",
+        "columns": {
+          "name": "Nazwa",
+          "access": "Uprawnienia",
+          "last_used": "Ostatnie użycie",
+          "actions": "Akcje"
+        },
+        "never_used": "Nigdy",
+        "edit": "Edytuj",
+        "roll": "Nowy sekret",
+        "delete": "Unieważnij",
+        "roll_title": "Nadać kluczowi „{{name}}” nowy sekret?",
+        "roll_description": "Obecny sekret od razu przestanie działać, podobnie jak podpisane nim adresy odtwarzania. Klucz zachowa nazwę i uprawnienia.",
+        "delete_title": "Unieważnić klucz „{{name}}”?",
+        "delete_description": "Klucz od razu przestanie działać, podobnie jak podpisane nim adresy odtwarzania. Inne klucze nie zostaną zmienione."
+      },
+      "key_form": {
+        "create_title": "Nowy klucz API",
+        "edit_title": "Edytuj klucz API",
+        "description": "Nazwij klucz od tego, co go używa, i zezwól tylko na to, czego potrzebuje integracja.",
+        "name": "Nazwa",
+        "name_placeholder": "Backend strony",
+        "scopes": "Uprawnienia",
+        "create": "Utwórz klucz",
+        "save": "Zapisz zmiany"
+      },
+      "presets": {
+        "read_only": "Tylko odczyt",
+        "upload_only": "Tylko przesyłanie",
+        "full_access": "Pełny dostęp"
+      },
+      "scopes": {
+        "videos_read": {
+          "label": "Odczyt filmów",
+          "description": "Wyświetlanie listy filmów oraz ich szczegółów i stanu przesyłania."
+        },
+        "videos_upload": {
+          "label": "Przesyłanie filmów",
+          "description": "Tworzenie filmów i przesyłanie ich plików przez tus."
+        },
+        "videos_manage": {
+          "label": "Zarządzanie filmami",
+          "description": "Zmiana nazw i usuwanie filmów."
+        },
+        "playback_sign": {
+          "label": "Podpisywanie adresów odtwarzania",
+          "description": "Tworzenie wygasających adresów odtwarzania. Po odebraniu uprawnienia jego adresy przestają działać."
+        }
+      },
+      "secret": {
+        "title": "Skopiuj teraz sekret",
+        "description": "Ze względów bezpieczeństwa jest wyświetlany tylko raz. Jeśli go zgubisz, nadaj kluczowi nowy sekret.",
+        "label": "Sekret",
+        "done": "Skopiowałem"
+      }
+    },
+    "encoding": {
+      "title": "Jakości transkodowania",
+      "description": "Przesłane filmy są transkodowane do HLS w tych jakościach, aby płynnie odtwarzały się przy każdym łączu i na każdym urządzeniu.",
+      "qualities": "Jakości",
+      "quality_details": "{{width}}×{{height}} · {{bitrate}} kb/s",
+      "hint": "Filmy nigdy nie są powiększane: jakości wyższe niż rozmiar filmu są pomijane, a filmy pionowe liczone są po krótszym boku. Zmiany dotyczą nowych przesłań; przetwórz wcześniejsze filmy ponownie, aby je zastosować.",
+      "save": "Zapisz jakości",
+      "owner_only_title": "Tylko właściciel może zmienić kodowanie",
+      "owner_only_description": "Poproś właściciela organizacji o zmianę jakości, do których ta biblioteka transkoduje filmy."
+    },
+    "webhooks": {
+      "owner_only_title": "Webhookami zarządza tylko właściciel",
+      "owner_only_description": "Poproś właściciela organizacji o skonfigurowanie webhooka dla tej biblioteki.",
+      "title": "Webhook",
+      "description": "OpenStream wysyła podpisane żądanie POST na Twój adres, gdy film zostanie utworzony, przemianowany, przesłany, przetworzony lub usunięty, więc Twoje serwery nie muszą odpytywać API.",
+      "url_label": "Adres URL",
+      "create": "Dodaj webhook",
+      "save": "Zapisz adres",
+      "signing_secret": "Sekret podpisu",
+      "send_test": "Wyślij zdarzenie testowe",
+      "roll": "Nowy sekret podpisu",
+      "delete": "Usuń webhook",
+      "events_title": "Zdarzenia",
+      "events": {
+        "video_created": "Utworzono film, w panelu albo przez API.",
+        "video_updated": "Zmieniono nazwę filmu.",
+        "video_deleted": "Usunięto film. Jego pliki zostaną wkrótce usunięte z magazynu.",
+        "video_uploaded": "Cały plik dotarł i przeszedł sprawdzenie.",
+        "video_upload_failed": "Plik odrzucono, np. nie jest naprawdę MP4 ani MOV.",
+        "video_processing_queued": "Film czeka na przetworzenie: właśnie przesłany albo zlecony ponownie.",
+        "video_processing_started": "Rozpoczęło się transkodowanie. Wysyłane raz, nie przy ponowieniach.",
+        "video_processing_ready": "HLS, miniatura i storyboard są gotowe do odtwarzania.",
+        "video_processing_failed": "Transkodowanie nie powiodło się przy każdej próbie albo plik nie zawiera obrazu.",
+        "webhook_test": "Wysyłane po kliknięciu „Wyślij zdarzenie testowe” na tej stronie."
+      },
+      "secret_title": "Skopiuj teraz sekret podpisu",
+      "secret_description": "Twój serwer sprawdza nim, czy żądania pochodzą z OpenStream. Jest pokazywany tylko raz; jeśli go zgubisz, nadaj webhookowi nowy sekret.",
+      "roll_title": "Nadać webhookowi nowy sekret podpisu?",
+      "roll_description": "Dostarczenia od razu będą podpisywane nowym sekretem, więc najpierw zaktualizuj serwer, inaczej je odrzuci.",
+      "delete_title": "Usunąć webhook?",
+      "delete_description": "Zdarzenia przestaną być wysyłane, a historia dostarczeń zostanie usunięta.",
+      "deliveries": {
+        "title": "Ostatnie dostarczenia",
+        "description": "Zdarzenia wysłane do webhooka w ciągu ostatnich 30 dni, od najnowszych.",
+        "empty": "Nic jeszcze nie wysłano. Wyślij zdarzenie testowe, aby sprawdzić swój endpoint.",
+        "columns": {
+          "event": "Zdarzenie",
+          "status": "Status",
+          "response": "Ostatnia odpowiedź",
+          "created": "Utworzono",
+          "actions": "Akcje"
+        },
+        "succeeded": "Dostarczono",
+        "failed": "Niepowodzenie",
+        "pending": "Wysyłanie",
+        "retrying": "Ponawianie",
+        "attempts_one": "{{count}} próba",
+        "attempts_few": "{{count}} próby",
+        "attempts_many": "{{count}} prób",
+        "attempts_other": "{{count}} próby",
+        "resend": "Wyślij ponownie"
+      },
+      "event_groups": {
+        "videos": "Filmy",
+        "uploads": "Przesyłanie",
+        "processing": "Przetwarzanie",
+        "testing": "Test"
+      },
+      "example_title": "Przykładowa treść żądania",
+      "example_description": "Każde zdarzenie filmu zawiera w data status filmu, w tym samym kształcie co endpoint statusu. To jest zdarzenie video.processing.ready.",
+      "receiving_title": "Odbieranie zdarzeń",
+      "receiving": {
+        "verify": "Sprawdź nagłówek <code>webhook-signature</code> sekretem podpisu. Żądania są zgodne ze specyfikacją Standard Webhooks, więc jej biblioteki zrobią to za Ciebie.",
+        "deduplicate": "Używaj <code>webhook-id</code>, aby pomijać obsłużone już zdarzenia; ponowienie zachowuje ten sam identyfikator.",
+        "answer": "Odpowiedz dowolnym statusem <code>2xx</code> w ciągu 10 sekund. Inne odpowiedzi są ponawiane z rosnącymi odstępami przez około godzinę."
+      },
+      "more_actions": "Więcej akcji webhooka",
+      "edit_url": "Zmień adres",
+      "added_on": "Dodano {{date}}",
+      "empty": "Brak webhooka. Dodaj adres swojego endpointu, aby odbierać zdarzenia.",
+      "url_dialog": {
+        "create_title": "Dodaj webhook",
+        "edit_title": "Zmień adres webhooka",
+        "description": "OpenStream wysyła każde zdarzenie metodą POST na ten adres. W produkcji musi to być publiczny adres HTTPS."
+      }
+    }
+  },
+  "videos": {
+    "description": "Prześlij pliki MP4 lub MOV albo utwórz film teraz i dodaj plik później.",
+    "fields": {
+      "title": "Tytuł",
+      "title_placeholder": "Zostaw puste, aby użyć nazwy pliku",
+      "file": "Plik wideo"
+    },
+    "create": {
+      "trigger": "Dodaj film",
+      "title": "Dodaj film",
+      "description": "Wybierz plik, aby od razu go przesłać, albo podaj tytuł, aby utworzyć film i przesłać plik później.",
+      "submit_upload": "Prześlij",
+      "submit_draft": "Utwórz film",
+      "title_or_file_required": "Podaj tytuł lub wybierz plik.",
+      "file_hint": "MP4 lub MOV, do {{size}}.",
+      "unsupported_file": "Można przesyłać tylko pliki MP4 i MOV.",
+      "file_too_large": "Ten plik przekracza limit przesyłania.",
+      "file_dropzone": "Upuść film tutaj lub kliknij, aby wybrać",
+      "file_remove": "Usuń plik"
+    },
+    "columns": {
+      "title": "Tytuł",
+      "state": "Status",
+      "created": "Utworzono"
+    },
+    "status": {
+      "draft": "Czeka na plik",
+      "uploaded": "Przesłano",
+      "failed": "Przesyłanie nie powiodło się"
+    },
+    "failure_reasons": {
+      "invalid_file_type": "Plik nie jest prawdziwym filmem MP4 ani MOV."
+    },
+    "upload_state": {
+      "uploading": "Przesyłanie {{percentage}}%",
+      "paused": "Wstrzymano przy {{percentage}}%",
+      "paused_hint": "Wybierz ten sam plik ponownie, aby wznowić.",
+      "progress": "{{uploaded}} z {{total}}"
+    },
+    "actions": {
+      "cancel_upload": "Anuluj przesyłanie",
+      "resume_upload": "Wznów przesyłanie",
+      "upload_file": "Prześlij plik",
+      "delete": "Usuń film",
+      "reprocess": "Przetwórz ponownie"
+    },
+    "delete": {
+      "title": "Usunąć film?",
+      "description": "„{{title}}” i jego plik zostaną trwale usunięte.",
+      "confirm": "Usuń film"
+    },
+    "empty": {
+      "title": "Brak filmów",
+      "description": "Dodaj film, aby przesłać jego plik do tej biblioteki."
+    },
+    "uploads_panel": {
+      "title": "Przesyłanie",
+      "completed": "Gotowe",
+      "failed": "Błąd",
+      "dismiss": "Zamknij"
+    },
+    "processing": {
+      "pending": "Oczekuje na przetworzenie",
+      "processing": "Przetwarzanie",
+      "ready": "Gotowy",
+      "failed": "Przetwarzanie nieudane",
+      "failure_reasons": {
+        "no_video_stream": "Plik nie zawiera obrazu.",
+        "transcoding_failed": "Nie udało się przetranskodować pliku. Może być uszkodzony."
+      }
+    },
+    "details": {
+      "not_playable": "Film będzie można odtworzyć tutaj po przesłaniu i przetworzeniu.",
+      "fields": {
+        "duration": "Długość",
+        "resolution": "Rozdzielczość",
+        "qualities": "Jakości",
+        "file_name": "Plik",
+        "format": "Format",
+        "size": "Rozmiar",
+        "created": "Utworzono",
+        "uploaded": "Przesłano",
+        "processed": "Przetworzono"
+      }
+    },
+    "player": {
+      "failed": "Nie udało się odtworzyć filmu. Spróbuj ponownie za chwilę.",
+      "unsupported": "Ta przeglądarka nie odtwarza filmów HLS.",
+      "quality_auto": "Auto",
+      "label": "Odtwarzacz wideo",
+      "play": "Odtwórz",
+      "pause": "Wstrzymaj",
+      "mute": "Wycisz",
+      "unmute": "Włącz dźwięk",
+      "volume": "Głośność",
+      "seek": "Przewiń",
+      "settings": "Ustawienia",
+      "quality": "Jakość",
+      "quality_auto_playing": "Auto ({{height}}p)",
+      "speed": "Prędkość",
+      "speed_normal": "Normalna",
+      "picture_in_picture": "Obraz w obrazie",
+      "fullscreen": "Pełny ekran",
+      "exit_fullscreen": "Zamknij pełny ekran"
+    }
+  },
+  "pagination": {
+    "label": "Paginacja",
+    "range": "{{from}}–{{to}} z {{total}}",
+    "previous": "Poprzednia",
+    "next": "Następna",
+    "load_more": "Wczytaj więcej"
+  },
+  "storages": {
+    "title": "Magazyny",
+    "description": "Podłącz buckety zgodne z S3 raz i przypisuj je do dowolnych bibliotek.",
+    "search_placeholder": "Szukaj po nazwie, buckecie lub endpoincie",
+    "owner_only_title": "Tylko właściciel może zarządzać magazynami",
+    "owner_only_description": "Magazyny zawierają klucze dostępu, więc tylko właściciel organizacji może je przeglądać i zmieniać.",
+    "empty": {
+      "title": "Brak magazynów",
+      "description": "Podłącz bucket, aby przechowywać filmy bibliotek poza domyślnym magazynem."
+    },
+    "no_results": {
+      "title": "Brak pasujących magazynów",
+      "description": "Żadna nazwa, bucket ani endpoint magazynu nie zawiera „{{search}}”."
+    },
+    "columns": {
+      "name": "Nazwa",
+      "bucket": "Bucket",
+      "libraries": "Biblioteki",
+      "actions": "Akcje"
+    },
+    "fields": {
+      "name": "Nazwa",
+      "name_placeholder": "Produkcyjny S3",
+      "endpoint": "Adres URL endpointu",
+      "region": "Region",
+      "bucket": "Bucket",
+      "addressing_style": "Adresowanie bucketu",
+      "path_template": "Szablon ścieżki",
+      "access_key_id": "Identyfikator klucza dostępu",
+      "secret_access_key": "Tajny klucz dostępu",
+      "keep_saved_placeholder": "Zostaw puste, aby zachować zapisany klucz"
+    },
+    "addressing_styles": {
+      "path": "W ścieżce (endpoint/bucket)",
+      "virtual_hosted": "W domenie (bucket.endpoint)"
+    },
+    "variables_hint": "Zbuduj folder każdego filmu z tych zmiennych. {videoId} jest wymagane, aby każdy film miał własny folder.",
+    "path_preview": "Przykładowy plik:",
+    "locked_title": "Bucket i ścieżka są ustalone",
+    "locked_description": "Ten magazyn przechowuje już pliki filmów, więc można zmienić tylko nazwę i klucze.",
+    "connection": {
+      "test": "Testuj połączenie",
+      "reachable": "Bucket jest osiągalny.",
+      "unreachable": "Nie udało się połączyć z bucketem przy tych ustawieniach."
+    },
+    "create": {
+      "trigger": "Nowy magazyn",
+      "title": "Podłącz magazyn",
+      "description": "Działa każda usługa zgodna z S3, np. AWS S3, Cloudflare R2 lub MinIO. Przed zapisaniem sprawdzamy dostęp do bucketu, a klucze przechowujemy zaszyfrowane.",
+      "submit": "Zapisz magazyn"
+    },
+    "edit": {
+      "trigger": "Edytuj",
+      "title": "Edytuj magazyn",
+      "description": "Zapisany klucz dostępu kończy się na {{hint}}. Podaj nowe klucze tylko wtedy, gdy chcesz go zastąpić.",
+      "submit": "Zapisz zmiany"
+    },
+    "delete": {
+      "trigger": "Usuń",
+      "title": "Usunąć magazyn?",
+      "description": "Magazyn „{{name}}” zostanie usunięty. Pliki w jego buckecie pozostaną.",
+      "confirm": "Usuń magazyn",
+      "in_use": "Biblioteki nadal używają tego magazynu."
+    },
+    "select": {
+      "placeholder": "Wybierz magazyn",
+      "search_placeholder": "Szukaj magazynów",
+      "empty": "Brak pasujących magazynów",
+      "default_description": "Zapewniany przez OpenStream"
+    }
+  },
+  "activity": {
+    "owner_only_title": "Dziennik aktywności widzi tylko właściciel",
+    "owner_only_description": "Zapytaj właściciela organizacji, jeśli chcesz wiedzieć, kto coś zmienił.",
+    "title": "Dziennik aktywności",
+    "description": "Kto co zmienił w tej organizacji, w panelu albo kluczem API. Rozwiń wpis, aby zobaczyć wartości przed i po zmianie.",
+    "search_placeholder": "Szukaj osób, kluczy, nazw i akcji",
+    "resource_type_search": "Szukaj rodzajów",
+    "toggle_details": "Pokaż szczegóły",
+    "resource_types": {
+      "all": "Wszystko",
+      "organization": "Organizacja",
+      "invitation": "Zaproszenie",
+      "membership": "Członek",
+      "storage": "Magazyn",
+      "library": "Biblioteka",
+      "api_key": "Klucz API",
+      "webhook": "Webhook",
+      "video": "Film",
+      "account": "Konto"
+    },
+    "columns": {
+      "action": "Co się stało",
+      "resource": "Czego dotyczy",
+      "actor": "Kto",
+      "when": "Kiedy"
+    },
+    "empty": {
+      "title": "Brak aktywności",
+      "description": "Tutaj pojawią się zmiany bibliotek, filmów, magazynów i zespołu."
+    },
+    "no_results": {
+      "title": "Brak pasującej aktywności",
+      "description": "Spróbuj innego wyszukiwania lub rodzaju."
+    },
+    "changes": {
+      "field": "Pole",
+      "before": "Przed",
+      "after": "Po",
+      "no_source": "Nie zapisano adresu"
+    },
+    "actions": {
+      "organization_created": "Utworzono organizację",
+      "organization_updated": "Zmieniono organizację",
+      "organization_deletion_scheduled": "Zaplanowano usunięcie organizacji",
+      "organization_deletion_canceled": "Anulowano usunięcie organizacji",
+      "organization_ownership_transferred": "Przekazano własność",
+      "invitation_created": "Wysłano zaproszenie",
+      "invitation_resent": "Ponowiono zaproszenie",
+      "invitation_canceled": "Anulowano zaproszenie",
+      "invitation_accepted": "Przyjęto zaproszenie",
+      "invitation_declined": "Odrzucono zaproszenie",
+      "membership_removed": "Usunięto członka",
+      "membership_left": "Opuszczono organizację",
+      "storage_created": "Dodano magazyn",
+      "storage_updated": "Zmieniono magazyn",
+      "storage_deleted": "Usunięto magazyn",
+      "library_created": "Utworzono bibliotekę",
+      "library_updated": "Zmieniono nazwę biblioteki",
+      "library_storage_changed": "Zmieniono magazyn biblioteki",
+      "library_encoding_updated": "Zmieniono jakości biblioteki",
+      "library_security_updated": "Zmieniono zabezpieczenia odtwarzania",
+      "api_key_created": "Utworzono klucz API",
+      "api_key_updated": "Zmieniono klucz API",
+      "api_key_rolled": "Nadano kluczowi API nowy sekret",
+      "api_key_deleted": "Unieważniono klucz API",
+      "webhook_created": "Dodano webhook",
+      "webhook_updated": "Zmieniono adres webhooka",
+      "webhook_deleted": "Usunięto webhook",
+      "webhook_secret_rolled": "Nadano webhookowi nowy sekret",
+      "webhook_test_sent": "Wysłano zdarzenie testowe",
+      "webhook_delivery_resent": "Ponowiono dostarczenie webhooka",
+      "video_created": "Utworzono film",
+      "video_updated": "Zmieniono nazwę filmu",
+      "video_deleted": "Usunięto film",
+      "video_uploaded": "Przesłano plik filmu",
+      "video_upload_canceled": "Anulowano przesyłanie",
+      "video_reprocess_requested": "Zlecono ponowne przetworzenie filmu",
+      "account_signed_up": "Utworzono konto",
+      "account_email_verified": "Potwierdzono adres e-mail",
+      "account_signed_in": "Zalogowano",
+      "account_sign_in_failed": "Nieudane logowanie",
+      "account_signed_out": "Wylogowano",
+      "account_password_reset_requested": "Poproszono o reset hasła",
+      "account_password_reset": "Zresetowano hasło",
+      "organization_deleted": "Usunięto organizację"
+    }
+  },
+  "account_activity": {
+    "title": "Aktywność konta",
+    "description": "Logowania na Twoje konto, nieudane próby, resety hasła i usunięte organizacje, których byłeś właścicielem. Rozwiń wpis, aby zobaczyć, skąd pochodził.",
+    "search_placeholder": "Szukaj akcji i adresów e-mail"
   }
 }

@@ -19,10 +19,11 @@ export function OrganizationSettingsHeader({
     "settings/organization"
   )
   const teamPath = buildOrganizationPath(organizationSlug, "settings/team")
-  const activePath = pathname === teamPath ? teamPath : organizationPath
+  const tabPaths = [organizationPath, teamPath]
+  const activePath = tabPaths.includes(pathname) ? pathname : organizationPath
 
   const handleTabChange = (value: unknown) => {
-    if (value !== organizationPath && value !== teamPath) return
+    if (typeof value !== "string" || !tabPaths.includes(value)) return
 
     void navigate({ href: value })
   }

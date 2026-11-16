@@ -1,5 +1,6 @@
 import { Hono } from "hono"
 import { describeRoute } from "hono-openapi"
+import { readActivityRequestSource } from "../../activity/utils/activity-actor.utils"
 import { OPENAPI_TAGS } from "../../common/http/openapi/openapi.constants"
 import {
   describeApiErrorResponses,
@@ -38,7 +39,10 @@ export function createAuthPasswordRouter(
       }),
       validateRequest("json", authForgotPasswordBodySchema),
       async (c) => {
-        await authPasswordResetService.requestPasswordReset(c.req.valid("json"))
+        await authPasswordResetService.requestPasswordReset(
+          c.req.valid("json"),
+          readActivityRequestSource(c.req)
+        )
 
         return c.json(
           createApiSuccessResponse(AUTH_SUCCESS_RESULTS.FORGOT_PASSWORD, {}),
@@ -64,7 +68,10 @@ export function createAuthPasswordRouter(
       }),
       validateRequest("json", authResetPasswordBodySchema),
       async (c) => {
-        await authPasswordResetService.resetPassword(c.req.valid("json"))
+        await authPasswordResetService.resetPassword(
+          c.req.valid("json"),
+          readActivityRequestSource(c.req)
+        )
 
         return c.json(
           createApiSuccessResponse(AUTH_SUCCESS_RESULTS.RESET_PASSWORD, {}),

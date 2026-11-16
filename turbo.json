@@ -31,6 +31,13 @@
         "@workspace/email-templates#build"
       ]
     },
+    "test:coverage": {
+      "cache": false,
+      "dependsOn": [
+        "@workspace/shared#build",
+        "@workspace/email-templates#build"
+      ]
+    },
     "dev": {
       "cache": false,
       "persistent": true,

@@ -11,3 +11,7 @@ app.openstream.localhost {
 mailbox.openstream.localhost {
 	reverse_proxy localhost:8025
 }
+
+storage.openstream.localhost {
+	reverse_proxy localhost:9001
+}

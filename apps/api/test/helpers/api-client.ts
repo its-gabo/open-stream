@@ -6,6 +6,8 @@ import type { TestApp } from "./test-app"
 export type ApiRequestOptions = {
   method?: string
   body?: unknown
+  /** Sent as is instead of JSON, e.g. the bytes of a tus upload chunk. */
+  rawBody?: Uint8Array<ArrayBuffer>
   headers?: Record<string, string>
 }
 
@@ -23,7 +25,8 @@ export function createApiClient(testApp: TestApp, cookie?: string) {
         ...options.headers,
       },
       body:
-        options.body === undefined ? undefined : JSON.stringify(options.body),
+        options.rawBody ??
+        (options.body === undefined ? undefined : JSON.stringify(options.body)),
     })
 
   return {
@@ -33,6 +36,8 @@ export function createApiClient(testApp: TestApp, cookie?: string) {
       request(path, { method: "POST", body }),
     patch: (path: string, body?: unknown) =>
       request(path, { method: "PATCH", body }),
+    put: (path: string, body?: unknown) =>
+      request(path, { method: "PUT", body }),
     delete: (path: string) => request(path, { method: "DELETE" }),
   }
 }

@@ -8,4 +8,11 @@ export const DOMAIN_ERROR_KINDS = {
   GONE: "gone",
   /** The resource exists but is temporarily blocked, e.g. pending deletion. */
   LOCKED: "locked",
+  PRECONDITION_FAILED: "precondition_failed",
+  TOO_LARGE: "too_large",
+  UNSUPPORTED_MEDIA_TYPE: "unsupported_media_type",
+  /** The requested byte range lies outside the resource. */
+  RANGE_NOT_SATISFIABLE: "range_not_satisfiable",
+  /** A dependency such as object storage could not be reached. */
+  UNAVAILABLE: "unavailable",
 } as const

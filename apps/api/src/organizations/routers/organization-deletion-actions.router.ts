@@ -41,6 +41,7 @@ export function createOrganizationDeletionActionsRouter(
       async (c) => {
         await organizationDeletionService.cancelDeletionByToken(
           c.get("authSession"),
+          c.get("activityActor"),
           c.req.valid("json").token
         )
 
@@ -73,6 +74,7 @@ export function createOrganizationDeletionActionsRouter(
       async (c) => {
         await organizationDeletionService.deleteOrganizationByToken(
           c.get("authSession"),
+          c.get("activityActor"),
           c.req.valid("json").token
         )
 

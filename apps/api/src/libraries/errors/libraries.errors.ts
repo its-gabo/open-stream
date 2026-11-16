@@ -1,0 +1,163 @@
+import { DOMAIN_ERROR_KINDS } from "../../common/errors/domain-error.constants"
+import type { DomainErrorCatalog } from "../../common/errors/domain-error.types"
+
+export const LIBRARY_ERROR_CODES = {
+  NOT_FOUND: "library.not_found",
+  STORAGE_LOCKED: "library.storage.locked",
+  STORAGE_CHANGED: "library.storage.changed",
+  STORAGE_UNAVAILABLE: "library.storage.unavailable",
+  VIDEO_NOT_FOUND: "video.not_found",
+  VIDEO_ALREADY_UPLOADED: "video.upload.already_uploaded",
+  UPLOAD_NOT_FOUND: "video.upload.not_found",
+  UNSUPPORTED_TUS_VERSION: "video.upload.unsupported_tus_version",
+  INVALID_UPLOAD_REQUEST: "video.upload.invalid_request",
+  FILE_TOO_LARGE: "video.upload.file_too_large",
+  UNSUPPORTED_FILE_TYPE: "video.upload.unsupported_file_type",
+  OFFSET_MISMATCH: "video.upload.offset_mismatch",
+  API_KEY_INVALID: "library.api_key.invalid",
+  API_KEY_SCOPE_MISSING: "library.api_key.scope_missing",
+  API_KEY_NOT_FOUND: "library.api_key.not_found",
+  API_KEY_LIMIT_REACHED: "library.api_key.limit_reached",
+  VIDEO_NOT_READY: "video.not_ready",
+  VIDEO_NOT_REPROCESSABLE: "video.processing.not_reprocessable",
+  PLAYBACK_HOST_NOT_ALLOWED: "video.playback.host_not_allowed",
+  PLAYBACK_SIGNATURE_INVALID: "video.playback.signature_invalid",
+  PLAYBACK_FILE_NOT_FOUND: "video.playback.file_not_found",
+  PLAYBACK_RANGE_NOT_SATISFIABLE: "video.playback.range_not_satisfiable",
+} as const
+
+export const LIBRARY_ERRORS = {
+  NOT_FOUND: {
+    kind: DOMAIN_ERROR_KINDS.NOT_FOUND,
+    code: LIBRARY_ERROR_CODES.NOT_FOUND,
+    message: "Library not found",
+    reason: "library.inaccessible",
+  },
+  STORAGE_LOCKED: {
+    kind: DOMAIN_ERROR_KINDS.CONFLICT,
+    code: LIBRARY_ERROR_CODES.STORAGE_LOCKED,
+    message: "The storage of a library with uploaded videos cannot change",
+    reason: "library.storage_in_use",
+  },
+  STORAGE_CHANGED: {
+    kind: DOMAIN_ERROR_KINDS.CONFLICT,
+    code: LIBRARY_ERROR_CODES.STORAGE_CHANGED,
+    message: "The library storage changed while the upload was starting",
+    reason: "library.storage_changed",
+  },
+  STORAGE_UNAVAILABLE: {
+    kind: DOMAIN_ERROR_KINDS.UNAVAILABLE,
+    code: LIBRARY_ERROR_CODES.STORAGE_UNAVAILABLE,
+    message: "The video storage is unavailable. Please try again later.",
+    reason: "library.storage_unavailable",
+  },
+  VIDEO_NOT_FOUND: {
+    kind: DOMAIN_ERROR_KINDS.NOT_FOUND,
+    code: LIBRARY_ERROR_CODES.VIDEO_NOT_FOUND,
+    message: "Video not found",
+    reason: "video.inaccessible",
+  },
+  VIDEO_ALREADY_UPLOADED: {
+    kind: DOMAIN_ERROR_KINDS.CONFLICT,
+    code: LIBRARY_ERROR_CODES.VIDEO_ALREADY_UPLOADED,
+    message: "This video already has a file",
+    reason: "video.already_uploaded",
+  },
+  UPLOAD_NOT_FOUND: {
+    kind: DOMAIN_ERROR_KINDS.NOT_FOUND,
+    code: LIBRARY_ERROR_CODES.UPLOAD_NOT_FOUND,
+    message: "Upload not found",
+    reason: "video.upload_inaccessible",
+  },
+  UNSUPPORTED_TUS_VERSION: {
+    kind: DOMAIN_ERROR_KINDS.PRECONDITION_FAILED,
+    code: LIBRARY_ERROR_CODES.UNSUPPORTED_TUS_VERSION,
+    message: "Unsupported upload protocol version",
+    reason: "video.upload_protocol_unsupported",
+  },
+  INVALID_UPLOAD_REQUEST: {
+    kind: DOMAIN_ERROR_KINDS.INVALID_INPUT,
+    code: LIBRARY_ERROR_CODES.INVALID_UPLOAD_REQUEST,
+    message: "The upload request is invalid",
+    reason: "video.upload_request_invalid",
+  },
+  FILE_TOO_LARGE: {
+    kind: DOMAIN_ERROR_KINDS.TOO_LARGE,
+    code: LIBRARY_ERROR_CODES.FILE_TOO_LARGE,
+    message: "The video file is too large",
+    reason: "video.file_too_large",
+  },
+  UNSUPPORTED_FILE_TYPE: {
+    kind: DOMAIN_ERROR_KINDS.UNSUPPORTED_MEDIA_TYPE,
+    code: LIBRARY_ERROR_CODES.UNSUPPORTED_FILE_TYPE,
+    message: "Only MP4 and MOV videos can be uploaded",
+    reason: "video.unsupported_file_type",
+  },
+  OFFSET_MISMATCH: {
+    kind: DOMAIN_ERROR_KINDS.CONFLICT,
+    code: LIBRARY_ERROR_CODES.OFFSET_MISMATCH,
+    message: "The upload offset does not match the received bytes",
+    reason: "video.upload_offset_mismatch",
+  },
+  API_KEY_INVALID: {
+    kind: DOMAIN_ERROR_KINDS.UNAUTHENTICATED,
+    code: LIBRARY_ERROR_CODES.API_KEY_INVALID,
+    message: "Send the library's API key as `Authorization: Bearer <key>`",
+    reason: "library.api_key_invalid",
+  },
+  API_KEY_SCOPE_MISSING: {
+    kind: DOMAIN_ERROR_KINDS.FORBIDDEN,
+    code: LIBRARY_ERROR_CODES.API_KEY_SCOPE_MISSING,
+    message: "This API key is not allowed to do this",
+    reason: "library.api_key_scope_missing",
+  },
+  API_KEY_NOT_FOUND: {
+    kind: DOMAIN_ERROR_KINDS.NOT_FOUND,
+    code: LIBRARY_ERROR_CODES.API_KEY_NOT_FOUND,
+    message: "API key not found",
+    reason: "library.api_key_inaccessible",
+  },
+  API_KEY_LIMIT_REACHED: {
+    kind: DOMAIN_ERROR_KINDS.CONFLICT,
+    code: LIBRARY_ERROR_CODES.API_KEY_LIMIT_REACHED,
+    message: "The library already has the maximum number of API keys",
+    reason: "library.api_key_limit_reached",
+  },
+  VIDEO_NOT_READY: {
+    kind: DOMAIN_ERROR_KINDS.CONFLICT,
+    code: LIBRARY_ERROR_CODES.VIDEO_NOT_READY,
+    message: "The video has no uploaded file yet, or is not processed yet",
+    reason: "video.not_ready",
+  },
+  VIDEO_NOT_REPROCESSABLE: {
+    kind: DOMAIN_ERROR_KINDS.CONFLICT,
+    code: LIBRARY_ERROR_CODES.VIDEO_NOT_REPROCESSABLE,
+    message:
+      "The video has no uploaded file yet, or is already being processed",
+    reason: "video.not_reprocessable",
+  },
+  PLAYBACK_HOST_NOT_ALLOWED: {
+    kind: DOMAIN_ERROR_KINDS.FORBIDDEN,
+    code: LIBRARY_ERROR_CODES.PLAYBACK_HOST_NOT_ALLOWED,
+    message: "This video cannot be played on this site",
+    reason: "video.playback_host_not_allowed",
+  },
+  PLAYBACK_SIGNATURE_INVALID: {
+    kind: DOMAIN_ERROR_KINDS.FORBIDDEN,
+    code: LIBRARY_ERROR_CODES.PLAYBACK_SIGNATURE_INVALID,
+    message: "The playback URL is not signed, has expired, or was revoked",
+    reason: "video.playback_signature_invalid",
+  },
+  PLAYBACK_FILE_NOT_FOUND: {
+    kind: DOMAIN_ERROR_KINDS.NOT_FOUND,
+    code: LIBRARY_ERROR_CODES.PLAYBACK_FILE_NOT_FOUND,
+    message: "This file does not exist for the video",
+    reason: "video.playback_file_not_found",
+  },
+  PLAYBACK_RANGE_NOT_SATISFIABLE: {
+    kind: DOMAIN_ERROR_KINDS.RANGE_NOT_SATISFIABLE,
+    code: LIBRARY_ERROR_CODES.PLAYBACK_RANGE_NOT_SATISFIABLE,
+    message: "The requested byte range is outside the video file",
+    reason: "video.playback_range_not_satisfiable",
+  },
+} as const satisfies DomainErrorCatalog<typeof LIBRARY_ERROR_CODES>

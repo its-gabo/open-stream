@@ -1,3 +1,10 @@
+import { ACTIVITY_ACTIONS } from "@workspace/shared"
+import type { ActivityLogService } from "../../activity/services/activity-log.service"
+import type { ActivityRequestSource } from "../../activity/types/activity.types"
+import {
+  activityActorOfUser,
+  anonymousActivityActor,
+} from "../../activity/utils/activity-actor.utils"
 import { DomainError } from "../../common/errors/domain-error"
 import { MINUTE_MS } from "../../common/time/time.constants"
 import type { AppConfig } from "../../config/app.config"
@@ -13,6 +20,7 @@ import type { AuthRepository } from "../repository/auth.repository"
 import type { AuthActionLinkService } from "./auth-action-link.service"
 import type { AuthEmailService } from "./auth-email.service"
 import type { AuthPasswordService } from "./auth-password.service"
+import { accountActivityResource } from "../utils/auth-activity.utils"
 import type { AuthTokenService } from "./auth-token.service"
 
 export class AuthPasswordResetService {
@@ -23,11 +31,15 @@ export class AuthPasswordResetService {
     private readonly authTokenService: AuthTokenService,
     private readonly authActionLinkService: AuthActionLinkService,
     private readonly authEmailService: AuthEmailService,
+    private readonly activityLogService: ActivityLogService,
     private readonly config: AppConfig
   ) {}
 
   /** Silently succeeds for unknown emails so accounts cannot be enumerated. */
-  async requestPasswordReset(input: AuthForgotPasswordBody) {
+  async requestPasswordReset(
+    input: AuthForgotPasswordBody,
+    source: ActivityRequestSource
+  ) {
     const user = await this.authRepository.findUserByEmail(input.email)
 
     if (!user) return
@@ -58,11 +70,24 @@ export class AuthPasswordResetService {
         resetEmail,
         transaction
       )
+      await this.activityLogService.recordActivity(
+        anonymousActivityActor(input.email, source),
+        {
+          organizationId: null,
+          accountUserId: user.id,
+          action: ACTIVITY_ACTIONS.ACCOUNT_PASSWORD_RESET_REQUESTED,
+          resource: accountActivityResource(user),
+        },
+        transaction
+      )
     })
   }
 
   /** Replaces the password and revokes every session and outstanding reset link of the user. */
-  async resetPassword(input: AuthResetPasswordBody) {
+  async resetPassword(
+    input: AuthResetPasswordBody,
+    source: ActivityRequestSource
+  ) {
     const tokenHash = this.authTokenService.hashToken(input.token)
     const passwordHash = await this.authPasswordService.hashPassword(
       input.password
@@ -106,6 +131,25 @@ export class AuthPasswordResetService {
         AUTH_TOKEN_PURPOSES.RESET_PASSWORD,
         transaction
       )
+
+      const user = await this.authRepository.findUserById(
+        resetToken.userId,
+        transaction
+      )
+
+      if (user) {
+        await this.activityLogService.recordActivity(
+          activityActorOfUser({ userId: user.id, ...user }, source),
+          {
+            organizationId: null,
+            accountUserId: user.id,
+            action: ACTIVITY_ACTIONS.ACCOUNT_PASSWORD_RESET,
+            resource: accountActivityResource(user),
+            context: { otherSessionsRevoked: true },
+          },
+          transaction
+        )
+      }
     })
   }
 }

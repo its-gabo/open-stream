@@ -1,5 +1,6 @@
 import { Hono } from "hono"
 import { describeRoute } from "hono-openapi"
+import { readActivityRequestSource } from "../../activity/utils/activity-actor.utils"
 import { OPENAPI_TAGS } from "../../common/http/openapi/openapi.constants"
 import {
   describeApiErrorResponses,
@@ -43,7 +44,8 @@ export function createAuthSessionRouter(
         const { session, sessionToken } =
           await authSessionService.signInWithEmail(
             c.req.valid("json"),
-            authCookieService.readSessionToken(c)
+            authCookieService.readSessionToken(c),
+            readActivityRequestSource(c.req)
           )
 
         authCookieService.setSessionCookie(c, sessionToken, session.expiresAt)
@@ -71,7 +73,10 @@ export function createAuthSessionRouter(
         },
       }),
       async (c) => {
-        await authSessionService.signOut(authCookieService.readSessionToken(c))
+        await authSessionService.signOut(
+          authCookieService.readSessionToken(c),
+          readActivityRequestSource(c.req)
+        )
 
         authCookieService.clearSessionCookie(c)
 

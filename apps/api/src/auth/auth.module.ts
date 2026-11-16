@@ -11,7 +11,7 @@ import { AuthTokenService } from "./services/auth-token.service"
 import type { AuthModuleDependencies } from "./types/auth.types"
 
 export function createAuthModule(dependencies: AuthModuleDependencies) {
-  const { db, config, outboxService } = dependencies
+  const { db, config, outboxService, activityLogService } = dependencies
 
   const authRepository = new AuthRepository(db)
   const authPasswordService = new AuthPasswordService()
@@ -29,12 +29,14 @@ export function createAuthModule(dependencies: AuthModuleDependencies) {
       authTokenService,
       authActionLinkService,
       authEmailService,
+      activityLogService,
       config
     ),
     authSessionService: new AuthSessionService(
       authRepository,
       authPasswordService,
       authTokenService,
+      activityLogService,
       config
     ),
     authPasswordResetService: new AuthPasswordResetService(
@@ -44,11 +46,13 @@ export function createAuthModule(dependencies: AuthModuleDependencies) {
       authTokenService,
       authActionLinkService,
       authEmailService,
+      activityLogService,
       config
     ),
     authEmailVerificationService: new AuthEmailVerificationService(
       authRepository,
-      authTokenService
+      authTokenService,
+      activityLogService
     ),
   }
 }

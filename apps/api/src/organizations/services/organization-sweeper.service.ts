@@ -1,4 +1,5 @@
-import { getErrorStack } from "../../common/utils/error.utils"
+import type { Logger } from "../../common/logging/logger"
+import { toError } from "../../common/utils/error.utils"
 import { DAY_MS } from "../../common/time/time.constants"
 import type { AppConfig } from "../../config/app.config"
 import { ORGANIZATION_INVITATION_RETENTION_DAYS } from "../constants/organizations.constants"
@@ -16,6 +17,7 @@ export class OrganizationSweeperService {
   constructor(
     private readonly organizationsRepository: OrganizationsRepository,
     private readonly organizationDeletionService: OrganizationDeletionService,
+    private readonly logger: Logger,
     private readonly config: AppConfig
   ) {}
 
@@ -24,7 +26,7 @@ export class OrganizationSweeperService {
       this.currentSweep = this.currentSweep
         .then(() => this.sweep())
         .catch((error) =>
-          console.error("Organization sweep failed", getErrorStack(error))
+          this.logger.error("Sweep failed", { error: toError(error) })
         )
     }, this.config.ORGANIZATION_SWEEP_INTERVAL_MS)
   }
@@ -35,7 +37,15 @@ export class OrganizationSweeperService {
   }
 
   async sweep() {
-    await this.organizationDeletionService.deleteDueOrganizations()
+    const deletedCount =
+      await this.organizationDeletionService.deleteDueOrganizations()
+
+    if (deletedCount > 0) {
+      this.logger.info("Deleted organizations whose grace period ended", {
+        count: deletedCount,
+      })
+    }
+
     await this.organizationsRepository.expireInvitations()
     await this.organizationsRepository.deleteExpiredInvitations(
       new Date(Date.now() - ORGANIZATION_INVITATION_RETENTION_DAYS * DAY_MS)

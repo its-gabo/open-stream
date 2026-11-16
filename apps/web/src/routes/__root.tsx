@@ -14,6 +14,7 @@ import type { RouterContext } from "@/router.types"
 import { RouteError } from "@/components/route-error"
 import { createPageMeta } from "@/lib/page-meta"
 import { APP_NAME } from "@/lib/page-meta.constants"
+import { TOASTER_MOBILE_OFFSET, TOASTER_OFFSET } from "@/lib/toaster.constants"
 import { AppProviders } from "@/providers/app-providers"
 
 export const Route = createRootRouteWithContext<RouterContext>()({
@@ -63,7 +64,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <AppProviders queryClient={queryClient}>{children}</AppProviders>
-        <Toaster />
+        <Toaster offset={TOASTER_OFFSET} mobileOffset={TOASTER_MOBILE_OFFSET} />
         <Scripts />
       </body>
     </html>

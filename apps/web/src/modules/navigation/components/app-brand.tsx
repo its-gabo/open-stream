@@ -6,12 +6,12 @@ export function AppBrand() {
       <img
         src="/openstream-logo-trimmed.png"
         alt={APP_NAME}
-        className="h-8 w-auto dark:invert group-data-[collapsible=icon]:hidden"
+        className="h-8 w-auto group-data-[collapsible=icon]:hidden dark:invert"
       />
       <img
         src="/openstream-signet.svg"
         alt={APP_NAME}
-        className="hidden size-8 dark:invert group-data-[collapsible=icon]:block"
+        className="hidden size-8 group-data-[collapsible=icon]:block dark:invert"
       />
     </div>
   )

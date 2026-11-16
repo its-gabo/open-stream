@@ -90,6 +90,7 @@ export function createOrganizationTeamRouter(
         const invitation = await organizationTeamService.inviteMember(
           c.get("organizationAccess"),
           c.get("authSession"),
+          c.get("activityActor"),
           c.req.valid("json")
         )
 
@@ -126,6 +127,7 @@ export function createOrganizationTeamRouter(
         const invitation = await organizationTeamService.resendInvitation(
           c.get("organizationAccess"),
           c.get("authSession"),
+          c.get("activityActor"),
           c.req.valid("param").invitationId
         )
 
@@ -161,6 +163,7 @@ export function createOrganizationTeamRouter(
       async (c) => {
         await organizationTeamService.cancelInvitation(
           c.get("organizationAccess"),
+          c.get("activityActor"),
           c.req.valid("param").invitationId
         )
 
@@ -196,6 +199,7 @@ export function createOrganizationTeamRouter(
       async (c) => {
         await organizationTeamService.removeMember(
           c.get("organizationAccess"),
+          c.get("activityActor"),
           c.req.valid("param").membershipId
         )
 

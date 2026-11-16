@@ -10,9 +10,11 @@
     "db:generate": "bun --env-file=../../.env run drizzle-kit generate",
     "db:migrate": "bun --env-file=../../.env run src/db/migrate.ts",
     "openapi:generate": "bun --env-file=../../.env run src/openapi/export-openapi-schema.ts && prettier --write src/openapi/api-schema.json",
-    "test:e2e": "bun test e2e"
+    "test:e2e": "bun test e2e",
+    "test:coverage": "bun test e2e --coverage --coverage-reporter=text --coverage-reporter=lcov --preload ./test/setup/load-all-modules.setup.ts && bun run test/coverage/check-feature-coverage.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "3.1160.0",
     "@hono/standard-validator": "0.4.0",
     "@standard-community/standard-json": "0.3.7",
     "@standard-community/standard-openapi": "0.2.11",

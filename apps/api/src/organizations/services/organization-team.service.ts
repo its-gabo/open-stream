@@ -1,8 +1,12 @@
 import {
+  ACTIVITY_ACTIONS,
   ORGANIZATION_INVITATION_STATUSES,
   ORGANIZATION_MEMBERSHIP_LIMIT,
   ORGANIZATION_ROLES,
 } from "@workspace/shared"
+import type { ActivityLogService } from "../../activity/services/activity-log.service"
+import type { ActivityActor } from "../../activity/types/activity.types"
+import { diffActivityValues } from "../../activity/utils/activity-changes.utils"
 import type { AuthUserSession } from "../../auth/types/auth.types"
 import { DomainError } from "../../common/errors/domain-error"
 import { DAY_MS } from "../../common/time/time.constants"
@@ -20,6 +24,11 @@ import type {
 import { ORGANIZATION_ERRORS } from "../errors/organizations.errors"
 import type { OrganizationsRepository } from "../repository/organizations.repository"
 import type { OrganizationAccess } from "../types/organizations.types"
+import {
+  invitationActivityResource,
+  membershipActivityResource,
+  organizationActivityResource,
+} from "../utils/organization-activity.utils"
 import { lockActiveOrganization } from "../utils/organization-locks.utils"
 import type { OrganizationActionLinkService } from "./organization-action-link.service"
 import type { OrganizationEmailService } from "./organization-email.service"
@@ -30,7 +39,8 @@ export class OrganizationTeamService {
     private readonly organizationsRepository: OrganizationsRepository,
     private readonly outboxService: OutboxService,
     private readonly organizationEmailService: OrganizationEmailService,
-    private readonly organizationActionLinkService: OrganizationActionLinkService
+    private readonly organizationActionLinkService: OrganizationActionLinkService,
+    private readonly activityLogService: ActivityLogService
   ) {}
 
   /** Every member; invitations only for the owner. */
@@ -60,6 +70,7 @@ export class OrganizationTeamService {
   async inviteMember(
     access: OrganizationAccess,
     session: AuthUserSession,
+    actor: ActivityActor,
     input: OrganizationInvitationCreateBody
   ) {
     return this.organizationsRepository.transaction(async (transaction) => {
@@ -104,6 +115,19 @@ export class OrganizationTeamService {
         session.name,
         transaction
       )
+      await this.activityLogService.recordActivity(
+        actor,
+        {
+          organizationId: organization.id,
+          action: ACTIVITY_ACTIONS.INVITATION_CREATED,
+          resource: invitationActivityResource(invitation),
+          after: {
+            email: invitation.email,
+            expiresAt: invitation.expiresAt.toISOString(),
+          },
+        },
+        transaction
+      )
 
       return { invitation: toOrganizationTeamInvitationDto(invitation) }
     })
@@ -113,10 +137,11 @@ export class OrganizationTeamService {
   async resendInvitation(
     access: OrganizationAccess,
     session: AuthUserSession,
+    actor: ActivityActor,
     invitationId: string
   ) {
     try {
-      return await this.renewInvitation(access, session, invitationId)
+      return await this.renewInvitation(access, session, actor, invitationId)
     } catch (error) {
       // An expired invitation cannot be renewed while a newer one to the same email is pending.
       if (isUniqueViolation(error)) {
@@ -127,7 +152,11 @@ export class OrganizationTeamService {
     }
   }
 
-  async cancelInvitation(access: OrganizationAccess, invitationId: string) {
+  async cancelInvitation(
+    access: OrganizationAccess,
+    actor: ActivityActor,
+    invitationId: string
+  ) {
     await this.organizationsRepository.transaction(async (transaction) => {
       await lockActiveOrganization(
         this.organizationsRepository,
@@ -146,11 +175,26 @@ export class OrganizationTeamService {
         { status: ORGANIZATION_INVITATION_STATUSES.CANCELED },
         transaction
       )
+      await this.activityLogService.recordActivity(
+        actor,
+        {
+          organizationId: access.organization.id,
+          action: ACTIVITY_ACTIONS.INVITATION_CANCELED,
+          resource: invitationActivityResource(invitation),
+          before: { status: invitation.status },
+          after: { status: ORGANIZATION_INVITATION_STATUSES.CANCELED },
+        },
+        transaction
+      )
     })
   }
 
   /** Removes a member; the owner cannot be removed, only replaced by a transfer. */
-  async removeMember(access: OrganizationAccess, membershipId: string) {
+  async removeMember(
+    access: OrganizationAccess,
+    actor: ActivityActor,
+    membershipId: string
+  ) {
     await this.organizationsRepository.transaction(async (transaction) => {
       const organization = await lockActiveOrganization(
         this.organizationsRepository,
@@ -171,6 +215,16 @@ export class OrganizationTeamService {
         member.membershipId,
         transaction
       )
+      await this.activityLogService.recordActivity(
+        actor,
+        {
+          organizationId: organization.id,
+          action: ACTIVITY_ACTIONS.MEMBERSHIP_REMOVED,
+          resource: membershipActivityResource(member),
+          before: { userId: member.userId, role: member.role },
+        },
+        transaction
+      )
       await this.outboxService.publishMessage(
         OUTBOX_MESSAGE_TYPES.SEND_EMAIL,
         this.organizationEmailService.composeMemberRemovedEmail(
@@ -184,7 +238,8 @@ export class OrganizationTeamService {
 
   async leaveOrganization(
     access: OrganizationAccess,
-    session: AuthUserSession
+    session: AuthUserSession,
+    actor: ActivityActor
   ) {
     await this.organizationsRepository.transaction(async (transaction) => {
       const organization = await lockActiveOrganization(
@@ -214,6 +269,16 @@ export class OrganizationTeamService {
         membership.membershipId,
         transaction
       )
+      await this.activityLogService.recordActivity(
+        actor,
+        {
+          organizationId: organization.id,
+          action: ACTIVITY_ACTIONS.MEMBERSHIP_LEFT,
+          resource: membershipActivityResource(membership),
+          before: { userId: membership.userId, role: membership.role },
+        },
+        transaction
+      )
 
       if (owner) {
         await this.outboxService.publishMessage(
@@ -233,6 +298,7 @@ export class OrganizationTeamService {
   async transferOwnership(
     access: OrganizationAccess,
     session: AuthUserSession,
+    actor: ActivityActor,
     input: OrganizationOwnershipTransferBody
   ) {
     await this.organizationsRepository.transaction(async (transaction) => {
@@ -278,6 +344,20 @@ export class OrganizationTeamService {
         ORGANIZATION_ROLES.OWNER,
         transaction
       )
+      await this.activityLogService.recordActivity(
+        actor,
+        {
+          organizationId: organization.id,
+          action: ACTIVITY_ACTIONS.ORGANIZATION_OWNERSHIP_TRANSFERRED,
+          resource: organizationActivityResource(organization),
+          before: {
+            ownerUserId: currentOwner.userId,
+            ownerEmail: currentOwner.email,
+          },
+          after: { ownerUserId: recipient.userId, ownerEmail: recipient.email },
+        },
+        transaction
+      )
 
       for (const email of this.organizationEmailService.composeOwnershipTransferEmails(
         currentOwner,
@@ -296,6 +376,7 @@ export class OrganizationTeamService {
   private renewInvitation(
     access: OrganizationAccess,
     session: AuthUserSession,
+    actor: ActivityActor,
     invitationId: string
   ) {
     return this.organizationsRepository.transaction(async (transaction) => {
@@ -332,6 +413,25 @@ export class OrganizationTeamService {
         renewedInvitation!,
         organization.name,
         session.name,
+        transaction
+      )
+      await this.activityLogService.recordActivity(
+        actor,
+        {
+          organizationId: organization.id,
+          action: ACTIVITY_ACTIONS.INVITATION_RESENT,
+          resource: invitationActivityResource(invitation),
+          ...diffActivityValues(
+            {
+              status: invitation.status,
+              expiresAt: invitation.expiresAt.toISOString(),
+            },
+            {
+              status: renewedInvitation!.status,
+              expiresAt: renewedInvitation!.expiresAt.toISOString(),
+            }
+          ),
+        },
         transaction
       )
 

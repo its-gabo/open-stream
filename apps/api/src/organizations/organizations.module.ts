@@ -11,7 +11,15 @@ import type { OrganizationModuleDependencies } from "./types/organizations.types
 export function createOrganizationsModule(
   dependencies: OrganizationModuleDependencies
 ) {
-  const { db, config, outboxService, authTokenService } = dependencies
+  const {
+    db,
+    config,
+    outboxService,
+    authTokenService,
+    activityLogService,
+    videoFilesCleanupService,
+    logger,
+  } = dependencies
 
   const organizationsRepository = new OrganizationsRepository(db)
   const organizationEmailService = new OrganizationEmailService()
@@ -23,26 +31,34 @@ export function createOrganizationsModule(
     outboxService,
     authTokenService,
     organizationActionLinkService,
-    organizationEmailService
+    organizationEmailService,
+    activityLogService,
+    videoFilesCleanupService
   )
 
   return {
-    organizationsService: new OrganizationsService(organizationsRepository),
+    organizationsService: new OrganizationsService(
+      organizationsRepository,
+      activityLogService
+    ),
     organizationTeamService: new OrganizationTeamService(
       organizationsRepository,
       outboxService,
       organizationEmailService,
-      organizationActionLinkService
+      organizationActionLinkService,
+      activityLogService
     ),
     organizationInvitationsService: new OrganizationInvitationsService(
       organizationsRepository,
       outboxService,
-      organizationEmailService
+      organizationEmailService,
+      activityLogService
     ),
     organizationDeletionService,
     organizationSweeperService: new OrganizationSweeperService(
       organizationsRepository,
       organizationDeletionService,
+      logger.child("organizations"),
       config
     ),
   }

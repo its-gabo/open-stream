@@ -9,6 +9,7 @@
     "format": "turbo format",
     "typecheck": "turbo typecheck",
     "test": "turbo test",
+    "test:coverage": "turbo test:coverage",
     "db:generate": "bun run --cwd apps/api db:generate",
     "db:migrate": "bun run --cwd apps/api db:migrate",
     "generate:api": "turbo run build --filter=@workspace/shared --filter=@workspace/email-templates && bun run --cwd apps/api openapi:generate && bun run --cwd apps/web generate:client"

@@ -1,8 +1,12 @@
 import {
+  ACTIVITY_ACTIONS,
   ORGANIZATION_DELETE_CONFIRMATION_PHRASE,
   ORGANIZATION_ROLES,
   ORGANIZATION_STATUSES,
 } from "@workspace/shared"
+import type { ActivityLogService } from "../../activity/services/activity-log.service"
+import type { ActivityActor } from "../../activity/types/activity.types"
+import { SYSTEM_ACTIVITY_ACTOR } from "../../activity/utils/activity-actor.utils"
 import type { AuthTokenService } from "../../auth/services/auth-token.service"
 import type { AuthUserSession } from "../../auth/types/auth.types"
 import { DomainError } from "../../common/errors/domain-error"
@@ -25,8 +29,11 @@ import { ORGANIZATION_ERRORS } from "../errors/organizations.errors"
 import type { OrganizationsRepository } from "../repository/organizations.repository"
 import type {
   OrganizationAccess,
+  OrganizationFilesCleanup,
+  OrganizationMember,
   OrganizationPerson,
 } from "../types/organizations.types"
+import { organizationActivityResource } from "../utils/organization-activity.utils"
 import { lockActiveOrganization } from "../utils/organization-locks.utils"
 import type { OrganizationActionLinkService } from "./organization-action-link.service"
 import type { OrganizationEmailService } from "./organization-email.service"
@@ -42,12 +49,15 @@ export class OrganizationDeletionService {
     private readonly outboxService: OutboxService,
     private readonly authTokenService: AuthTokenService,
     private readonly organizationActionLinkService: OrganizationActionLinkService,
-    private readonly organizationEmailService: OrganizationEmailService
+    private readonly organizationEmailService: OrganizationEmailService,
+    private readonly activityLogService: ActivityLogService,
+    private readonly organizationFilesCleanup: OrganizationFilesCleanup
   ) {}
 
   async scheduleDeletion(
     access: OrganizationAccess,
     session: AuthUserSession,
+    actor: ActivityActor,
     input: OrganizationDeletionScheduleBody
   ) {
     if (
@@ -92,6 +102,22 @@ export class OrganizationDeletionService {
         { status: ORGANIZATION_STATUSES.PENDING_DELETION },
         transaction
       )
+
+      await this.activityLogService.recordActivity(
+        actor,
+        {
+          organizationId: organization.id,
+          action: ACTIVITY_ACTIONS.ORGANIZATION_DELETION_SCHEDULED,
+          resource: organizationActivityResource(organization),
+          before: { status: organization.status },
+          after: {
+            status: ORGANIZATION_STATUSES.PENDING_DELETION,
+            scheduledFor: request.scheduledFor.toISOString(),
+          },
+        },
+        transaction
+      )
+
       await this.outboxService.publishMessage(
         OUTBOX_MESSAGE_TYPES.SEND_EMAIL,
         this.organizationEmailService.composeDeletionScheduledEmail({
@@ -121,12 +147,17 @@ export class OrganizationDeletionService {
   }
 
   /** Cancels from the organization settings, without the emailed link. */
-  async cancelDeletion(access: OrganizationAccess, session: AuthUserSession) {
+  async cancelDeletion(
+    access: OrganizationAccess,
+    session: AuthUserSession,
+    actor: ActivityActor
+  ) {
     await this.organizationsRepository.transaction(async (transaction) => {
       const organization = await this.organizationsRepository.lockOrganization(
         access.organization.id,
         transaction
       )
+
       const request = organization
         ? await this.organizationsRepository.findDeletionRequestOfOrganization(
             organization.id,
@@ -144,12 +175,22 @@ export class OrganizationDeletionService {
         transaction
       )
 
-      await this.restoreOrganization(organization, request, owner, transaction)
+      await this.restoreOrganization(
+        organization,
+        request,
+        owner,
+        actor,
+        transaction
+      )
     })
   }
 
   /** Cancels through the emailed link; it works only for the owner who is signed in. */
-  async cancelDeletionByToken(session: AuthUserSession, rawToken: string) {
+  async cancelDeletionByToken(
+    session: AuthUserSession,
+    actor: ActivityActor,
+    rawToken: string
+  ) {
     await this.organizationsRepository.transaction(async (transaction) => {
       const { request, organization, owner } = await this.resolveDeletionAction(
         await this.organizationsRepository.lockDeletionRequestByCancelTokenHash(
@@ -160,14 +201,24 @@ export class OrganizationDeletionService {
         transaction
       )
 
-      await this.restoreOrganization(organization, request, owner, transaction)
+      await this.restoreOrganization(
+        organization,
+        request,
+        owner,
+        actor,
+        transaction
+      )
     })
   }
 
   /** Deletes right away through the emailed link; it works only for the owner who is signed in. */
-  async deleteOrganizationByToken(session: AuthUserSession, rawToken: string) {
+  async deleteOrganizationByToken(
+    session: AuthUserSession,
+    actor: ActivityActor,
+    rawToken: string
+  ) {
     await this.organizationsRepository.transaction(async (transaction) => {
-      const { organization, owner } = await this.resolveDeletionAction(
+      const { request, organization, owner } = await this.resolveDeletionAction(
         await this.organizationsRepository.lockDeletionRequestByDeleteTokenHash(
           this.authTokenService.hashToken(rawToken),
           transaction
@@ -176,7 +227,13 @@ export class OrganizationDeletionService {
         transaction
       )
 
-      await this.deleteOrganization(organization, owner, transaction)
+      await this.deleteOrganization(
+        organization,
+        request,
+        owner,
+        actor,
+        transaction
+      )
     })
   }
 
@@ -203,7 +260,13 @@ export class OrganizationDeletionService {
           transaction
         )
 
-        await this.deleteOrganization(organization, owner, transaction)
+        await this.deleteOrganization(
+          organization,
+          request,
+          owner,
+          SYSTEM_ACTIVITY_ACTOR,
+          transaction
+        )
       }
 
       return requests.length
@@ -236,7 +299,7 @@ export class OrganizationDeletionService {
   ): Promise<{
     request: OrganizationDeletionRequestRecord
     organization: OrganizationRecord
-    owner: OrganizationPerson
+    owner: OrganizationMember
   }> {
     if (!request || request.scheduledFor <= new Date()) {
       throw new DomainError(ORGANIZATION_ERRORS.INVALID_DELETION_ACTION)
@@ -262,17 +325,35 @@ export class OrganizationDeletionService {
     organization: OrganizationRecord,
     request: OrganizationDeletionRequestRecord,
     owner: OrganizationPerson,
+    actor: ActivityActor,
     transaction: Transaction
   ) {
     await this.organizationsRepository.deleteDeletionRequest(
       request.id,
       transaction
     )
+
     await this.organizationsRepository.updateOrganization(
       organization.id,
       { status: ORGANIZATION_STATUSES.ACTIVE },
       transaction
     )
+
+    await this.activityLogService.recordActivity(
+      actor,
+      {
+        organizationId: organization.id,
+        action: ACTIVITY_ACTIONS.ORGANIZATION_DELETION_CANCELED,
+        resource: organizationActivityResource(organization),
+        before: {
+          status: organization.status,
+          scheduledFor: request.scheduledFor.toISOString(),
+        },
+        after: { status: ORGANIZATION_STATUSES.ACTIVE },
+      },
+      transaction
+    )
+
     await this.outboxService.publishMessage(
       OUTBOX_MESSAGE_TYPES.SEND_EMAIL,
       this.organizationEmailService.composeDeletionCanceledEmail(
@@ -283,12 +364,38 @@ export class OrganizationDeletionService {
     )
   }
 
-  /** Memberships, invitations and the deletion request go with it (cascade). */
+  /**
+   * Everything of the organization goes with it (cascade); the files of its
+   * videos are removed from storage by the worker afterwards.
+   */
   private async deleteOrganization(
     organization: OrganizationRecord,
-    owner: OrganizationPerson | null,
+    request: OrganizationDeletionRequestRecord,
+    owner: OrganizationMember | null,
+    actor: ActivityActor,
     transaction: Transaction
   ) {
+    await this.organizationFilesCleanup.scheduleOrganizationFilesRemoval(
+      organization.id,
+      transaction
+    )
+
+    await this.activityLogService.recordActivity(
+      actor,
+      {
+        organizationId: organization.id,
+        accountUserId: owner?.userId ?? null,
+        action: ACTIVITY_ACTIONS.ORGANIZATION_DELETED,
+        resource: organizationActivityResource(organization),
+        before: { name: organization.name, slug: organization.slug },
+        context: {
+          scheduledFor: request.scheduledFor.toISOString(),
+          scheduledByUserId: request.scheduledByUserId,
+        },
+      },
+      transaction
+    )
+
     await this.organizationsRepository.deleteOrganization(
       organization.id,
       transaction

@@ -1,6 +1,9 @@
 export const VALID_ENVIRONMENT = {
   DATABASE_URL: "postgresql://user:password@localhost:5432/database",
   AUTH_SECRET: "s".repeat(32),
+  OBJECT_STORAGE_ACCESS_KEY_ID: "access-key",
+  OBJECT_STORAGE_SECRET_ACCESS_KEY: "secret-key",
+  STORAGE_ENCRYPTION_KEY: Buffer.alloc(32, 1).toString("base64"),
 }
 
 export const REJECTED_ENVIRONMENTS = [
@@ -22,6 +25,21 @@ export const REJECTED_ENVIRONMENTS = [
       AUTH_COOKIE_SECURE: "false",
     },
     error: "Production requires secure cookies",
+  },
+  {
+    description: "a storage encryption key that is not 32 bytes",
+    environment: {
+      STORAGE_ENCRYPTION_KEY: Buffer.alloc(16, 1).toString("base64"),
+    },
+    error: "STORAGE_ENCRYPTION_KEY",
+  },
+  {
+    description: "a stall timeout that a late heartbeat could reach",
+    environment: {
+      VIDEO_PROCESSING_HEARTBEAT_INTERVAL_MS: "60000",
+      VIDEO_PROCESSING_STALL_TIMEOUT_MS: "90000",
+    },
+    error: "at least twice the heartbeat interval",
   },
   {
     description: "a short auth secret",

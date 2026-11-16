@@ -13,7 +13,14 @@ export const outboxMessages = pgTable(
   "outbox_messages",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    type: text("type", { enum: [OUTBOX_MESSAGE_TYPES.SEND_EMAIL] }).notNull(),
+    type: text("type", {
+      enum: [
+        OUTBOX_MESSAGE_TYPES.SEND_EMAIL,
+        OUTBOX_MESSAGE_TYPES.PROCESS_VIDEO,
+        OUTBOX_MESSAGE_TYPES.DELIVER_WEBHOOK,
+        OUTBOX_MESSAGE_TYPES.CLEAN_UP_STORAGE,
+      ],
+    }).notNull(),
     payload: jsonb("payload").$type<OutboxMessagePayload>().notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()

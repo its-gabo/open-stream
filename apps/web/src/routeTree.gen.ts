@@ -21,10 +21,20 @@ import { Route as GuestSignInRouteImport } from './routes/_guest/sign-in'
 import { Route as GuestSignUpRouteImport } from './routes/_guest/sign-up'
 import { Route as GuestVerifyEmailRouteImport } from './routes/_guest/verify-email'
 import { Route as AuthenticatedOrganizationSlugIndexRouteImport } from './routes/_authenticated/$organizationSlug/index'
+import { Route as AuthenticatedOrganizationSlugActivityRouteImport } from './routes/_authenticated/$organizationSlug/activity'
+import { Route as AuthenticatedOrganizationSlugStoragesRouteImport } from './routes/_authenticated/$organizationSlug/storages'
+import { Route as AuthenticatedAccountActivityRouteImport } from './routes/_authenticated/account/activity'
 import { Route as AuthenticatedOrganizationsNewRouteImport } from './routes/_authenticated/organizations/new'
+import { Route as AuthenticatedOrganizationSlugLibrariesIndexRouteImport } from './routes/_authenticated/$organizationSlug/libraries/index'
+import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId'
 import { Route as AuthenticatedOrganizationSlugSettingsIndexRouteImport } from './routes/_authenticated/$organizationSlug/settings/index'
 import { Route as AuthenticatedOrganizationSlugSettingsOrganizationRouteImport } from './routes/_authenticated/$organizationSlug/settings/organization'
 import { Route as AuthenticatedOrganizationSlugSettingsTeamRouteImport } from './routes/_authenticated/$organizationSlug/settings/team'
+import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdIndexRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/index'
+import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdApiRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/api'
+import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/encoding'
+import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/storage'
+import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdWebhooksRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/webhooks'
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
@@ -87,11 +97,41 @@ const AuthenticatedOrganizationSlugIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedOrganizationSlugRoute,
   } as any)
+const AuthenticatedOrganizationSlugActivityRoute =
+  AuthenticatedOrganizationSlugActivityRouteImport.update({
+    id: '/activity',
+    path: '/activity',
+    getParentRoute: () => AuthenticatedOrganizationSlugRoute,
+  } as any)
+const AuthenticatedOrganizationSlugStoragesRoute =
+  AuthenticatedOrganizationSlugStoragesRouteImport.update({
+    id: '/storages',
+    path: '/storages',
+    getParentRoute: () => AuthenticatedOrganizationSlugRoute,
+  } as any)
+const AuthenticatedAccountActivityRoute =
+  AuthenticatedAccountActivityRouteImport.update({
+    id: '/account/activity',
+    path: '/account/activity',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedOrganizationsNewRoute =
   AuthenticatedOrganizationsNewRouteImport.update({
     id: '/organizations/new',
     path: '/organizations/new',
     getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedOrganizationSlugLibrariesIndexRoute =
+  AuthenticatedOrganizationSlugLibrariesIndexRouteImport.update({
+    id: '/libraries/',
+    path: '/libraries/',
+    getParentRoute: () => AuthenticatedOrganizationSlugRoute,
+  } as any)
+const AuthenticatedOrganizationSlugLibrariesLibraryIdRoute =
+  AuthenticatedOrganizationSlugLibrariesLibraryIdRouteImport.update({
+    id: '/libraries/$libraryId',
+    path: '/libraries/$libraryId',
+    getParentRoute: () => AuthenticatedOrganizationSlugRoute,
   } as any)
 const AuthenticatedOrganizationSlugSettingsIndexRoute =
   AuthenticatedOrganizationSlugSettingsIndexRouteImport.update({
@@ -111,6 +151,36 @@ const AuthenticatedOrganizationSlugSettingsTeamRoute =
     path: '/settings/team',
     getParentRoute: () => AuthenticatedOrganizationSlugRoute,
   } as any)
+const AuthenticatedOrganizationSlugLibrariesLibraryIdIndexRoute =
+  AuthenticatedOrganizationSlugLibrariesLibraryIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedOrganizationSlugLibrariesLibraryIdRoute,
+  } as any)
+const AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute =
+  AuthenticatedOrganizationSlugLibrariesLibraryIdApiRouteImport.update({
+    id: '/api',
+    path: '/api',
+    getParentRoute: () => AuthenticatedOrganizationSlugLibrariesLibraryIdRoute,
+  } as any)
+const AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute =
+  AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRouteImport.update({
+    id: '/encoding',
+    path: '/encoding',
+    getParentRoute: () => AuthenticatedOrganizationSlugLibrariesLibraryIdRoute,
+  } as any)
+const AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRoute =
+  AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRouteImport.update({
+    id: '/storage',
+    path: '/storage',
+    getParentRoute: () => AuthenticatedOrganizationSlugLibrariesLibraryIdRoute,
+  } as any)
+const AuthenticatedOrganizationSlugLibrariesLibraryIdWebhooksRoute =
+  AuthenticatedOrganizationSlugLibrariesLibraryIdWebhooksRouteImport.update({
+    id: '/webhooks',
+    path: '/webhooks',
+    getParentRoute: () => AuthenticatedOrganizationSlugLibrariesLibraryIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
@@ -122,11 +192,21 @@ export interface FileRoutesByFullPath {
   '/sign-in': typeof GuestSignInRoute
   '/sign-up': typeof GuestSignUpRoute
   '/verify-email': typeof GuestVerifyEmailRoute
+  '/$organizationSlug/activity': typeof AuthenticatedOrganizationSlugActivityRoute
+  '/$organizationSlug/storages': typeof AuthenticatedOrganizationSlugStoragesRoute
+  '/account/activity': typeof AuthenticatedAccountActivityRoute
   '/organizations/new': typeof AuthenticatedOrganizationsNewRoute
   '/$organizationSlug/': typeof AuthenticatedOrganizationSlugIndexRoute
+  '/$organizationSlug/libraries/$libraryId': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdRouteWithChildren
   '/$organizationSlug/settings/organization': typeof AuthenticatedOrganizationSlugSettingsOrganizationRoute
   '/$organizationSlug/settings/team': typeof AuthenticatedOrganizationSlugSettingsTeamRoute
+  '/$organizationSlug/libraries/': typeof AuthenticatedOrganizationSlugLibrariesIndexRoute
   '/$organizationSlug/settings/': typeof AuthenticatedOrganizationSlugSettingsIndexRoute
+  '/$organizationSlug/libraries/$libraryId/api': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute
+  '/$organizationSlug/libraries/$libraryId/encoding': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute
+  '/$organizationSlug/libraries/$libraryId/storage': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRoute
+  '/$organizationSlug/libraries/$libraryId/webhooks': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdWebhooksRoute
+  '/$organizationSlug/libraries/$libraryId/': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof AuthenticatedIndexRoute
@@ -137,11 +217,20 @@ export interface FileRoutesByTo {
   '/sign-in': typeof GuestSignInRoute
   '/sign-up': typeof GuestSignUpRoute
   '/verify-email': typeof GuestVerifyEmailRoute
+  '/$organizationSlug/activity': typeof AuthenticatedOrganizationSlugActivityRoute
+  '/$organizationSlug/storages': typeof AuthenticatedOrganizationSlugStoragesRoute
+  '/account/activity': typeof AuthenticatedAccountActivityRoute
   '/organizations/new': typeof AuthenticatedOrganizationsNewRoute
   '/$organizationSlug': typeof AuthenticatedOrganizationSlugIndexRoute
   '/$organizationSlug/settings/organization': typeof AuthenticatedOrganizationSlugSettingsOrganizationRoute
   '/$organizationSlug/settings/team': typeof AuthenticatedOrganizationSlugSettingsTeamRoute
+  '/$organizationSlug/libraries': typeof AuthenticatedOrganizationSlugLibrariesIndexRoute
   '/$organizationSlug/settings': typeof AuthenticatedOrganizationSlugSettingsIndexRoute
+  '/$organizationSlug/libraries/$libraryId/api': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute
+  '/$organizationSlug/libraries/$libraryId/encoding': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute
+  '/$organizationSlug/libraries/$libraryId/storage': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRoute
+  '/$organizationSlug/libraries/$libraryId/webhooks': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdWebhooksRoute
+  '/$organizationSlug/libraries/$libraryId': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -156,11 +245,21 @@ export interface FileRoutesById {
   '/_guest/sign-up': typeof GuestSignUpRoute
   '/_guest/verify-email': typeof GuestVerifyEmailRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/$organizationSlug/activity': typeof AuthenticatedOrganizationSlugActivityRoute
+  '/_authenticated/$organizationSlug/storages': typeof AuthenticatedOrganizationSlugStoragesRoute
+  '/_authenticated/account/activity': typeof AuthenticatedAccountActivityRoute
   '/_authenticated/organizations/new': typeof AuthenticatedOrganizationsNewRoute
   '/_authenticated/$organizationSlug/': typeof AuthenticatedOrganizationSlugIndexRoute
+  '/_authenticated/$organizationSlug/libraries/$libraryId': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdRouteWithChildren
   '/_authenticated/$organizationSlug/settings/organization': typeof AuthenticatedOrganizationSlugSettingsOrganizationRoute
   '/_authenticated/$organizationSlug/settings/team': typeof AuthenticatedOrganizationSlugSettingsTeamRoute
+  '/_authenticated/$organizationSlug/libraries/': typeof AuthenticatedOrganizationSlugLibrariesIndexRoute
   '/_authenticated/$organizationSlug/settings/': typeof AuthenticatedOrganizationSlugSettingsIndexRoute
+  '/_authenticated/$organizationSlug/libraries/$libraryId/api': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute
+  '/_authenticated/$organizationSlug/libraries/$libraryId/encoding': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute
+  '/_authenticated/$organizationSlug/libraries/$libraryId/storage': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRoute
+  '/_authenticated/$organizationSlug/libraries/$libraryId/webhooks': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdWebhooksRoute
+  '/_authenticated/$organizationSlug/libraries/$libraryId/': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -174,11 +273,21 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/verify-email'
+    | '/$organizationSlug/activity'
+    | '/$organizationSlug/storages'
+    | '/account/activity'
     | '/organizations/new'
     | '/$organizationSlug/'
+    | '/$organizationSlug/libraries/$libraryId'
     | '/$organizationSlug/settings/organization'
     | '/$organizationSlug/settings/team'
+    | '/$organizationSlug/libraries/'
     | '/$organizationSlug/settings/'
+    | '/$organizationSlug/libraries/$libraryId/api'
+    | '/$organizationSlug/libraries/$libraryId/encoding'
+    | '/$organizationSlug/libraries/$libraryId/storage'
+    | '/$organizationSlug/libraries/$libraryId/webhooks'
+    | '/$organizationSlug/libraries/$libraryId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -189,11 +298,20 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/verify-email'
+    | '/$organizationSlug/activity'
+    | '/$organizationSlug/storages'
+    | '/account/activity'
     | '/organizations/new'
     | '/$organizationSlug'
     | '/$organizationSlug/settings/organization'
     | '/$organizationSlug/settings/team'
+    | '/$organizationSlug/libraries'
     | '/$organizationSlug/settings'
+    | '/$organizationSlug/libraries/$libraryId/api'
+    | '/$organizationSlug/libraries/$libraryId/encoding'
+    | '/$organizationSlug/libraries/$libraryId/storage'
+    | '/$organizationSlug/libraries/$libraryId/webhooks'
+    | '/$organizationSlug/libraries/$libraryId'
   id:
     | '__root__'
     | '/_authenticated'
@@ -207,11 +325,21 @@ export interface FileRouteTypes {
     | '/_guest/sign-up'
     | '/_guest/verify-email'
     | '/_authenticated/'
+    | '/_authenticated/$organizationSlug/activity'
+    | '/_authenticated/$organizationSlug/storages'
+    | '/_authenticated/account/activity'
     | '/_authenticated/organizations/new'
     | '/_authenticated/$organizationSlug/'
+    | '/_authenticated/$organizationSlug/libraries/$libraryId'
     | '/_authenticated/$organizationSlug/settings/organization'
     | '/_authenticated/$organizationSlug/settings/team'
+    | '/_authenticated/$organizationSlug/libraries/'
     | '/_authenticated/$organizationSlug/settings/'
+    | '/_authenticated/$organizationSlug/libraries/$libraryId/api'
+    | '/_authenticated/$organizationSlug/libraries/$libraryId/encoding'
+    | '/_authenticated/$organizationSlug/libraries/$libraryId/storage'
+    | '/_authenticated/$organizationSlug/libraries/$libraryId/webhooks'
+    | '/_authenticated/$organizationSlug/libraries/$libraryId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -305,12 +433,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOrganizationSlugIndexRouteImport
       parentRoute: typeof AuthenticatedOrganizationSlugRoute
     }
+    '/_authenticated/$organizationSlug/activity': {
+      id: '/_authenticated/$organizationSlug/activity'
+      path: '/activity'
+      fullPath: '/$organizationSlug/activity'
+      preLoaderRoute: typeof AuthenticatedOrganizationSlugActivityRouteImport
+      parentRoute: typeof AuthenticatedOrganizationSlugRoute
+    }
+    '/_authenticated/$organizationSlug/storages': {
+      id: '/_authenticated/$organizationSlug/storages'
+      path: '/storages'
+      fullPath: '/$organizationSlug/storages'
+      preLoaderRoute: typeof AuthenticatedOrganizationSlugStoragesRouteImport
+      parentRoute: typeof AuthenticatedOrganizationSlugRoute
+    }
+    '/_authenticated/account/activity': {
+      id: '/_authenticated/account/activity'
+      path: '/account/activity'
+      fullPath: '/account/activity'
+      preLoaderRoute: typeof AuthenticatedAccountActivityRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/organizations/new': {
       id: '/_authenticated/organizations/new'
       path: '/organizations/new'
       fullPath: '/organizations/new'
       preLoaderRoute: typeof AuthenticatedOrganizationsNewRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/$organizationSlug/libraries/': {
+      id: '/_authenticated/$organizationSlug/libraries/'
+      path: '/libraries'
+      fullPath: '/$organizationSlug/libraries/'
+      preLoaderRoute: typeof AuthenticatedOrganizationSlugLibrariesIndexRouteImport
+      parentRoute: typeof AuthenticatedOrganizationSlugRoute
+    }
+    '/_authenticated/$organizationSlug/libraries/$libraryId': {
+      id: '/_authenticated/$organizationSlug/libraries/$libraryId'
+      path: '/libraries/$libraryId'
+      fullPath: '/$organizationSlug/libraries/$libraryId'
+      preLoaderRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdRouteImport
+      parentRoute: typeof AuthenticatedOrganizationSlugRoute
     }
     '/_authenticated/$organizationSlug/settings/': {
       id: '/_authenticated/$organizationSlug/settings/'
@@ -333,24 +496,98 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOrganizationSlugSettingsTeamRouteImport
       parentRoute: typeof AuthenticatedOrganizationSlugRoute
     }
+    '/_authenticated/$organizationSlug/libraries/$libraryId/': {
+      id: '/_authenticated/$organizationSlug/libraries/$libraryId/'
+      path: '/'
+      fullPath: '/$organizationSlug/libraries/$libraryId/'
+      preLoaderRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdIndexRouteImport
+      parentRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdRoute
+    }
+    '/_authenticated/$organizationSlug/libraries/$libraryId/api': {
+      id: '/_authenticated/$organizationSlug/libraries/$libraryId/api'
+      path: '/api'
+      fullPath: '/$organizationSlug/libraries/$libraryId/api'
+      preLoaderRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdApiRouteImport
+      parentRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdRoute
+    }
+    '/_authenticated/$organizationSlug/libraries/$libraryId/encoding': {
+      id: '/_authenticated/$organizationSlug/libraries/$libraryId/encoding'
+      path: '/encoding'
+      fullPath: '/$organizationSlug/libraries/$libraryId/encoding'
+      preLoaderRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRouteImport
+      parentRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdRoute
+    }
+    '/_authenticated/$organizationSlug/libraries/$libraryId/storage': {
+      id: '/_authenticated/$organizationSlug/libraries/$libraryId/storage'
+      path: '/storage'
+      fullPath: '/$organizationSlug/libraries/$libraryId/storage'
+      preLoaderRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRouteImport
+      parentRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdRoute
+    }
+    '/_authenticated/$organizationSlug/libraries/$libraryId/webhooks': {
+      id: '/_authenticated/$organizationSlug/libraries/$libraryId/webhooks'
+      path: '/webhooks'
+      fullPath: '/$organizationSlug/libraries/$libraryId/webhooks'
+      preLoaderRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdWebhooksRouteImport
+      parentRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdRoute
+    }
   }
 }
 
+interface AuthenticatedOrganizationSlugLibrariesLibraryIdRouteChildren {
+  AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute
+  AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute
+  AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRoute
+  AuthenticatedOrganizationSlugLibrariesLibraryIdWebhooksRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdWebhooksRoute
+  AuthenticatedOrganizationSlugLibrariesLibraryIdIndexRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdIndexRoute
+}
+
+const AuthenticatedOrganizationSlugLibrariesLibraryIdRouteChildren: AuthenticatedOrganizationSlugLibrariesLibraryIdRouteChildren =
+  {
+    AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute:
+      AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute,
+    AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute:
+      AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute,
+    AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRoute:
+      AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRoute,
+    AuthenticatedOrganizationSlugLibrariesLibraryIdWebhooksRoute:
+      AuthenticatedOrganizationSlugLibrariesLibraryIdWebhooksRoute,
+    AuthenticatedOrganizationSlugLibrariesLibraryIdIndexRoute:
+      AuthenticatedOrganizationSlugLibrariesLibraryIdIndexRoute,
+  }
+
+const AuthenticatedOrganizationSlugLibrariesLibraryIdRouteWithChildren =
+  AuthenticatedOrganizationSlugLibrariesLibraryIdRoute._addFileChildren(
+    AuthenticatedOrganizationSlugLibrariesLibraryIdRouteChildren,
+  )
+
 interface AuthenticatedOrganizationSlugRouteChildren {
+  AuthenticatedOrganizationSlugActivityRoute: typeof AuthenticatedOrganizationSlugActivityRoute
+  AuthenticatedOrganizationSlugStoragesRoute: typeof AuthenticatedOrganizationSlugStoragesRoute
   AuthenticatedOrganizationSlugIndexRoute: typeof AuthenticatedOrganizationSlugIndexRoute
+  AuthenticatedOrganizationSlugLibrariesLibraryIdRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdRouteWithChildren
   AuthenticatedOrganizationSlugSettingsOrganizationRoute: typeof AuthenticatedOrganizationSlugSettingsOrganizationRoute
   AuthenticatedOrganizationSlugSettingsTeamRoute: typeof AuthenticatedOrganizationSlugSettingsTeamRoute
+  AuthenticatedOrganizationSlugLibrariesIndexRoute: typeof AuthenticatedOrganizationSlugLibrariesIndexRoute
   AuthenticatedOrganizationSlugSettingsIndexRoute: typeof AuthenticatedOrganizationSlugSettingsIndexRoute
 }
 
 const AuthenticatedOrganizationSlugRouteChildren: AuthenticatedOrganizationSlugRouteChildren =
   {
+    AuthenticatedOrganizationSlugActivityRoute:
+      AuthenticatedOrganizationSlugActivityRoute,
+    AuthenticatedOrganizationSlugStoragesRoute:
+      AuthenticatedOrganizationSlugStoragesRoute,
     AuthenticatedOrganizationSlugIndexRoute:
       AuthenticatedOrganizationSlugIndexRoute,
+    AuthenticatedOrganizationSlugLibrariesLibraryIdRoute:
+      AuthenticatedOrganizationSlugLibrariesLibraryIdRouteWithChildren,
     AuthenticatedOrganizationSlugSettingsOrganizationRoute:
       AuthenticatedOrganizationSlugSettingsOrganizationRoute,
     AuthenticatedOrganizationSlugSettingsTeamRoute:
       AuthenticatedOrganizationSlugSettingsTeamRoute,
+    AuthenticatedOrganizationSlugLibrariesIndexRoute:
+      AuthenticatedOrganizationSlugLibrariesIndexRoute,
     AuthenticatedOrganizationSlugSettingsIndexRoute:
       AuthenticatedOrganizationSlugSettingsIndexRoute,
   }
@@ -365,6 +602,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedInboxRoute: typeof AuthenticatedInboxRoute
   AuthenticatedOrganizationDeletionRoute: typeof AuthenticatedOrganizationDeletionRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedAccountActivityRoute: typeof AuthenticatedAccountActivityRoute
   AuthenticatedOrganizationsNewRoute: typeof AuthenticatedOrganizationsNewRoute
 }
 
@@ -375,6 +613,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedOrganizationDeletionRoute:
     AuthenticatedOrganizationDeletionRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedAccountActivityRoute: AuthenticatedAccountActivityRoute,
   AuthenticatedOrganizationsNewRoute: AuthenticatedOrganizationsNewRoute,
 }
 

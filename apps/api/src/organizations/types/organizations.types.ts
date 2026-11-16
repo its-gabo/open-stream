@@ -1,3 +1,5 @@
+import type { Logger } from "../../common/logging/logger"
+import type { ActivityLogService } from "../../activity/services/activity-log.service"
 import type {
   ORGANIZATION_INVITATION_STATUSES,
   ORGANIZATION_ROLES,
@@ -9,7 +11,7 @@ import type { AuthTokenService } from "../../auth/services/auth-token.service"
 import type { AuthenticatedEnv } from "../../auth/types/auth.types"
 import type { ValueOf } from "../../common/types/common.types"
 import type { AppConfig } from "../../config/app.config"
-import type { Database } from "../../db/database.types"
+import type { Database, Transaction } from "../../db/database.types"
 import type { OutboxService } from "../../outbox/services/outbox.service"
 import type { ORGANIZATION_DELETION_ACTIONS } from "../constants/organizations.constants"
 
@@ -49,11 +51,29 @@ export type OrganizationPerson = {
   name: string
 }
 
+/** A member with the account behind them. */
+export type OrganizationMember = OrganizationPerson & {
+  membershipId: string
+  userId: string
+  role: OrganizationRole
+}
+
+/** Removes the files an organization keeps in storage once it is deleted; implemented by the libraries. */
+export type OrganizationFilesCleanup = {
+  scheduleOrganizationFilesRemoval(
+    organizationId: string,
+    transaction: Transaction
+  ): Promise<void>
+}
+
 export type OrganizationModuleDependencies = {
   db: Database
   config: AppConfig
   outboxService: OutboxService
   authTokenService: AuthTokenService
+  activityLogService: ActivityLogService
+  videoFilesCleanupService: OrganizationFilesCleanup
+  logger: Logger
 }
 
 export type OrganizationRouterDependencies = {

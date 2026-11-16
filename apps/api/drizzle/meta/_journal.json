@@ -15,6 +15,13 @@
       "when": 1792958736488,
       "tag": "0001_add_organizations",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794867928392,
+      "tag": "0002_add_libraries_videos_webhooks_and_activity",
+      "breakpoints": true
     }
   ]
 }

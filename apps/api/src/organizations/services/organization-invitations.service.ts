@@ -1,8 +1,11 @@
 import {
+  ACTIVITY_ACTIONS,
   ORGANIZATION_INVITATION_STATUSES,
   ORGANIZATION_MEMBERSHIP_LIMIT,
   ORGANIZATION_ROLES,
 } from "@workspace/shared"
+import type { ActivityLogService } from "../../activity/services/activity-log.service"
+import type { ActivityActor } from "../../activity/types/activity.types"
 import type { AuthUserSession } from "../../auth/types/auth.types"
 import { DomainError } from "../../common/errors/domain-error"
 import type { Transaction } from "../../db/database.types"
@@ -11,6 +14,7 @@ import type { OutboxService } from "../../outbox/services/outbox.service"
 import { toOrganizationSummaryDto } from "../dto/organizations.dto.mappers"
 import { ORGANIZATION_ERRORS } from "../errors/organizations.errors"
 import type { OrganizationsRepository } from "../repository/organizations.repository"
+import { invitationActivityResource } from "../utils/organization-activity.utils"
 import { lockActiveOrganization } from "../utils/organization-locks.utils"
 import type { OrganizationEmailService } from "./organization-email.service"
 
@@ -19,11 +23,16 @@ export class OrganizationInvitationsService {
   constructor(
     private readonly organizationsRepository: OrganizationsRepository,
     private readonly outboxService: OutboxService,
-    private readonly organizationEmailService: OrganizationEmailService
+    private readonly organizationEmailService: OrganizationEmailService,
+    private readonly activityLogService: ActivityLogService
   ) {}
 
   /** Joins the organization as a member, selects it and notifies the owner. */
-  async acceptInvitation(session: AuthUserSession, invitationId: string) {
+  async acceptInvitation(
+    session: AuthUserSession,
+    actor: ActivityActor,
+    invitationId: string
+  ) {
     return this.organizationsRepository.transaction(async (transaction) => {
       await this.organizationsRepository.lockUser(session.userId, transaction)
 
@@ -64,6 +73,20 @@ export class OrganizationInvitationsService {
         { status: ORGANIZATION_INVITATION_STATUSES.ACCEPTED },
         transaction
       )
+      await this.activityLogService.recordActivity(
+        actor,
+        {
+          organizationId: organization.id,
+          action: ACTIVITY_ACTIONS.INVITATION_ACCEPTED,
+          resource: invitationActivityResource(invitation),
+          before: { status: invitation.status },
+          after: {
+            status: ORGANIZATION_INVITATION_STATUSES.ACCEPTED,
+            membershipId: membership.id,
+          },
+        },
+        transaction
+      )
 
       const owner = await this.organizationsRepository.findOwner(
         organization.id,
@@ -91,7 +114,11 @@ export class OrganizationInvitationsService {
     })
   }
 
-  async declineInvitation(session: AuthUserSession, invitationId: string) {
+  async declineInvitation(
+    session: AuthUserSession,
+    actor: ActivityActor,
+    invitationId: string
+  ) {
     await this.organizationsRepository.transaction(async (transaction) => {
       const invitation = await this.lockPendingInvitation(
         session,
@@ -102,6 +129,17 @@ export class OrganizationInvitationsService {
       await this.organizationsRepository.updateInvitation(
         invitation.id,
         { status: ORGANIZATION_INVITATION_STATUSES.DECLINED },
+        transaction
+      )
+      await this.activityLogService.recordActivity(
+        actor,
+        {
+          organizationId: invitation.organizationId,
+          action: ACTIVITY_ACTIONS.INVITATION_DECLINED,
+          resource: invitationActivityResource(invitation),
+          before: { status: invitation.status },
+          after: { status: ORGANIZATION_INVITATION_STATUSES.DECLINED },
+        },
         transaction
       )
     })

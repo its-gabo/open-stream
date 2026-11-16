@@ -1,21 +1,13 @@
+import type { Logger } from "../../common/logging/logger"
+import { logJobFailed } from "../../common/logging/queue-job-logging.utils"
 import { UnrecoverableError, Worker, type Job } from "bullmq"
 import type { AppConfig } from "../../config/app.config"
-import {
-  OUTBOX_MESSAGE_TYPES,
-  OUTBOX_QUEUE_NAME,
-} from "../constants/outbox.constants"
+import { OUTBOX_QUEUE_NAME } from "../constants/outbox.constants"
 import type {
   OutboxMessageHandlers,
   OutboxMessagePayload,
-  OutboxMessageType,
 } from "../types/outbox.types"
-
-const OUTBOX_MESSAGE_TYPE_VALUES = new Set<string>(
-  Object.values(OUTBOX_MESSAGE_TYPES)
-)
-
-const isOutboxMessageType = (name: string): name is OutboxMessageType =>
-  OUTBOX_MESSAGE_TYPE_VALUES.has(name)
+import { isOutboxMessageType } from "../utils/outbox.utils"
 
 /** Processes queued outbox messages with the handler registered for their type. */
 export class OutboxConsumerService {
@@ -23,6 +15,7 @@ export class OutboxConsumerService {
 
   constructor(
     private readonly outboxMessageHandlers: OutboxMessageHandlers,
+    private readonly logger: Logger,
     private readonly config: AppConfig
   ) {}
 
@@ -36,12 +29,16 @@ export class OutboxConsumerService {
       }
     )
 
+    this.worker.on("completed", (job) =>
+      this.logger.debug("Message handled", {
+        messageId: job.id,
+        type: job.name,
+      })
+    )
     this.worker.on("failed", (job, error) =>
-      console.error("Outbox message handling failed", {
-        jobId: job?.id,
+      logJobFailed(this.logger, job, error, {
+        messageId: job?.id,
         type: job?.name,
-        attemptsMade: job?.attemptsMade,
-        error: error.message,
       })
     )
   }

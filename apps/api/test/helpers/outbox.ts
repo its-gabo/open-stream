@@ -8,6 +8,9 @@ import { OUTBOX_MESSAGE_TYPES } from "../../src/outbox/constants/outbox.constant
 
 import type { OrganizationNotificationEmailProps } from "@workspace/email-templates"
 import type { SendEmailPayload } from "../../src/email/types/email.types"
+import type { ProcessVideoPayload } from "../../src/libraries/types/libraries.types"
+import type { StorageCleanupPayload } from "../../src/storage/types/storage.types"
+import type { DeliverWebhookPayload } from "../../src/webhooks/types/webhooks.types"
 import type { TestApp } from "./test-app"
 
 /** Emails published to the outbox, oldest first; the worker is not running in tests. */
@@ -128,4 +131,47 @@ export async function latestInvitationId(testApp: TestApp, recipient: string) {
     .otherwise(() => {
       throw new Error(`No invitation was published to ${recipient}`)
     })
+}
+
+/** Processing requests published to the outbox, oldest first. */
+export async function findVideoProcessingRequests(testApp: TestApp) {
+  const messages = await testApp.appModule.db
+    .select()
+    .from(outboxMessages)
+    .orderBy(asc(outboxMessages.createdAt))
+
+  return messages
+    .filter((message) => message.type === OUTBOX_MESSAGE_TYPES.PROCESS_VIDEO)
+    .map((message) => message.payload as ProcessVideoPayload)
+}
+
+/** Webhook delivery requests published to the outbox, oldest first. */
+export async function findWebhookDeliveryRequests(testApp: TestApp) {
+  const messages = await testApp.appModule.db
+    .select()
+    .from(outboxMessages)
+    .orderBy(asc(outboxMessages.createdAt))
+
+  return messages
+    .filter((message) => message.type === OUTBOX_MESSAGE_TYPES.DELIVER_WEBHOOK)
+    .map((message) => message.payload as DeliverWebhookPayload)
+}
+
+/** Runs what the worker runs for every storage cleanup published so far; returns the errors of those that failed. */
+export async function runStorageCleanups(testApp: TestApp) {
+  const messages = await testApp.appModule.db
+    .select()
+    .from(outboxMessages)
+    .orderBy(asc(outboxMessages.createdAt))
+  const errors: unknown[] = []
+
+  for (const message of messages) {
+    if (message.type !== OUTBOX_MESSAGE_TYPES.CLEAN_UP_STORAGE) continue
+
+    await testApp.appModule.storageCleanupService
+      .runCleanup(message.payload as StorageCleanupPayload)
+      .catch((error: unknown) => errors.push(error))
+  }
+
+  return errors
 }

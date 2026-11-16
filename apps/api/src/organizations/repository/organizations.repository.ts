@@ -24,22 +24,10 @@ import type {
   OrganizationRole,
   OrganizationStatus,
 } from "../types/organizations.types"
-
-const organizationSummaryColumns = {
-  id: organizations.id,
-  name: organizations.name,
-  slug: organizations.slug,
-  status: organizations.status,
-  scheduledDeletionAt: organizationDeletionRequests.scheduledFor,
-}
-
-const membershipWithUserColumns = {
-  membershipId: organizationMemberships.id,
-  userId: organizationMemberships.userId,
-  role: organizationMemberships.role,
-  email: users.email,
-  name: users.name,
-}
+import {
+  membershipWithUserColumns,
+  organizationSummaryColumns,
+} from "../utils/organization-query.utils"
 
 export class OrganizationsRepository {
   constructor(private readonly db: Database) {}

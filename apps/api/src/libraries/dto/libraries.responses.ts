@@ -23,6 +23,7 @@ export const LIBRARY_SUCCESS_CODES = {
   ENCODING_UPDATE: "library.encoding.update.success",
   VIDEO_REPROCESS: "video.reprocess.success",
   VIDEO_STATUS_GET: "video.status.get.success",
+  VIDEO_EMBED_GET: "video.embed.get.success",
 } as const
 
 export const LIBRARY_SUCCESS_RESULTS = {
@@ -97,6 +98,10 @@ export const LIBRARY_SUCCESS_RESULTS = {
   PLAYBACK_URL_CREATE: {
     code: LIBRARY_SUCCESS_CODES.PLAYBACK_URL_CREATE,
     message: "Playback URL created.",
+  },
+  VIDEO_EMBED_GET: {
+    code: LIBRARY_SUCCESS_CODES.VIDEO_EMBED_GET,
+    message: "Video embed fetched.",
   },
   ENCODING_GET: {
     code: LIBRARY_SUCCESS_CODES.ENCODING_GET,

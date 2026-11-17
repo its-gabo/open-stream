@@ -9,6 +9,7 @@ const ffprobeOutputSchema = z.object({
         codec_name: z.string().optional(),
         width: z.number().optional(),
         height: z.number().optional(),
+        avg_frame_rate: z.string().optional(),
         tags: z.object({ rotate: z.string().optional() }).optional(),
         side_data_list: z
           .array(z.object({ rotation: z.number().optional() }))
@@ -25,6 +26,14 @@ const readRotation = (
 ) =>
   stream.side_data_list?.find((data) => data.rotation !== undefined)
     ?.rotation ?? Number(stream.tags?.rotate ?? 0)
+
+/** A rate such as `30000/1001`; ffprobe writes `0/0` when it does not know. */
+const parseFrameRate = (rate: string | undefined) => {
+  const [frames, seconds] = (rate ?? "").split("/").map(Number)
+  const frameRate = frames! / seconds!
+
+  return Number.isFinite(frameRate) && frameRate > 0 ? frameRate : null
+}
 
 /** The probe of `ffprobe -print_format json -show_streams -show_format`; null without a video stream. */
 export function parseFfprobeOutput(output: string): MediaProbe | null {
@@ -45,5 +54,6 @@ export function parseFfprobeOutput(output: string): MediaProbe | null {
     height: isQuarterTurn ? video.width : video.height,
     videoCodec: video.codec_name ?? "unknown",
     audioCodec: audio?.codec_name ?? null,
+    frameRate: parseFrameRate(video.avg_frame_rate),
   }
 }

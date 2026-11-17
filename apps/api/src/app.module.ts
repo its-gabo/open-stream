@@ -1,4 +1,5 @@
 import { createActivityModule } from "./activity/activity.module"
+import { createAnalyticsModule } from "./analytics/analytics.module"
 import { createAuthModule } from "./auth/auth.module"
 import { createLoggingModule } from "./common/logging/logging.module"
 import type { LogSink } from "./common/logging/logging.types"
@@ -70,6 +71,10 @@ export function createAppModule(
     ...storage,
     ...media,
   })
+  const analytics = createAnalyticsModule({
+    db: database.db,
+    videoPlaybackService: libraries.videoPlaybackService,
+  })
   const organizations = createOrganizationsModule({
     db: database.db,
     config,
@@ -93,6 +98,7 @@ export function createAppModule(
     ...media,
     ...webhooks,
     ...libraries,
+    ...analytics,
     async close() {
       email.emailSenderService.close()
       await database.close()

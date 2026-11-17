@@ -52,7 +52,13 @@ export const PROBE_OUTPUTS = [
     description: "a landscape video with audio",
     output: {
       streams: [
-        { codec_type: "video", codec_name: "h264", width: 1920, height: 1080 },
+        {
+          codec_type: "video",
+          codec_name: "h264",
+          width: 1920,
+          height: 1080,
+          avg_frame_rate: "30000/1001",
+        },
         { codec_type: "audio", codec_name: "aac" },
       ],
       format: { duration: "12.5" },
@@ -63,6 +69,7 @@ export const PROBE_OUTPUTS = [
       height: 1080,
       videoCodec: "h264",
       audioCodec: "aac",
+      frameRate: 30000 / 1001,
     },
   },
   {
@@ -74,6 +81,7 @@ export const PROBE_OUTPUTS = [
           codec_name: "hevc",
           width: 1920,
           height: 1080,
+          avg_frame_rate: "0/0",
           side_data_list: [{ rotation: -90 }],
         },
       ],
@@ -85,6 +93,7 @@ export const PROBE_OUTPUTS = [
       height: 1920,
       videoCodec: "hevc",
       audioCodec: null,
+      frameRate: null,
     },
   },
 ] as const

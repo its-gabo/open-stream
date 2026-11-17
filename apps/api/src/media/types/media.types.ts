@@ -10,6 +10,8 @@ export type MediaProbe = {
   height: number
   videoCodec: string
   audioCodec: string | null
+  /** Average frames per second; null when the file does not say. */
+  frameRate: number | null
 }
 
 export type HlsRenditionOutput = {
@@ -39,6 +41,8 @@ export type HlsTranscodeJob = {
   outputDir: string
   renditions: HlsRenditionOutput[]
   hasAudio: boolean
+  /** The source's average frame rate; the renditions get a constant one from it. */
+  sourceFrameRate: number | null
   segmentSeconds: number
   masterPlaylistName: string
   variantPlaylistName: string

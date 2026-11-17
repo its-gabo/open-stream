@@ -6,11 +6,17 @@ import {
   SheetTitle,
 } from "@workspace/ui/components/sheet"
 import { Skeleton } from "@workspace/ui/components/skeleton"
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@workspace/ui/components/tabs"
 import { FilmIcon } from "lucide-react"
 import { Suspense, lazy } from "react"
 import { useTranslation } from "react-i18next"
 
-import { VIDEO_PLAYER_PATHS } from "../libraries.constants"
+import { VIDEO_DETAILS_TABS, VIDEO_PLAYER_PATHS } from "../libraries.constants"
 import {
   buildVideoFileUrl,
   buildVideoPosterUrl,
@@ -19,6 +25,8 @@ import {
 } from "../libraries.utils"
 
 import type { Video } from "@/api/generated-api"
+import { VideoAnalyticsSection } from "@/modules/analytics/components/video-analytics-section"
+import { VideoEmbedSection } from "@/modules/embed/components/video-embed-section"
 
 const VideoPlayer = lazy(() =>
   import("./video-player").then((module) => ({ default: module.VideoPlayer }))
@@ -66,6 +74,10 @@ function VideoDetails({
 }: Omit<VideoDetailsSheetProps, "video" | "onClose"> & { video: Video }) {
   const { t, i18n } = useTranslation()
   const isPlayable = video.processingStatus === VIDEO_PROCESSING_STATUSES.READY
+  const embedSize =
+    isPlayable && video.width !== null && video.height !== null
+      ? { width: video.width, height: video.height }
+      : null
   const formatDate = (value: string | null) =>
     value
       ? new Intl.DateTimeFormat(i18n.language, {
@@ -138,16 +150,64 @@ function VideoDetails({
             {t("videos.details.not_playable")}
           </div>
         )}
-        <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-sm">
-          {details.map(({ key, value }) => (
-            <div key={key} className="contents">
-              <dt className="text-muted-foreground">
-                {t(`videos.details.fields.${key}`)}
-              </dt>
-              <dd className="min-w-0 break-words">{value}</dd>
-            </div>
-          ))}
-        </dl>
+        <Tabs defaultValue={VIDEO_DETAILS_TABS.DETAILS} className="gap-4">
+          <TabsList
+            variant="line"
+            className="h-11 w-full justify-start gap-5 rounded-none border-b"
+          >
+            <TabsTrigger
+              value={VIDEO_DETAILS_TABS.DETAILS}
+              className="h-full flex-none px-0"
+            >
+              {t("videos.details.title")}
+            </TabsTrigger>
+            {isPlayable && (
+              <TabsTrigger
+                value={VIDEO_DETAILS_TABS.ANALYTICS}
+                className="h-full flex-none px-0"
+              >
+                {t("analytics.video.title")}
+              </TabsTrigger>
+            )}
+            {embedSize && (
+              <TabsTrigger
+                value={VIDEO_DETAILS_TABS.EMBED}
+                className="h-full flex-none px-0"
+              >
+                {t("embed.section.title")}
+              </TabsTrigger>
+            )}
+          </TabsList>
+          <TabsContent value={VIDEO_DETAILS_TABS.DETAILS}>
+            <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-sm">
+              {details.map(({ key, value }) => (
+                <div key={key} className="contents">
+                  <dt className="text-muted-foreground">
+                    {t(`videos.details.fields.${key}`)}
+                  </dt>
+                  <dd className="min-w-0 break-words">{value}</dd>
+                </div>
+              ))}
+            </dl>
+          </TabsContent>
+          {isPlayable && (
+            <TabsContent value={VIDEO_DETAILS_TABS.ANALYTICS}>
+              <VideoAnalyticsSection
+                organizationSlug={organizationSlug}
+                libraryId={libraryId}
+                videoId={video.id}
+              />
+            </TabsContent>
+          )}
+          {embedSize && (
+            <TabsContent value={VIDEO_DETAILS_TABS.EMBED}>
+              <VideoEmbedSection
+                libraryId={libraryId}
+                video={{ ...video, ...embedSize }}
+              />
+            </TabsContent>
+          )}
+        </Tabs>
       </div>
     </>
   )

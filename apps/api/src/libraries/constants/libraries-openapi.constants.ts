@@ -108,6 +108,11 @@ export const LIBRARY_ROUTE_ERROR_DESCRIPTIONS = {
     409: "The video is not processed yet",
     503: "The video storage is unavailable",
   },
+  VIDEO_EMBED: {
+    403: "The embedding page's host is not allowed, or the URL is not validly signed",
+    404: "The library or video does not exist",
+    409: "The video is not processed yet",
+  },
   VIDEO_STREAM: {
     403: "The page's host is not allowed, or the URL is not validly signed",
     404: "The library or video does not exist",

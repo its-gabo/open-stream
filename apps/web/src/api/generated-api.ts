@@ -116,6 +116,112 @@ export type ActivityResourceType =
   | "webhook"
   | "video"
 
+export interface AnalyticsDay {
+  /**
+   * @format date
+   * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+   */
+  date: string
+  /**
+   * @min 0
+   * @max 9007199254740991
+   */
+  views: number
+  /** @min 0 */
+  watchSeconds: number
+}
+
+export interface AnalyticsDevice {
+  deviceType: ViewerDeviceType
+  /**
+   * @min 0
+   * @max 9007199254740991
+   */
+  views: number
+}
+
+export interface AnalyticsEmbeddingHost {
+  host: string
+  /**
+   * @min 0
+   * @max 9007199254740991
+   */
+  views: number
+}
+
+export interface AnalyticsPeriod {
+  /**
+   * @exclusiveMin 0
+   * @max 9007199254740991
+   */
+  days: number
+  /**
+   * @format date-time
+   * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+   */
+  from: string
+  /**
+   * @format date-time
+   * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+   */
+  to: string
+}
+
+export interface AnalyticsTopLibrary {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  name: string
+  /**
+   * @min 0
+   * @max 9007199254740991
+   */
+  views: number
+  /** @min 0 */
+  watchSeconds: number
+}
+
+export interface AnalyticsTopVideo {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  libraryName: string
+  title: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+  /**
+   * @min 0
+   * @max 9007199254740991
+   */
+  views: number
+  /** @min 0 */
+  watchSeconds: number
+}
+
+export interface AnalyticsTotals {
+  /**
+   * @min 0
+   * @max 1
+   */
+  averageCompletion: number
+  /** @min 0 */
+  averageViewSeconds: number
+  /**
+   * @min 0
+   * @max 9007199254740991
+   */
+  views: number
+  /** @min 0 */
+  watchSeconds: number
+}
+
 export type ApiEmptyData = object
 
 export interface ApiErrorResponse {
@@ -334,6 +440,17 @@ export interface DeleteVideoParams {
   videoId: string
 }
 
+export interface GetLibraryAnalyticsParams {
+  /** @default 30 */
+  days?: number
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  organizationSlug: string
+}
+
 export interface GetLibraryApiAccessParams {
   /**
    * @format uuid
@@ -341,6 +458,47 @@ export interface GetLibraryApiAccessParams {
    */
   libraryId: string
   organizationSlug: string
+}
+
+export interface GetLibraryApiAnalyticsParams {
+  /** @default 30 */
+  days?: number
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+}
+
+export interface GetLibraryApiVideoAnalyticsParams {
+  /** @default 30 */
+  days?: number
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+}
+
+export interface GetLibraryApiVideoEmbedParams {
+  expires?: string
+  key?: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  token?: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
 }
 
 export interface GetLibraryApiVideoParams {
@@ -405,6 +563,12 @@ export interface GetLibraryWebhookParams {
   organizationSlug: string
 }
 
+export interface GetOrganizationAnalyticsParams {
+  /** @default 30 */
+  days?: number
+  organizationSlug: string
+}
+
 export interface GetOrganizationParams {
   organizationSlug: string
 }
@@ -420,6 +584,22 @@ export interface GetStorageParams {
    * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
    */
   storageId: string
+}
+
+export interface GetVideoAnalyticsParams {
+  /** @default 30 */
+  days?: number
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  organizationSlug: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
 }
 
 export interface GetVideoHlsFileParams {
@@ -517,6 +697,23 @@ export interface Library {
   videoCount: number
 }
 
+export interface LibraryAnalytics {
+  daily: AnalyticsDay[]
+  devices: AnalyticsDevice[]
+  embeddingHosts: AnalyticsEmbeddingHost[]
+  period: AnalyticsPeriod
+  topVideos: AnalyticsTopVideo[]
+  totals: AnalyticsTotals
+}
+
+export interface LibraryAnalyticsSuccessResponse {
+  code: string
+  data: {
+    analytics: LibraryAnalytics
+  }
+  message: string
+}
+
 export interface LibraryApiAccess {
   apiKeys: LibraryApiKey[]
   /** @format uri */
@@ -562,12 +759,20 @@ export interface LibraryApiKeyCreateBody {
   name: string
   /** @minItems 1 */
   scopes: (
-    "videos:read" | "videos:upload" | "videos:manage" | "playback:sign"
+    | "videos:read"
+    | "videos:upload"
+    | "videos:manage"
+    | "playback:sign"
+    | "analytics:read"
   )[]
 }
 
 export type LibraryApiKeyScope =
-  "videos:read" | "videos:upload" | "videos:manage" | "playback:sign"
+  | "videos:read"
+  | "videos:upload"
+  | "videos:manage"
+  | "playback:sign"
+  | "analytics:read"
 
 export interface LibraryApiKeySecretSuccessResponse {
   code: string
@@ -594,7 +799,11 @@ export interface LibraryApiKeyUpdateBody {
   name?: string
   /** @minItems 1 */
   scopes?: (
-    "videos:read" | "videos:upload" | "videos:manage" | "playback:sign"
+    | "videos:read"
+    | "videos:upload"
+    | "videos:manage"
+    | "playback:sign"
+    | "analytics:read"
   )[]
 }
 
@@ -854,6 +1063,24 @@ export interface ListVideosParams {
    */
   libraryId: string
   organizationSlug: string
+}
+
+export interface OrganizationAnalytics {
+  daily: AnalyticsDay[]
+  devices: AnalyticsDevice[]
+  embeddingHosts: AnalyticsEmbeddingHost[]
+  period: AnalyticsPeriod
+  topLibraries: AnalyticsTopLibrary[]
+  topVideos: AnalyticsTopVideo[]
+  totals: AnalyticsTotals
+}
+
+export interface OrganizationAnalyticsSuccessResponse {
+  code: string
+  data: {
+    analytics: OrganizationAnalytics
+  }
+  message: string
 }
 
 export interface OrganizationContext {
@@ -1120,6 +1347,8 @@ export interface Pagination {
 }
 
 export interface PlaybackUrl {
+  /** @format uri */
+  embedUrl: string
   /**
    * @format date-time
    * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
@@ -1197,6 +1426,24 @@ export interface RemoveOrganizationMemberParams {
   organizationSlug: string
 }
 
+export interface ReportVideoViewProgressParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  viewId: string
+}
+
 export interface ReprocessLibraryApiVideoParams {
   /**
    * @format uuid
@@ -1247,6 +1494,19 @@ export interface ResendOrganizationInvitationParams {
   organizationSlug: string
 }
 
+export interface RetentionPoint {
+  /**
+   * @min 0
+   * @max 100
+   */
+  percent: number
+  /**
+   * @min 0
+   * @max 9007199254740991
+   */
+  views: number
+}
+
 export interface RollLibraryApiKeyParams {
   /**
    * @format uuid
@@ -1294,6 +1554,22 @@ export interface SendLibraryWebhookTestParams {
    */
   libraryId: string
   organizationSlug: string
+}
+
+export interface StartVideoViewParams {
+  expires?: string
+  key?: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  token?: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
 }
 
 export interface Storage {
@@ -1616,6 +1892,28 @@ export interface Video {
   width: number | null
 }
 
+export interface VideoAnalytics {
+  daily: AnalyticsDay[]
+  devices: AnalyticsDevice[]
+  embeddingHosts: AnalyticsEmbeddingHost[]
+  period: AnalyticsPeriod
+  retention: RetentionPoint[]
+  totals: AnalyticsTotals
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+}
+
+export interface VideoAnalyticsSuccessResponse {
+  code: string
+  data: {
+    analytics: VideoAnalytics
+  }
+  message: string
+}
+
 export interface VideoCreateBody {
   /**
    * @minLength 1
@@ -1627,6 +1925,44 @@ export interface VideoCreateBody {
    * @maxLength 200
    */
   title?: string
+}
+
+export interface VideoEmbed {
+  allowedPlaybackHosts: string[]
+  /** @min 0 */
+  durationSeconds: number
+  /**
+   * @exclusiveMin 0
+   * @max 9007199254740991
+   */
+  height: number
+  /** @format uri */
+  hlsUrl: string
+  /** @format uri */
+  posterUrl: string
+  /** @format uri */
+  storyboardUrl: string
+  title: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+  /** @format uri */
+  viewsUrl: string
+  /**
+   * @exclusiveMin 0
+   * @max 9007199254740991
+   */
+  width: number
+}
+
+export interface VideoEmbedSuccessResponse {
+  code: string
+  data: {
+    embed: VideoEmbed
+  }
+  message: string
 }
 
 export type VideoFailureReason = "invalid_file_type"
@@ -1725,6 +2061,58 @@ export interface VideoUpdateBody {
    */
   title: string
 }
+
+export interface VideoView {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  id: string
+  /**
+   * @exclusiveMin 0
+   * @max 9007199254740991
+   */
+  reportIntervalSeconds: number
+}
+
+export interface VideoViewProgressBody {
+  /** @min 0 */
+  positionSeconds: number
+  /**
+   * @min 0
+   * @max 86400
+   */
+  watchedSeconds: number
+}
+
+export interface VideoViewProgressSuccessResponse {
+  code: string
+  data: {
+    view: {
+      /**
+       * @format uuid
+       * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+       */
+      id: string
+    }
+  }
+  message: string
+}
+
+export interface VideoViewStartBody {
+  /** @default null */
+  embeddingHost?: string | null
+}
+
+export interface VideoViewSuccessResponse {
+  code: string
+  data: {
+    view: VideoView
+  }
+  message: string
+}
+
+export type ViewerDeviceType = "desktop" | "mobile" | "tablet"
 
 export interface WebhookDelivery {
   /**
@@ -3340,7 +3728,138 @@ export class OpenStreamApi<
         ...params,
       }),
   }
+  analytics = {
+    /**
+     * No description
+     *
+     * @tags Analytics
+     * @name GetLibraryAnalytics
+     * @summary Read the library's views and watch time over the last `days`
+     * @request GET:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/analytics
+     */
+    getLibraryAnalytics: (
+      { organizationSlug, libraryId, ...query }: GetLibraryAnalyticsParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<LibraryAnalyticsSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/analytics`,
+        method: "GET",
+        query: query,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Analytics
+     * @name GetVideoAnalytics
+     * @summary Read a video's views, watch time and retention over the last `days`
+     * @request GET:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/videos/{videoId}/analytics
+     */
+    getVideoAnalytics: (
+      {
+        organizationSlug,
+        libraryId,
+        videoId,
+        ...query
+      }: GetVideoAnalyticsParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<VideoAnalyticsSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/videos/${videoId}/analytics`,
+        method: "GET",
+        query: query,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Analytics
+     * @name StartVideoView
+     * @summary Start counting a view when the player starts playing; signed libraries need `key`, `expires` and `token`
+     * @request POST:/api/v1/libraries/{libraryId}/videos/{videoId}/views
+     */
+    startVideoView: (
+      { libraryId, videoId, ...query }: StartVideoViewParams,
+      data: VideoViewStartBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<VideoViewSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/videos/${videoId}/views`,
+        method: "POST",
+        query: query,
+        body: data,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Analytics
+     * @name ReportVideoViewProgress
+     * @summary Report the seconds watched since the last report and the current position
+     * @request POST:/api/v1/libraries/{libraryId}/videos/{videoId}/views/{viewId}/progress
+     */
+    reportVideoViewProgress: (
+      { libraryId, videoId, viewId }: ReportVideoViewProgressParams,
+      data: VideoViewProgressBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<VideoViewProgressSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/videos/${videoId}/views/${viewId}/progress`,
+        method: "POST",
+        body: data,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Analytics
+     * @name GetOrganizationAnalytics
+     * @summary Read the views and watch time of all the organization's libraries over the last `days`
+     * @request GET:/api/v1/organizations/{organizationSlug}/analytics
+     */
+    getOrganizationAnalytics: (
+      { organizationSlug, ...query }: GetOrganizationAnalyticsParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<OrganizationAnalyticsSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/analytics`,
+        method: "GET",
+        query: query,
+        format: "json",
+        ...params,
+      }),
+  }
   libraryApi = {
+    /**
+     * No description
+     *
+     * @tags Library API
+     * @name GetLibraryApiVideoEmbed
+     * @summary Read what the embeddable player needs; the `Referer` is the page that frames it, and signed libraries need `key`, `expires` and `token`
+     * @request GET:/api/v1/libraries/{libraryId}/videos/{videoId}/embed
+     */
+    getLibraryApiVideoEmbed: (
+      { libraryId, videoId, ...query }: GetLibraryApiVideoEmbedParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<VideoEmbedSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/videos/${videoId}/embed`,
+        method: "GET",
+        query: query,
+        format: "json",
+        ...params,
+      }),
+
     /**
      * No description
      *
@@ -3401,6 +3920,50 @@ export class OpenStreamApi<
         method: "GET",
         query: query,
         format: "blob",
+        ...params,
+      }),
+
+    /**
+     * @description Needs the `analytics:read` scope.
+     *
+     * @tags Library API
+     * @name GetLibraryApiAnalytics
+     * @summary Read the library's views and watch time over the last `days`
+     * @request GET:/api/v1/libraries/{libraryId}/analytics
+     * @secure
+     */
+    getLibraryApiAnalytics: (
+      { libraryId, ...query }: GetLibraryApiAnalyticsParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<LibraryAnalyticsSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/analytics`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Needs the `analytics:read` scope.
+     *
+     * @tags Library API
+     * @name GetLibraryApiVideoAnalytics
+     * @summary Read a video's views, watch time and retention over the last `days`
+     * @request GET:/api/v1/libraries/{libraryId}/videos/{videoId}/analytics
+     * @secure
+     */
+    getLibraryApiVideoAnalytics: (
+      { libraryId, videoId, ...query }: GetLibraryApiVideoAnalyticsParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<VideoAnalyticsSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/videos/${videoId}/analytics`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
         ...params,
       }),
 

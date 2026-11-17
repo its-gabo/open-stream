@@ -72,7 +72,6 @@ export function useVideoUpload() {
         onBeforeRequest: (request) => {
           const xhr: unknown = request.getUnderlyingObject()
 
-          // Sends the session cookie when the API runs on another origin.
           if (xhr instanceof XMLHttpRequest) xhr.withCredentials = true
         },
         onUploadUrlAvailable: () => {

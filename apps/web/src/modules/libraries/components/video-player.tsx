@@ -20,6 +20,7 @@ import { P, match } from "ts-pattern"
 import { useHlsPlayback } from "../hooks/use-hls-playback"
 import { useMediaState } from "../hooks/use-media-state"
 import { useStoryboard } from "../hooks/use-storyboard"
+import { useViewReporting } from "../hooks/use-view-reporting"
 import {
   PLAYER_CONTROLS_HIDE_DELAY_MS,
   PLAYER_SEEK_STEP_SECONDS,
@@ -40,6 +41,21 @@ type VideoPlayerProps = {
   poster: string
   /** The storyboard WebVTT, for previews over the seek bar. */
   storyboardUrl: string
+  /** Shown over the top of the video while the controls are. */
+  title?: string
+  autoPlay?: boolean
+  /** Starts muted; browsers only autoplay muted video. */
+  muted?: boolean
+  loop?: boolean
+  startSeconds?: number
+  /** Fills its container edge to edge instead of a rounded 16:9 box, e.g. in an embed. */
+  fill?: boolean
+  /** Sends the session cookie with each file request; the public library API needs none. */
+  sendsCredentials?: boolean
+  /** Takes the keyboard focus when it appears, for the shortcuts. */
+  autoFocus?: boolean
+  /** Where to count views of this video; views are not counted without it. */
+  viewsUrl?: string
 }
 
 /**
@@ -48,13 +64,30 @@ type VideoPlayerProps = {
  * fullscreen and keyboard shortcuts. Where hls.js cannot run, e.g. on older
  * iPhones, the browser plays the stream with its own controls.
  */
-export function VideoPlayer({ src, poster, storyboardUrl }: VideoPlayerProps) {
+export function VideoPlayer({
+  src,
+  poster,
+  storyboardUrl,
+  title,
+  autoPlay = false,
+  muted = false,
+  loop = false,
+  startSeconds,
+  fill = false,
+  sendsCredentials = true,
+  autoFocus = true,
+  viewsUrl,
+}: VideoPlayerProps) {
   const { t } = useTranslation()
   const containerRef = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
-  const playback = useHlsPlayback(videoRef, src)
+  const playback = useHlsPlayback(videoRef, src, {
+    startSeconds,
+    sendsCredentials,
+  })
   const media = useMediaState(videoRef)
-  const storyboard = useStoryboard(storyboardUrl)
+  useViewReporting(videoRef, viewsUrl)
+  const storyboard = useStoryboard(storyboardUrl, { sendsCredentials })
   const [usesOwnControls] = useState(() => Hls.isSupported())
   const [isSupported] = useState(
     () => Hls.isSupported() || canPlayHlsNatively()
@@ -68,12 +101,14 @@ export function VideoPlayer({ src, poster, storyboardUrl }: VideoPlayerProps) {
   const areControlsVisible = !isPlaying || !isIdle || isSettingsOpen
 
   useEffect(() => {
+    if (!autoFocus) return
+
     const frame = requestAnimationFrame(() =>
       containerRef.current?.focus({ preventScroll: true })
     )
 
     return () => cancelAnimationFrame(frame)
-  }, [])
+  }, [autoFocus])
 
   useEffect(() => {
     const updateFullscreen = () =>
@@ -173,7 +208,12 @@ export function VideoPlayer({ src, poster, storyboardUrl }: VideoPlayerProps) {
 
   if (!isSupported || playback.hasFailed) {
     return (
-      <div className="flex aspect-video w-full flex-col items-center justify-center gap-2 rounded-lg bg-muted p-6 text-center text-sm text-muted-foreground">
+      <div
+        className={cn(
+          "flex w-full flex-col items-center justify-center gap-2 bg-muted p-6 text-center text-sm text-muted-foreground",
+          fill ? "h-full" : "aspect-video rounded-lg"
+        )}
+      >
         <CircleAlertIcon className="size-5" />
         {isSupported
           ? t("videos.player.failed")
@@ -186,11 +226,17 @@ export function VideoPlayer({ src, poster, storyboardUrl }: VideoPlayerProps) {
     return (
       <video
         ref={videoRef}
-        className="aspect-video w-full rounded-lg bg-black"
+        className={cn(
+          "w-full bg-black",
+          fill ? "h-full" : "aspect-video rounded-lg"
+        )}
         poster={poster}
         controls
         playsInline
         preload="metadata"
+        autoPlay={autoPlay}
+        muted={muted}
+        loop={loop}
       />
     )
   }
@@ -210,7 +256,8 @@ export function VideoPlayer({ src, poster, storyboardUrl }: VideoPlayerProps) {
       tabIndex={0}
       aria-label={t("videos.player.label")}
       className={cn(
-        "group/player relative aspect-video w-full overflow-hidden rounded-lg bg-black outline-none",
+        "group/player relative w-full overflow-hidden bg-black outline-none",
+        fill ? "h-full" : "aspect-video rounded-lg",
         isFullscreen && "rounded-none",
         !areControlsVisible && "cursor-none"
       )}
@@ -225,9 +272,23 @@ export function VideoPlayer({ src, poster, storyboardUrl }: VideoPlayerProps) {
         poster={poster}
         playsInline
         preload="metadata"
+        autoPlay={autoPlay}
+        muted={muted}
+        loop={loop}
         onClick={togglePlay}
         onDoubleClick={toggleFullscreen}
       />
+
+      {title && (
+        <div
+          className={cn(
+            "pointer-events-none absolute inset-x-0 top-0 bg-gradient-to-b from-black/70 to-transparent px-4 pt-3 pb-8 transition-opacity duration-200",
+            areControlsVisible ? "opacity-100" : "opacity-0"
+          )}
+        >
+          <p className="truncate text-sm font-medium text-white">{title}</p>
+        </div>
+      )}
 
       {media?.isWaiting && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">

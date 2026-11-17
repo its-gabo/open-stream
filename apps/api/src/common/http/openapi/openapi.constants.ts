@@ -9,6 +9,7 @@ export const OPENAPI_TAGS = {
   STORAGES: "Storages",
   LIBRARY_API: "Library API",
   ACTIVITY: "Activity",
+  ANALYTICS: "Analytics",
 } as const
 
 export const OPENAPI_SECURITY_SCHEMES = {

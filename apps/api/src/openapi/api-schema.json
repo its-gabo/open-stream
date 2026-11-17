@@ -1403,7 +1403,8 @@
           "videos:read",
           "videos:upload",
           "videos:manage",
-          "playback:sign"
+          "playback:sign",
+          "analytics:read"
         ]
       },
       "LibrarySecuritySettings": {
@@ -1465,7 +1466,8 @@
                 "videos:read",
                 "videos:upload",
                 "videos:manage",
-                "playback:sign"
+                "playback:sign",
+                "analytics:read"
               ]
             }
           }
@@ -1512,7 +1514,8 @@
                 "videos:read",
                 "videos:upload",
                 "videos:manage",
-                "playback:sign"
+                "playback:sign",
+                "analytics:read"
               ]
             }
           }
@@ -1551,6 +1554,309 @@
           }
         },
         "required": ["allowedPlaybackHosts", "requireSignedPlayback"]
+      },
+      "LibraryAnalyticsSuccessResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "analytics": {
+                "$ref": "#/components/schemas/LibraryAnalytics"
+              }
+            },
+            "required": ["analytics"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["code", "message", "data"],
+        "additionalProperties": false
+      },
+      "LibraryAnalytics": {
+        "type": "object",
+        "properties": {
+          "period": {
+            "$ref": "#/components/schemas/AnalyticsPeriod"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/AnalyticsTotals"
+          },
+          "daily": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsDay"
+            }
+          },
+          "topVideos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsTopVideo"
+            }
+          },
+          "devices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsDevice"
+            }
+          },
+          "embeddingHosts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsEmbeddingHost"
+            }
+          }
+        },
+        "required": [
+          "period",
+          "totals",
+          "daily",
+          "topVideos",
+          "devices",
+          "embeddingHosts"
+        ],
+        "additionalProperties": false
+      },
+      "AnalyticsPeriod": {
+        "type": "object",
+        "properties": {
+          "days": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "from": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "to": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          }
+        },
+        "required": ["days", "from", "to"],
+        "additionalProperties": false
+      },
+      "AnalyticsTotals": {
+        "type": "object",
+        "properties": {
+          "views": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "watchSeconds": {
+            "type": "number",
+            "minimum": 0
+          },
+          "averageViewSeconds": {
+            "type": "number",
+            "minimum": 0
+          },
+          "averageCompletion": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        },
+        "required": [
+          "views",
+          "watchSeconds",
+          "averageViewSeconds",
+          "averageCompletion"
+        ],
+        "additionalProperties": false
+      },
+      "AnalyticsDay": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          },
+          "views": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "watchSeconds": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": ["date", "views", "watchSeconds"],
+        "additionalProperties": false
+      },
+      "AnalyticsTopVideo": {
+        "type": "object",
+        "properties": {
+          "videoId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "title": {
+            "type": "string"
+          },
+          "libraryId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "libraryName": {
+            "type": "string"
+          },
+          "views": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "watchSeconds": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "videoId",
+          "title",
+          "libraryId",
+          "libraryName",
+          "views",
+          "watchSeconds"
+        ],
+        "additionalProperties": false
+      },
+      "AnalyticsDevice": {
+        "type": "object",
+        "properties": {
+          "deviceType": {
+            "$ref": "#/components/schemas/ViewerDeviceType"
+          },
+          "views": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": ["deviceType", "views"],
+        "additionalProperties": false
+      },
+      "ViewerDeviceType": {
+        "type": "string",
+        "enum": ["desktop", "mobile", "tablet"]
+      },
+      "AnalyticsEmbeddingHost": {
+        "type": "object",
+        "properties": {
+          "host": {
+            "type": "string"
+          },
+          "views": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": ["host", "views"],
+        "additionalProperties": false
+      },
+      "VideoAnalyticsSuccessResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "analytics": {
+                "$ref": "#/components/schemas/VideoAnalytics"
+              }
+            },
+            "required": ["analytics"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["code", "message", "data"],
+        "additionalProperties": false
+      },
+      "VideoAnalytics": {
+        "type": "object",
+        "properties": {
+          "videoId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "period": {
+            "$ref": "#/components/schemas/AnalyticsPeriod"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/AnalyticsTotals"
+          },
+          "daily": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsDay"
+            }
+          },
+          "retention": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RetentionPoint"
+            }
+          },
+          "devices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsDevice"
+            }
+          },
+          "embeddingHosts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsEmbeddingHost"
+            }
+          }
+        },
+        "required": [
+          "videoId",
+          "period",
+          "totals",
+          "daily",
+          "retention",
+          "devices",
+          "embeddingHosts"
+        ],
+        "additionalProperties": false
+      },
+      "RetentionPoint": {
+        "type": "object",
+        "properties": {
+          "percent": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "views": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": ["percent", "views"],
+        "additionalProperties": false
       },
       "LibraryWebhookSuccessResponse": {
         "type": "object",
@@ -2250,6 +2556,196 @@
         },
         "required": ["title"]
       },
+      "VideoEmbedSuccessResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "embed": {
+                "$ref": "#/components/schemas/VideoEmbed"
+              }
+            },
+            "required": ["embed"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["code", "message", "data"],
+        "additionalProperties": false
+      },
+      "VideoEmbed": {
+        "type": "object",
+        "properties": {
+          "videoId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "title": {
+            "type": "string"
+          },
+          "durationSeconds": {
+            "type": "number",
+            "minimum": 0
+          },
+          "width": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "height": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "hlsUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "posterUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "storyboardUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "viewsUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "allowedPlaybackHosts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "videoId",
+          "title",
+          "durationSeconds",
+          "width",
+          "height",
+          "hlsUrl",
+          "posterUrl",
+          "storyboardUrl",
+          "viewsUrl",
+          "allowedPlaybackHosts"
+        ],
+        "additionalProperties": false
+      },
+      "VideoViewSuccessResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "view": {
+                "$ref": "#/components/schemas/VideoView"
+              }
+            },
+            "required": ["view"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["code", "message", "data"],
+        "additionalProperties": false
+      },
+      "VideoView": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "reportIntervalSeconds": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": ["id", "reportIntervalSeconds"],
+        "additionalProperties": false
+      },
+      "VideoViewStartBody": {
+        "type": "object",
+        "properties": {
+          "embeddingHost": {
+            "default": null,
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 253,
+                "pattern": "^(\\*\\.)?([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\\.)*[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(:\\d{1,5})?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "VideoViewProgressSuccessResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "view": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  }
+                },
+                "required": ["id"],
+                "additionalProperties": false
+              }
+            },
+            "required": ["view"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["code", "message", "data"],
+        "additionalProperties": false
+      },
+      "VideoViewProgressBody": {
+        "type": "object",
+        "properties": {
+          "watchedSeconds": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 86400
+          },
+          "positionSeconds": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": ["watchedSeconds", "positionSeconds"]
+      },
       "VideoPageSuccessResponse": {
         "type": "object",
         "properties": {
@@ -2344,6 +2840,10 @@
             "type": "string",
             "format": "uri"
           },
+          "embedUrl": {
+            "type": "string",
+            "format": "uri"
+          },
           "expiresAt": {
             "type": "string",
             "format": "date-time",
@@ -2355,6 +2855,7 @@
           "originalUrl",
           "posterUrl",
           "storyboardUrl",
+          "embedUrl",
           "expiresAt"
         ],
         "additionalProperties": false
@@ -2590,6 +3091,104 @@
           "webhook",
           "video"
         ]
+      },
+      "OrganizationAnalyticsSuccessResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "analytics": {
+                "$ref": "#/components/schemas/OrganizationAnalytics"
+              }
+            },
+            "required": ["analytics"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["code", "message", "data"],
+        "additionalProperties": false
+      },
+      "OrganizationAnalytics": {
+        "type": "object",
+        "properties": {
+          "period": {
+            "$ref": "#/components/schemas/AnalyticsPeriod"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/AnalyticsTotals"
+          },
+          "daily": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsDay"
+            }
+          },
+          "topVideos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsTopVideo"
+            }
+          },
+          "devices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsDevice"
+            }
+          },
+          "embeddingHosts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsEmbeddingHost"
+            }
+          },
+          "topLibraries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsTopLibrary"
+            }
+          }
+        },
+        "required": [
+          "period",
+          "totals",
+          "daily",
+          "topVideos",
+          "devices",
+          "embeddingHosts",
+          "topLibraries"
+        ],
+        "additionalProperties": false
+      },
+      "AnalyticsTopLibrary": {
+        "type": "object",
+        "properties": {
+          "libraryId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "views": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "watchSeconds": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": ["libraryId", "name", "views", "watchSeconds"],
+        "additionalProperties": false
       }
     }
   },
@@ -6258,6 +6857,190 @@
         }
       }
     },
+    "/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/analytics": {
+      "get": {
+        "operationId": "getLibraryAnalytics",
+        "tags": ["Analytics"],
+        "summary": "Read the library's views and watch time over the last `days`",
+        "responses": {
+          "200": {
+            "description": "Library analytics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryAnalyticsSuccessResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Organization or library does not exist, or the user is not a member",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request body or query is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Organization is pending deletion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organizationSlug",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "libraryId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "days",
+            "schema": {
+              "default": 30,
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/videos/{videoId}/analytics": {
+      "get": {
+        "operationId": "getVideoAnalytics",
+        "tags": ["Analytics"],
+        "summary": "Read a video's views, watch time and retention over the last `days`",
+        "responses": {
+          "200": {
+            "description": "Video analytics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoAnalyticsSuccessResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Organization, library or video does not exist, or the user is not a member",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request body or query is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Organization is pending deletion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organizationSlug",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "libraryId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "videoId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "days",
+            "schema": {
+              "default": 30,
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
     "/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/webhook": {
       "get": {
         "operationId": "getLibraryWebhook",
@@ -7759,6 +8542,98 @@
         ]
       }
     },
+    "/api/v1/libraries/{libraryId}/videos/{videoId}/embed": {
+      "get": {
+        "operationId": "getLibraryApiVideoEmbed",
+        "tags": ["Library API"],
+        "summary": "Read what the embeddable player needs; the `Referer` is the page that frames it, and signed libraries need `key`, `expires` and `token`",
+        "responses": {
+          "200": {
+            "description": "Video embed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoEmbedSuccessResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The embedding page's host is not allowed, or the URL is not validly signed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The library or video does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The video is not processed yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "libraryId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "videoId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "key",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "expires",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "token",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
     "/api/v1/libraries/{libraryId}/videos/{videoId}/stream": {
       "get": {
         "operationId": "streamLibraryApiVideo",
@@ -8102,6 +8977,388 @@
             "name": "token",
             "schema": {
               "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/libraries/{libraryId}/videos/{videoId}/views": {
+      "post": {
+        "operationId": "startVideoView",
+        "tags": ["Analytics"],
+        "summary": "Start counting a view when the player starts playing; signed libraries need `key`, `expires` and `token`",
+        "responses": {
+          "201": {
+            "description": "View started",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoViewSuccessResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The page's host is not allowed, or the URL is not validly signed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The library or video does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The video is not processed yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request body or query is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "libraryId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "videoId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "key",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "expires",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "token",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VideoViewStartBody"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/libraries/{libraryId}/videos/{videoId}/views/{viewId}/progress": {
+      "post": {
+        "operationId": "reportVideoViewProgress",
+        "tags": ["Analytics"],
+        "summary": "Report the seconds watched since the last report and the current position",
+        "responses": {
+          "200": {
+            "description": "Progress recorded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoViewProgressSuccessResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The view does not exist for this video, or no longer takes reports",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request body or query is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "libraryId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "videoId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "viewId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VideoViewProgressBody"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/libraries/{libraryId}/analytics": {
+      "get": {
+        "operationId": "getLibraryApiAnalytics",
+        "tags": ["Library API"],
+        "security": [
+          {
+            "libraryApiKey": []
+          }
+        ],
+        "description": "Needs the `analytics:read` scope.",
+        "summary": "Read the library's views and watch time over the last `days`",
+        "responses": {
+          "200": {
+            "description": "Library analytics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryAnalyticsSuccessResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The API key is missing, invalid or not for this library",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The API key lacks the scope this needs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request body or query is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Organization is pending deletion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "libraryId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "days",
+            "schema": {
+              "default": 30,
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/libraries/{libraryId}/videos/{videoId}/analytics": {
+      "get": {
+        "operationId": "getLibraryApiVideoAnalytics",
+        "tags": ["Library API"],
+        "security": [
+          {
+            "libraryApiKey": []
+          }
+        ],
+        "description": "Needs the `analytics:read` scope.",
+        "summary": "Read a video's views, watch time and retention over the last `days`",
+        "responses": {
+          "200": {
+            "description": "Video analytics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoAnalyticsSuccessResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The API key is missing, invalid or not for this library",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The API key lacks the scope this needs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The video does not exist in this library",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request body or query is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Organization is pending deletion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "libraryId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "videoId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "days",
+            "schema": {
+              "default": 30,
+              "type": "number"
             }
           }
         ]
@@ -9058,6 +10315,83 @@
             "schema": {
               "type": "string",
               "maxLength": 100
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/organizations/{organizationSlug}/analytics": {
+      "get": {
+        "operationId": "getOrganizationAnalytics",
+        "tags": ["Analytics"],
+        "summary": "Read the views and watch time of all the organization's libraries over the last `days`",
+        "responses": {
+          "200": {
+            "description": "Organization analytics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationAnalyticsSuccessResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Organization does not exist, or the user is not a member",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request body or query is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Organization is pending deletion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organizationSlug",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "days",
+            "schema": {
+              "default": 30,
+              "type": "number"
             }
           }
         ]

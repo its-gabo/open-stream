@@ -476,6 +476,7 @@
     },
     "tabs": {
       "videos": "Videos",
+      "analytics": "Analytics",
       "storage": "Storage",
       "api": "API",
       "encoding": "Encoding",
@@ -604,6 +605,10 @@
         "playback_sign": {
           "label": "Sign playback URLs",
           "description": "Create expiring playback URLs. Its URLs stop working if this permission is removed."
+        },
+        "analytics_read": {
+          "label": "Read analytics",
+          "description": "Read view counts, watch time and retention of the library's videos."
         }
       },
       "secret": {
@@ -770,6 +775,7 @@
       }
     },
     "details": {
+      "title": "Details",
       "not_playable": "The video plays here once it is uploaded and processed.",
       "fields": {
         "duration": "Duration",
@@ -802,6 +808,84 @@
       "picture_in_picture": "Picture in picture",
       "fullscreen": "Fullscreen",
       "exit_fullscreen": "Exit fullscreen"
+    }
+  },
+  "embed": {
+    "section": {
+      "title": "Embed",
+      "description": "Paste this code into any page to show the video in OpenStream's player.",
+      "autoplay_muted": "Browsers only autoplay muted video, so the player starts muted.",
+      "restrictions": "The library's playback rules still apply: only allowed hosts can show the player, and a library that requires signed playback needs an embed URL signed through the API (the embedUrl of the playback URLs)."
+    },
+    "options": {
+      "autoplay": "Autoplay",
+      "muted": "Start muted",
+      "loop": "Loop",
+      "title": "Show title",
+      "start": "Start at (seconds)"
+    },
+    "unavailable": {
+      "not_ready": "This video is still being processed. Try again in a moment.",
+      "not_allowed": "This video can't be played on this site.",
+      "not_found": "This video is not available."
+    }
+  },
+  "analytics": {
+    "description": "Views of this library's embedded videos. Previews in the dashboard are not counted.",
+    "views_one": "{{formatted}} view",
+    "views_other": "{{formatted}} views",
+    "empty_period": "No views in this period yet.",
+    "period": {
+      "label": "Period",
+      "days_one": "{{count}} day",
+      "days_other": "{{count}} days"
+    },
+    "totals": {
+      "views": "Views",
+      "watch_time": "Watch time",
+      "average_view": "Average view",
+      "average_completion": "Average completion"
+    },
+    "daily": {
+      "title": "Views per day"
+    },
+    "top_videos": {
+      "title": "Top videos"
+    },
+    "devices": {
+      "title": "Devices",
+      "desktop": "Desktop",
+      "mobile": "Mobile",
+      "tablet": "Tablet"
+    },
+    "sites": {
+      "title": "Top sites",
+      "empty": "No views from embedding sites yet."
+    },
+    "video": {
+      "title": "Analytics"
+    },
+    "retention": {
+      "title": "Audience retention",
+      "description": "Share of views still watching at each point of the video.",
+      "point_one": "{{count}} view reached {{percent}}%",
+      "point_other": "{{count}} views reached {{percent}}%",
+      "start": "Start",
+      "end": "End"
+    },
+    "table": {
+      "date": "Date",
+      "views": "Views",
+      "watch_time": "Watch time",
+      "position": "Point of the video",
+      "share": "Share of views"
+    },
+    "dashboard": {
+      "title": "Analytics",
+      "description": "Views of every library's embedded videos together. Open a library for its own figures."
+    },
+    "top_libraries": {
+      "title": "Top libraries"
     }
   },
   "pagination": {

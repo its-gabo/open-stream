@@ -97,6 +97,8 @@ export const LIBRARY_API_KEY_SCOPES = {
   VIDEOS_MANAGE: "videos:manage",
   /** Sign playback URLs. */
   PLAYBACK_SIGN: "playback:sign",
+  /** Read view counts and watch time. */
+  ANALYTICS_READ: "analytics:read",
 } as const
 
 export const LIBRARY_API_KEY_LIMITS = {

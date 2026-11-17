@@ -46,6 +46,8 @@ type TestMediaOptions = {
   seconds?: number
   hasVideo?: boolean
   hasAudio?: boolean
+  /** Seconds of the picture with no frames stored, as variable-rate screen recordings have. */
+  missingFrames?: { from: number; to: number }
 }
 
 /** A small, real MP4 made by ffmpeg from a test pattern and a tone. */
@@ -55,6 +57,7 @@ export async function createTestMediaFile({
   seconds = 3,
   hasVideo = true,
   hasAudio = true,
+  missingFrames,
 }: TestMediaOptions = {}) {
   const dir = await mkdtemp(join(tmpdir(), "openstream-test-media-"))
   const outputPath = join(dir, "test.mp4")
@@ -80,6 +83,14 @@ export async function createTestMediaFile({
       ...inputs,
       ...(hasVideo
         ? ["-c:v", "libx264", "-preset", "ultrafast", "-pix_fmt", "yuv420p"]
+        : []),
+      ...(missingFrames
+        ? [
+            "-vf",
+            `select='not(between(t,${missingFrames.from},${missingFrames.to}))'`,
+            "-fps_mode",
+            "passthrough",
+          ]
         : []),
       ...(hasAudio ? ["-c:a", "aac"] : []),
       "-shortest",

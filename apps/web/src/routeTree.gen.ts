@@ -25,12 +25,14 @@ import { Route as AuthenticatedOrganizationSlugActivityRouteImport } from './rou
 import { Route as AuthenticatedOrganizationSlugStoragesRouteImport } from './routes/_authenticated/$organizationSlug/storages'
 import { Route as AuthenticatedAccountActivityRouteImport } from './routes/_authenticated/account/activity'
 import { Route as AuthenticatedOrganizationsNewRouteImport } from './routes/_authenticated/organizations/new'
+import { Route as EmbedLibraryIdVideoIdRouteImport } from './routes/embed.$libraryId.$videoId'
 import { Route as AuthenticatedOrganizationSlugLibrariesIndexRouteImport } from './routes/_authenticated/$organizationSlug/libraries/index'
 import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId'
 import { Route as AuthenticatedOrganizationSlugSettingsIndexRouteImport } from './routes/_authenticated/$organizationSlug/settings/index'
 import { Route as AuthenticatedOrganizationSlugSettingsOrganizationRouteImport } from './routes/_authenticated/$organizationSlug/settings/organization'
 import { Route as AuthenticatedOrganizationSlugSettingsTeamRouteImport } from './routes/_authenticated/$organizationSlug/settings/team'
 import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdIndexRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/index'
+import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdAnalyticsRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/analytics'
 import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdApiRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/api'
 import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/encoding'
 import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/storage'
@@ -121,6 +123,11 @@ const AuthenticatedOrganizationsNewRoute =
     path: '/organizations/new',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const EmbedLibraryIdVideoIdRoute = EmbedLibraryIdVideoIdRouteImport.update({
+  id: '/embed/$libraryId/$videoId',
+  path: '/embed/$libraryId/$videoId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedOrganizationSlugLibrariesIndexRoute =
   AuthenticatedOrganizationSlugLibrariesIndexRouteImport.update({
     id: '/libraries/',
@@ -155,6 +162,12 @@ const AuthenticatedOrganizationSlugLibrariesLibraryIdIndexRoute =
   AuthenticatedOrganizationSlugLibrariesLibraryIdIndexRouteImport.update({
     id: '/',
     path: '/',
+    getParentRoute: () => AuthenticatedOrganizationSlugLibrariesLibraryIdRoute,
+  } as any)
+const AuthenticatedOrganizationSlugLibrariesLibraryIdAnalyticsRoute =
+  AuthenticatedOrganizationSlugLibrariesLibraryIdAnalyticsRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
     getParentRoute: () => AuthenticatedOrganizationSlugLibrariesLibraryIdRoute,
   } as any)
 const AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute =
@@ -196,12 +209,14 @@ export interface FileRoutesByFullPath {
   '/$organizationSlug/storages': typeof AuthenticatedOrganizationSlugStoragesRoute
   '/account/activity': typeof AuthenticatedAccountActivityRoute
   '/organizations/new': typeof AuthenticatedOrganizationsNewRoute
+  '/embed/$libraryId/$videoId': typeof EmbedLibraryIdVideoIdRoute
   '/$organizationSlug/': typeof AuthenticatedOrganizationSlugIndexRoute
   '/$organizationSlug/libraries/$libraryId': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdRouteWithChildren
   '/$organizationSlug/settings/organization': typeof AuthenticatedOrganizationSlugSettingsOrganizationRoute
   '/$organizationSlug/settings/team': typeof AuthenticatedOrganizationSlugSettingsTeamRoute
   '/$organizationSlug/libraries/': typeof AuthenticatedOrganizationSlugLibrariesIndexRoute
   '/$organizationSlug/settings/': typeof AuthenticatedOrganizationSlugSettingsIndexRoute
+  '/$organizationSlug/libraries/$libraryId/analytics': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdAnalyticsRoute
   '/$organizationSlug/libraries/$libraryId/api': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute
   '/$organizationSlug/libraries/$libraryId/encoding': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute
   '/$organizationSlug/libraries/$libraryId/storage': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRoute
@@ -221,11 +236,13 @@ export interface FileRoutesByTo {
   '/$organizationSlug/storages': typeof AuthenticatedOrganizationSlugStoragesRoute
   '/account/activity': typeof AuthenticatedAccountActivityRoute
   '/organizations/new': typeof AuthenticatedOrganizationsNewRoute
+  '/embed/$libraryId/$videoId': typeof EmbedLibraryIdVideoIdRoute
   '/$organizationSlug': typeof AuthenticatedOrganizationSlugIndexRoute
   '/$organizationSlug/settings/organization': typeof AuthenticatedOrganizationSlugSettingsOrganizationRoute
   '/$organizationSlug/settings/team': typeof AuthenticatedOrganizationSlugSettingsTeamRoute
   '/$organizationSlug/libraries': typeof AuthenticatedOrganizationSlugLibrariesIndexRoute
   '/$organizationSlug/settings': typeof AuthenticatedOrganizationSlugSettingsIndexRoute
+  '/$organizationSlug/libraries/$libraryId/analytics': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdAnalyticsRoute
   '/$organizationSlug/libraries/$libraryId/api': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute
   '/$organizationSlug/libraries/$libraryId/encoding': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute
   '/$organizationSlug/libraries/$libraryId/storage': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRoute
@@ -249,12 +266,14 @@ export interface FileRoutesById {
   '/_authenticated/$organizationSlug/storages': typeof AuthenticatedOrganizationSlugStoragesRoute
   '/_authenticated/account/activity': typeof AuthenticatedAccountActivityRoute
   '/_authenticated/organizations/new': typeof AuthenticatedOrganizationsNewRoute
+  '/embed/$libraryId/$videoId': typeof EmbedLibraryIdVideoIdRoute
   '/_authenticated/$organizationSlug/': typeof AuthenticatedOrganizationSlugIndexRoute
   '/_authenticated/$organizationSlug/libraries/$libraryId': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdRouteWithChildren
   '/_authenticated/$organizationSlug/settings/organization': typeof AuthenticatedOrganizationSlugSettingsOrganizationRoute
   '/_authenticated/$organizationSlug/settings/team': typeof AuthenticatedOrganizationSlugSettingsTeamRoute
   '/_authenticated/$organizationSlug/libraries/': typeof AuthenticatedOrganizationSlugLibrariesIndexRoute
   '/_authenticated/$organizationSlug/settings/': typeof AuthenticatedOrganizationSlugSettingsIndexRoute
+  '/_authenticated/$organizationSlug/libraries/$libraryId/analytics': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdAnalyticsRoute
   '/_authenticated/$organizationSlug/libraries/$libraryId/api': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute
   '/_authenticated/$organizationSlug/libraries/$libraryId/encoding': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute
   '/_authenticated/$organizationSlug/libraries/$libraryId/storage': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRoute
@@ -277,12 +296,14 @@ export interface FileRouteTypes {
     | '/$organizationSlug/storages'
     | '/account/activity'
     | '/organizations/new'
+    | '/embed/$libraryId/$videoId'
     | '/$organizationSlug/'
     | '/$organizationSlug/libraries/$libraryId'
     | '/$organizationSlug/settings/organization'
     | '/$organizationSlug/settings/team'
     | '/$organizationSlug/libraries/'
     | '/$organizationSlug/settings/'
+    | '/$organizationSlug/libraries/$libraryId/analytics'
     | '/$organizationSlug/libraries/$libraryId/api'
     | '/$organizationSlug/libraries/$libraryId/encoding'
     | '/$organizationSlug/libraries/$libraryId/storage'
@@ -302,11 +323,13 @@ export interface FileRouteTypes {
     | '/$organizationSlug/storages'
     | '/account/activity'
     | '/organizations/new'
+    | '/embed/$libraryId/$videoId'
     | '/$organizationSlug'
     | '/$organizationSlug/settings/organization'
     | '/$organizationSlug/settings/team'
     | '/$organizationSlug/libraries'
     | '/$organizationSlug/settings'
+    | '/$organizationSlug/libraries/$libraryId/analytics'
     | '/$organizationSlug/libraries/$libraryId/api'
     | '/$organizationSlug/libraries/$libraryId/encoding'
     | '/$organizationSlug/libraries/$libraryId/storage'
@@ -329,12 +352,14 @@ export interface FileRouteTypes {
     | '/_authenticated/$organizationSlug/storages'
     | '/_authenticated/account/activity'
     | '/_authenticated/organizations/new'
+    | '/embed/$libraryId/$videoId'
     | '/_authenticated/$organizationSlug/'
     | '/_authenticated/$organizationSlug/libraries/$libraryId'
     | '/_authenticated/$organizationSlug/settings/organization'
     | '/_authenticated/$organizationSlug/settings/team'
     | '/_authenticated/$organizationSlug/libraries/'
     | '/_authenticated/$organizationSlug/settings/'
+    | '/_authenticated/$organizationSlug/libraries/$libraryId/analytics'
     | '/_authenticated/$organizationSlug/libraries/$libraryId/api'
     | '/_authenticated/$organizationSlug/libraries/$libraryId/encoding'
     | '/_authenticated/$organizationSlug/libraries/$libraryId/storage'
@@ -345,6 +370,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   GuestRoute: typeof GuestRouteWithChildren
+  EmbedLibraryIdVideoIdRoute: typeof EmbedLibraryIdVideoIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -461,6 +487,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOrganizationsNewRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/embed/$libraryId/$videoId': {
+      id: '/embed/$libraryId/$videoId'
+      path: '/embed/$libraryId/$videoId'
+      fullPath: '/embed/$libraryId/$videoId'
+      preLoaderRoute: typeof EmbedLibraryIdVideoIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/$organizationSlug/libraries/': {
       id: '/_authenticated/$organizationSlug/libraries/'
       path: '/libraries'
@@ -503,6 +536,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdIndexRouteImport
       parentRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdRoute
     }
+    '/_authenticated/$organizationSlug/libraries/$libraryId/analytics': {
+      id: '/_authenticated/$organizationSlug/libraries/$libraryId/analytics'
+      path: '/analytics'
+      fullPath: '/$organizationSlug/libraries/$libraryId/analytics'
+      preLoaderRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdRoute
+    }
     '/_authenticated/$organizationSlug/libraries/$libraryId/api': {
       id: '/_authenticated/$organizationSlug/libraries/$libraryId/api'
       path: '/api'
@@ -535,6 +575,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedOrganizationSlugLibrariesLibraryIdRouteChildren {
+  AuthenticatedOrganizationSlugLibrariesLibraryIdAnalyticsRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdAnalyticsRoute
   AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute
   AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute
   AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRoute
@@ -544,6 +585,8 @@ interface AuthenticatedOrganizationSlugLibrariesLibraryIdRouteChildren {
 
 const AuthenticatedOrganizationSlugLibrariesLibraryIdRouteChildren: AuthenticatedOrganizationSlugLibrariesLibraryIdRouteChildren =
   {
+    AuthenticatedOrganizationSlugLibrariesLibraryIdAnalyticsRoute:
+      AuthenticatedOrganizationSlugLibrariesLibraryIdAnalyticsRoute,
     AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute:
       AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute,
     AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute:
@@ -642,6 +685,7 @@ const GuestRouteWithChildren = GuestRoute._addFileChildren(GuestRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   GuestRoute: GuestRouteWithChildren,
+  EmbedLibraryIdVideoIdRoute: EmbedLibraryIdVideoIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

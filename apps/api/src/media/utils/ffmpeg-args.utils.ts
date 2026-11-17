@@ -11,6 +11,9 @@ import type {
 const MAX_RATE_FACTOR = 1.07
 const BUFFER_SIZE_FACTOR = 1.5
 const JPEG_QUALITY = "3"
+/** Renditions never play faster than this, and sources that do not state a rate get the fallback. */
+const MAX_FRAME_RATE = 60
+const FALLBACK_FRAME_RATE = 30
 /** JPEG needs full-range colour; ffmpeg 8 refuses the limited range videos use. */
 const TO_JPEG_COLOURS = "out_range=full,format=yuvj420p"
 /** Seconds ffmpeg waits at most between attempts to reconnect to a source URL. */
@@ -118,8 +121,15 @@ export function buildHlsTranscodeArgs(
       `[s${index}]scale=${width}:${height},setsar=1[v${index}]`
   )
   const storyboardFilter = `[board]fps=1/${storyboard.intervalSeconds},scale=${storyboard.tileWidth}:${storyboard.tileHeight}:${TO_JPEG_COLOURS},tile=${storyboard.columns}x${storyboard.rows}[storyboard]`
+  // A constant rate fills the gaps of variable-rate sources, such as screen
+  // recordings that store no frames while nothing moves: browsers stall at
+  // a gap in an HLS stream instead of playing through it.
+  const frameRate = Math.min(
+    job.sourceFrameRate ?? FALLBACK_FRAME_RATE,
+    MAX_FRAME_RATE
+  )
   const filterGraph = [
-    `[0:v:0]split=${count + 1}${splitLabels}`,
+    `[0:v:0]fps=${frameRate},split=${count + 1}${splitLabels}`,
     ...scaleFilters,
     storyboardFilter,
   ].join(";")

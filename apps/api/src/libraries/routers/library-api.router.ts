@@ -7,6 +7,9 @@ import {
   publicVideoParamSchema,
   publicVideoUploadParamSchema,
 } from "../dto/libraries.schemas"
+import type { AnalyticsModule } from "../../analytics/analytics.module"
+import { createLibraryApiAnalyticsRouter } from "../../analytics/routers/library-api-analytics.router"
+import { createVideoViewsRouter } from "../../analytics/routers/video-views.router"
 import type { LibrariesModule } from "../libraries.module"
 import { requireLibraryApiKey } from "../middleware/library-api-key.middleware"
 import { createLibraryApiVideosRouter } from "./library-api-videos.router"
@@ -18,7 +21,9 @@ import { createVideoPlaybackRouter } from "./video-playback.router"
  * of a session. It sends no cookies, so it is open to any origin. Mount at
  * the API root.
  */
-export function createLibraryApiRouter(module: LibrariesModule) {
+export function createLibraryApiRouter(
+  module: LibrariesModule & AnalyticsModule
+) {
   return new Hono().route(
     LIBRARY_API_PATH,
     new Hono()
@@ -47,6 +52,14 @@ export function createLibraryApiRouter(module: LibrariesModule) {
         })
       )
       .route("/", createVideoPlaybackRouter(module.videoPlaybackService))
+      .route("/", createVideoViewsRouter(module.videoViewsService))
+      .route(
+        "/",
+        createLibraryApiAnalyticsRouter(
+          module.libraryApiAccessService,
+          module.videoAnalyticsService
+        )
+      )
       .route(
         "/",
         createLibraryApiVideosRouter(

@@ -27,6 +27,7 @@ import type { WebhookEventsService } from "../../webhooks/services/webhook-event
 import type { MiddlewareHandler } from "hono"
 import type { ZodType } from "zod"
 import type { OrganizationsService } from "../../organizations/services/organizations.service"
+import type { AnalyticsModule } from "../../analytics/analytics.module"
 import type { WebhooksModule } from "../../webhooks/webhooks.module"
 import type { LibrariesModule } from "../libraries.module"
 
@@ -231,6 +232,7 @@ export type VideoFiles = Pick<VideoRecord, "libraryId" | "sourceObjectKey"> & {
 
 export type LibrariesRouterDependencies = LibrariesModule &
   Pick<WebhooksModule, "libraryWebhooksService"> &
+  Pick<AnalyticsModule, "videoAnalyticsService"> &
   OrganizationRouterDependencies & {
     organizationsService: OrganizationsService
   }

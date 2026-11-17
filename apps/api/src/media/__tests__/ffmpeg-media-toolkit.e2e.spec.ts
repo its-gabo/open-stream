@@ -36,6 +36,34 @@ describe("ffmpeg media toolkit (e2e)", () => {
     return path
   }
 
+  /** When each frame of a file or HLS playlist is shown, in seconds. */
+  const readFrameTimes = async (path: string) => {
+    const child = Bun.spawn(
+      [
+        "ffprobe",
+        "-v",
+        "error",
+        "-select_streams",
+        "v:0",
+        "-show_entries",
+        "frame=pts_time",
+        "-of",
+        "csv=p=0",
+        path,
+      ],
+      { stdout: "pipe" }
+    )
+    const output = await new Response(child.stdout).text()
+
+    await child.exited
+
+    // A frame with side data gets a trailing comma.
+    return output
+      .trim()
+      .split("\n")
+      .map((line) => Number.parseFloat(line))
+  }
+
   const writeSource = async (
     options?: Parameters<typeof createTestMediaFile>[0]
   ) => {
@@ -60,6 +88,7 @@ describe("ffmpeg media toolkit (e2e)", () => {
         },
       ],
       hasAudio: true,
+      sourceFrameRate: 24,
       segmentSeconds: 2,
       masterPlaylistName: "master.m3u8",
       variantPlaylistName: "playlist.m3u8",
@@ -85,6 +114,7 @@ describe("ffmpeg media toolkit (e2e)", () => {
         height: 360,
         videoCodec: "h264",
         audioCodec: "aac",
+        frameRate: 24,
       })
     })
 
@@ -111,6 +141,25 @@ describe("ffmpeg media toolkit (e2e)", () => {
       ).toBe(true)
       expect(progress.length).toBeGreaterThan(0)
       expect(progress).toEqual([...progress].sort((a, b) => a - b))
+    })
+
+    it("fills the gaps of a variable-rate source, so playback never stalls on one", async () => {
+      const source = await writeSource({
+        seconds: 3,
+        missingFrames: { from: 1, to: 2 },
+      })
+
+      await createToolkit().transcodeToHls(hlsJob(source))
+
+      const frameTimes = await readFrameTimes(
+        join(workDir, "hls", "360p", "playlist.m3u8")
+      )
+      const longestGap = Math.max(
+        ...frameTimes.slice(1).map((time, index) => time - frameTimes[index]!)
+      )
+
+      expect(frameTimes.length).toBeGreaterThan(60)
+      expect(longestGap).toBeLessThan(2 / 24)
     })
 
     it("captures one frame as an image", async () => {

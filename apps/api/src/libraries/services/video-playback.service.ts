@@ -6,6 +6,7 @@ import {
   VIDEO_FILE_FORMAT_DETAILS,
   VIDEO_PROCESSING_STATUSES,
   VIDEO_STATUSES,
+  videoEmbedPath,
 } from "@workspace/shared"
 import { DomainError } from "../../common/errors/domain-error"
 import { API_BASE_PATH } from "../../common/http/http.constants"
@@ -97,24 +98,79 @@ export class VideoPlaybackService {
         apiKey.keyHash,
         { libraryId: library.id, videoId: video.id, expires }
       ),
-    })
-    const videoUrl = `${this.config.WEB_ORIGIN}${API_BASE_PATH}${LIBRARY_API_PATH}/${library.id}/videos/${video.id}`
-    const signed = (path: string) => `${videoUrl}/${path}?${query}`
+    }).toString()
+    const urls = this.toPlaybackUrls(library.id, video.id, query)
 
     return {
       playback: {
-        hlsUrl: signed(
-          `${VIDEO_DERIVED_FILES.HLS_FOLDER}/${VIDEO_DERIVED_FILES.MASTER_PLAYLIST}`
-        ),
-        originalUrl: signed("stream"),
-        posterUrl: signed(
-          `${VIDEO_DERIVED_FILES.THUMBNAILS_FOLDER}/${VIDEO_DERIVED_FILES.POSTER}`
-        ),
-        storyboardUrl: signed(
-          `${VIDEO_DERIVED_FILES.THUMBNAILS_FOLDER}/${VIDEO_DERIVED_FILES.STORYBOARD_VTT}`
-        ),
+        hlsUrl: urls.hlsUrl,
+        originalUrl: urls.originalUrl,
+        posterUrl: urls.posterUrl,
+        storyboardUrl: urls.storyboardUrl,
+        embedUrl: `${this.config.WEB_ORIGIN}${videoEmbedPath(library.id, video.id)}?${query}`,
         expiresAt: new Date(expires * 1000).toISOString(),
       },
+    }
+  }
+
+  /**
+   * What the embeddable player needs to play a processed video. The request
+   * comes from the web app's embed page on behalf of the page that frames
+   * it, whose host the library's rules are checked against; the URLs carry
+   * the embed URL's signature on to the files.
+   */
+  async getVideoEmbed(request: PlaybackRequest) {
+    const { library, video } = await this.authorizePlayback(request)
+
+    if (
+      video.processingStatus !== VIDEO_PROCESSING_STATUSES.READY ||
+      video.durationSeconds === null ||
+      video.width === null ||
+      video.height === null
+    ) {
+      throw new DomainError(LIBRARY_ERRORS.VIDEO_NOT_READY)
+    }
+
+    const urls = this.toPlaybackUrls(
+      library.id,
+      video.id,
+      toSignatureQuery(request)
+    )
+
+    return {
+      embed: {
+        videoId: video.id,
+        title: video.title,
+        durationSeconds: video.durationSeconds,
+        width: video.width,
+        height: video.height,
+        hlsUrl: urls.hlsUrl,
+        posterUrl: urls.posterUrl,
+        storyboardUrl: urls.storyboardUrl,
+        viewsUrl: urls.viewsUrl,
+        allowedPlaybackHosts: library.allowedPlaybackHosts,
+      },
+    }
+  }
+
+  /** The library API URLs a player reads, with `query` (a signature, or empty) added to each. */
+  private toPlaybackUrls(libraryId: string, videoId: string, query: string) {
+    const videoUrl = `${this.config.WEB_ORIGIN}${API_BASE_PATH}${LIBRARY_API_PATH}/${libraryId}/videos/${videoId}`
+    const withQuery = (path: string) =>
+      query ? `${videoUrl}/${path}?${query}` : `${videoUrl}/${path}`
+
+    return {
+      hlsUrl: withQuery(
+        `${VIDEO_DERIVED_FILES.HLS_FOLDER}/${VIDEO_DERIVED_FILES.MASTER_PLAYLIST}`
+      ),
+      originalUrl: withQuery("stream"),
+      posterUrl: withQuery(
+        `${VIDEO_DERIVED_FILES.THUMBNAILS_FOLDER}/${VIDEO_DERIVED_FILES.POSTER}`
+      ),
+      storyboardUrl: withQuery(
+        `${VIDEO_DERIVED_FILES.THUMBNAILS_FOLDER}/${VIDEO_DERIVED_FILES.STORYBOARD_VTT}`
+      ),
+      viewsUrl: withQuery("views"),
     }
   }
 
@@ -264,8 +320,11 @@ export class VideoPlaybackService {
     )
   }
 
-  /** Checks the playback rules before anything about the video is revealed. */
-  private async authorizePlayback(request: PlaybackRequest) {
+  /**
+   * Checks the playback rules before anything about the video is revealed;
+   * also guards what players report about their viewing.
+   */
+  async authorizePlayback(request: PlaybackRequest) {
     const library = await this.librariesRepository.findPublicLibrary(
       request.libraryId
     )
@@ -305,11 +364,16 @@ export class VideoPlaybackService {
     return video.sourceObjectKey
   }
 
+  /**
+   * The web app's own host always passes: its embed page checked the host
+   * that frames it, and the player inside reads files from the app's origin.
+   */
   private assertHostAllowed(
     library: LibraryProfile,
     requestingHost: string | null
   ) {
     if (library.allowedPlaybackHosts.length === 0) return
+    if (requestingHost === new URL(this.config.WEB_ORIGIN).host) return
 
     if (
       !requestingHost ||

@@ -306,9 +306,30 @@ export const playbackUrlDtoSchema = z
     posterUrl: z.url(),
     /** WebVTT of seek preview tiles. */
     storyboardUrl: z.url(),
+    /** The embeddable player page, for an iframe; signed like the other URLs. */
+    embedUrl: z.url(),
     expiresAt: z.iso.datetime(),
   })
   .meta({ id: "PlaybackUrl" })
+
+export const videoEmbedDtoSchema = z
+  .object({
+    videoId: z.uuid(),
+    title: z.string(),
+    durationSeconds: z.number().nonnegative(),
+    width: z.int().positive(),
+    height: z.int().positive(),
+    /** HLS master playlist, carrying the embed URL's signature when it had one. */
+    hlsUrl: z.url(),
+    posterUrl: z.url(),
+    /** WebVTT of seek preview tiles. */
+    storyboardUrl: z.url(),
+    /** Where the player starts counting a view, carrying the same signature. */
+    viewsUrl: z.url(),
+    /** Hosts allowed to frame the player; empty when any site may. */
+    allowedPlaybackHosts: z.array(z.string()),
+  })
+  .meta({ id: "VideoEmbed" })
 
 export const libraryEmptySuccessResponseSchema = createApiSuccessResponseSchema(
   apiEmptyDataSchema
@@ -354,6 +375,10 @@ export const libraryApiKeySecretSuccessResponseSchema =
     })
   ).meta({ id: "LibraryApiKeySecretSuccessResponse" })
 
+export const videoEmbedSuccessResponseSchema = createApiSuccessResponseSchema(
+  z.object({ embed: videoEmbedDtoSchema })
+).meta({ id: "VideoEmbedSuccessResponse" })
+
 export const playbackUrlSuccessResponseSchema = createApiSuccessResponseSchema(
   z.object({ playback: playbackUrlDtoSchema })
 ).meta({ id: "PlaybackUrlSuccessResponse" })
@@ -390,6 +415,7 @@ export type LibraryEncodingUpdateBody = z.infer<
 export type LibrarySecurityUpdateBody = z.infer<
   typeof librarySecurityUpdateBodySchema
 >
+export type VideoEmbedDto = z.infer<typeof videoEmbedDtoSchema>
 export type PlaybackUrlCreateBody = z.infer<typeof playbackUrlCreateBodySchema>
 export type LibraryApiAccessDto = z.infer<typeof libraryApiAccessDtoSchema>
 export type LibraryApiKeyDto = z.infer<typeof libraryApiKeyDtoSchema>

@@ -37,6 +37,7 @@ const failingMediaToolkit: MediaToolkit = {
     height: 360,
     videoCodec: "h264",
     audioCodec: "aac",
+    frameRate: 24,
   }),
   transcodeToHls: async () => {
     throw new Error("ffmpeg crashed")

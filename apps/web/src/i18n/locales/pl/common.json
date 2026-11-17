@@ -476,6 +476,7 @@
     },
     "tabs": {
       "videos": "Filmy",
+      "analytics": "Statystyki",
       "storage": "Magazyn",
       "api": "API",
       "encoding": "Kodowanie",
@@ -606,6 +607,10 @@
         "playback_sign": {
           "label": "Podpisywanie adresów odtwarzania",
           "description": "Tworzenie wygasających adresów odtwarzania. Po odebraniu uprawnienia jego adresy przestają działać."
+        },
+        "analytics_read": {
+          "label": "Odczyt statystyk",
+          "description": "Odczytuj wyświetlenia, czas oglądania i utrzymanie widzów filmów biblioteki."
         }
       },
       "secret": {
@@ -774,6 +779,7 @@
       }
     },
     "details": {
+      "title": "Szczegóły",
       "not_playable": "Film będzie można odtworzyć tutaj po przesłaniu i przetworzeniu.",
       "fields": {
         "duration": "Długość",
@@ -806,6 +812,90 @@
       "picture_in_picture": "Obraz w obrazie",
       "fullscreen": "Pełny ekran",
       "exit_fullscreen": "Zamknij pełny ekran"
+    }
+  },
+  "embed": {
+    "section": {
+      "title": "Osadzanie",
+      "description": "Wklej ten kod na dowolnej stronie, aby pokazać wideo w odtwarzaczu OpenStream.",
+      "autoplay_muted": "Przeglądarki odtwarzają automatycznie tylko wyciszone wideo, więc odtwarzacz startuje bez dźwięku.",
+      "restrictions": "Zasady odtwarzania biblioteki nadal obowiązują: odtwarzacz pokażą tylko dozwolone hosty, a biblioteka wymagająca podpisanego odtwarzania potrzebuje adresu osadzenia podpisanego przez API (embedUrl z adresów odtwarzania)."
+    },
+    "options": {
+      "autoplay": "Autoodtwarzanie",
+      "muted": "Start bez dźwięku",
+      "loop": "Zapętlenie",
+      "title": "Pokaż tytuł",
+      "start": "Start od (sekundy)"
+    },
+    "unavailable": {
+      "not_ready": "To wideo jest jeszcze przetwarzane. Spróbuj ponownie za chwilę.",
+      "not_allowed": "Tego wideo nie można odtworzyć na tej stronie.",
+      "not_found": "To wideo jest niedostępne."
+    }
+  },
+  "analytics": {
+    "description": "Wyświetlenia osadzonych filmów tej biblioteki. Podglądy w panelu nie są liczone.",
+    "views_one": "{{formatted}} wyświetlenie",
+    "views_few": "{{formatted}} wyświetlenia",
+    "views_many": "{{formatted}} wyświetleń",
+    "views_other": "{{formatted}} wyświetlenia",
+    "empty_period": "Brak wyświetleń w tym okresie.",
+    "period": {
+      "label": "Okres",
+      "days_one": "{{count}} dzień",
+      "days_few": "{{count}} dni",
+      "days_many": "{{count}} dni",
+      "days_other": "{{count}} dni"
+    },
+    "totals": {
+      "views": "Wyświetlenia",
+      "watch_time": "Czas oglądania",
+      "average_view": "Średni czas wyświetlenia",
+      "average_completion": "Średnie ukończenie"
+    },
+    "daily": {
+      "title": "Wyświetlenia dziennie"
+    },
+    "top_videos": {
+      "title": "Najpopularniejsze filmy"
+    },
+    "devices": {
+      "title": "Urządzenia",
+      "desktop": "Komputer",
+      "mobile": "Telefon",
+      "tablet": "Tablet"
+    },
+    "sites": {
+      "title": "Najczęstsze strony",
+      "empty": "Brak wyświetleń ze stron osadzających."
+    },
+    "video": {
+      "title": "Statystyki"
+    },
+    "retention": {
+      "title": "Utrzymanie widzów",
+      "description": "Odsetek wyświetleń, które dotarły do danego miejsca filmu.",
+      "point_one": "{{count}} wyświetlenie dotarło do {{percent}}%",
+      "point_few": "{{count}} wyświetlenia dotarły do {{percent}}%",
+      "point_many": "{{count}} wyświetleń dotarło do {{percent}}%",
+      "point_other": "{{count}} wyświetlenia dotarły do {{percent}}%",
+      "start": "Początek",
+      "end": "Koniec"
+    },
+    "table": {
+      "date": "Data",
+      "views": "Wyświetlenia",
+      "watch_time": "Czas oglądania",
+      "position": "Miejsce filmu",
+      "share": "Odsetek wyświetleń"
+    },
+    "dashboard": {
+      "title": "Statystyki",
+      "description": "Wyświetlenia osadzonych filmów ze wszystkich bibliotek razem. Otwórz bibliotekę, aby zobaczyć jej własne dane."
+    },
+    "top_libraries": {
+      "title": "Najpopularniejsze biblioteki"
     }
   },
   "pagination": {

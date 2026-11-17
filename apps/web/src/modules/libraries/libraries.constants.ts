@@ -24,6 +24,11 @@ export const LOCAL_UPLOAD_STATUSES = {
 export const LIBRARY_TABS = [
   { suffix: "", labelKey: "libraries.tabs.videos", isOwnerOnly: false },
   {
+    suffix: "analytics",
+    labelKey: "libraries.tabs.analytics",
+    isOwnerOnly: false,
+  },
+  {
     suffix: "storage",
     labelKey: "libraries.tabs.storage",
     isOwnerOnly: true,
@@ -48,6 +53,7 @@ export const LIBRARY_API_KEY_SCOPE_TRANSLATION_KEYS = {
   [LIBRARY_API_KEY_SCOPES.VIDEOS_UPLOAD]: "videos_upload",
   [LIBRARY_API_KEY_SCOPES.VIDEOS_MANAGE]: "videos_manage",
   [LIBRARY_API_KEY_SCOPES.PLAYBACK_SIGN]: "playback_sign",
+  [LIBRARY_API_KEY_SCOPES.ANALYTICS_READ]: "analytics_read",
 } as const satisfies Record<LibraryApiKeyScope, string>
 
 /** Common scope sets offered when creating a key. */
@@ -159,10 +165,20 @@ export const VIDEO_PLAYER_PATHS = {
   STORYBOARD: "thumbnails/storyboard.vtt",
 } as const
 
+/** Tabs below the player in a video's details sheet. */
+export const VIDEO_DETAILS_TABS = {
+  DETAILS: "details",
+  ANALYTICS: "analytics",
+  EMBED: "embed",
+} as const
+
 /** hls.js picks the quality from the bandwidth while this is selected. */
 export const AUTO_QUALITY_LEVEL = -1
 
 export const HLS_MIME_TYPE = "application/vnd.apple.mpegurl"
+
+/** A jump of the playback position longer than this between two time updates is a seek, not playback. */
+export const VIEW_REPORT_MAX_STEP_SECONDS = 2
 
 export const PLAYBACK_RATES = [0.5, 0.75, 1, 1.25, 1.5, 2] as const
 

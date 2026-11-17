@@ -3,6 +3,7 @@ import { except } from "hono/combine"
 import { cors } from "hono/cors"
 import { openAPIRouteHandler } from "hono-openapi"
 import { createActivityRouter } from "./activity/routers/activity.router"
+import { createAnalyticsRouter } from "./analytics/routers/analytics.router"
 import type { AppModule } from "./app.module"
 import { createAuthRouter } from "./auth/routers/auth.router"
 import {
@@ -50,6 +51,7 @@ export function createAppRouter(appModule: AppModule) {
     .route("/", createLibrariesRouter(appModule))
     .route("/", createLibraryApiRouter(appModule))
     .route("/", createActivityRouter(appModule))
+    .route("/", createAnalyticsRouter(appModule))
 
   router.get(
     OPENAPI_DOCUMENT_PATH,

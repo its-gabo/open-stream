@@ -1,6 +1,7 @@
 import { Hono } from "hono"
 import { requireSession } from "../../auth/middleware/session.middleware"
 import type { AuthenticatedEnv } from "../../auth/types/auth.types"
+import { createLibraryAnalyticsRouter } from "../../analytics/routers/library-analytics.router"
 import { createLibraryWebhooksRouter } from "../../webhooks/routers/library-webhooks.router"
 import { createLibrariesCoreRouter } from "./libraries-core.router"
 import { createLibraryApiAccessRouter } from "./library-api-access.router"
@@ -49,6 +50,14 @@ export function createLibrariesRouter(module: LibrariesRouterDependencies) {
           module.organizationsService,
           module.librariesService,
           module.libraryApiAccessService
+        )
+      )
+      .route(
+        "/",
+        createLibraryAnalyticsRouter(
+          module.organizationsService,
+          module.librariesService,
+          module.videoAnalyticsService
         )
       )
       .route(

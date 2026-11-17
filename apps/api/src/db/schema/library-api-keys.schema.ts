@@ -24,6 +24,7 @@ export const libraryApiKeys = pgTable(
         LIBRARY_API_KEY_SCOPES.VIDEOS_UPLOAD,
         LIBRARY_API_KEY_SCOPES.VIDEOS_MANAGE,
         LIBRARY_API_KEY_SCOPES.PLAYBACK_SIGN,
+        LIBRARY_API_KEY_SCOPES.ANALYTICS_READ,
       ],
     })
       .array()

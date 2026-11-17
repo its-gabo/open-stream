@@ -13,7 +13,11 @@ import type { VideoPlayerQuality } from "../libraries.types"
  */
 export function useHlsPlayback(
   videoRef: RefObject<HTMLVideoElement | null>,
-  src: string
+  src: string,
+  {
+    startSeconds,
+    sendsCredentials = true,
+  }: { startSeconds?: number; sendsCredentials?: boolean } = {}
 ) {
   const hlsRef = useRef<Hls | null>(null)
   const [qualities, setQualities] = useState<VideoPlayerQuality[]>([])
@@ -27,14 +31,20 @@ export function useHlsPlayback(
     if (!video) return
 
     if (!Hls.isSupported()) {
+      const seekToStart = () => {
+        if (startSeconds) video.currentTime = startSeconds
+      }
+
+      video.addEventListener("loadedmetadata", seekToStart, { once: true })
       video.src = src
 
-      return
+      return () => video.removeEventListener("loadedmetadata", seekToStart)
     }
 
     const hls = new Hls({
+      startPosition: startSeconds ?? -1,
       xhrSetup: (xhr) => {
-        xhr.withCredentials = true
+        xhr.withCredentials = sendsCredentials
       },
     })
 
@@ -57,7 +67,7 @@ export function useHlsPlayback(
       hls.destroy()
       hlsRef.current = null
     }
-  }, [videoRef, src])
+  }, [videoRef, src, startSeconds, sendsCredentials])
 
   const selectLevel = useCallback((level: number) => {
     setSelectedLevel(level)
@@ -68,7 +78,6 @@ export function useHlsPlayback(
   return {
     qualities,
     selectedLevel,
-    /** The quality on screen, also while the choice is automatic. */
     playingHeight: qualities.find(({ level }) => level === playingLevel)
       ?.height,
     selectLevel,

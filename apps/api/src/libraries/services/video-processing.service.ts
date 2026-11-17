@@ -555,6 +555,7 @@ export class VideoProcessingService {
         name: rendition.quality,
       })),
       hasAudio: probe.audioCodec !== null,
+      sourceFrameRate: probe.frameRate,
       segmentSeconds: HLS_SEGMENT_SECONDS,
       masterPlaylistName: VIDEO_DERIVED_FILES.MASTER_PLAYLIST,
       variantPlaylistName: VIDEO_DERIVED_FILES.VARIANT_PLAYLIST,

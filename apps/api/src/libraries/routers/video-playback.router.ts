@@ -4,15 +4,19 @@ import { OPENAPI_TAGS } from "../../common/http/openapi/openapi.constants"
 import {
   describeApiErrorResponses,
   describeBinaryResponse,
+  describeJsonResponse,
 } from "../../common/http/openapi/openapi.utils"
+import { createApiSuccessResponse } from "../../common/http/response/response.factory"
 import { validateRequest } from "../../common/http/validation/validate-request"
 import { LIBRARY_ROUTE_ERROR_DESCRIPTIONS } from "../constants/libraries-openapi.constants"
 import {
   playbackQuerySchema,
   publicVideoParamSchema,
   videoHlsFileParamSchema,
+  videoEmbedSuccessResponseSchema,
   videoThumbnailParamSchema,
 } from "../dto/libraries.schemas"
+import { LIBRARY_SUCCESS_RESULTS } from "../dto/libraries.responses"
 import type { VideoPlaybackService } from "../services/video-playback.service"
 import {
   toFileResponse,
@@ -24,12 +28,43 @@ import {
  * Plays videos without an API key: the library's playback rules decide who
  * may watch, so the CORS headers of the library API allow any origin. The
  * uploaded file supports range requests for seeking; processed videos also
- * play as HLS and have a poster and a storyboard.
+ * play as HLS, have a poster and a storyboard, and describe themselves to
+ * the web app's embeddable player.
  */
 export function createVideoPlaybackRouter(
   videoPlaybackService: VideoPlaybackService
 ) {
   return new Hono()
+    .get(
+      "/:libraryId/videos/:videoId/embed",
+      describeRoute({
+        tags: [OPENAPI_TAGS.LIBRARY_API],
+        operationId: "getLibraryApiVideoEmbed",
+        summary:
+          "Read what the embeddable player needs; the `Referer` is the page that frames it, and signed libraries need `key`, `expires` and `token`",
+        responses: {
+          200: describeJsonResponse(
+            "Video embed",
+            videoEmbedSuccessResponseSchema
+          ),
+          ...describeApiErrorResponses(
+            LIBRARY_ROUTE_ERROR_DESCRIPTIONS.VIDEO_EMBED
+          ),
+        },
+      }),
+      validateRequest("param", publicVideoParamSchema),
+      validateRequest("query", playbackQuerySchema),
+      async (c) =>
+        c.json(
+          createApiSuccessResponse(
+            LIBRARY_SUCCESS_RESULTS.VIDEO_EMBED_GET,
+            await videoPlaybackService.getVideoEmbed(
+              toPlaybackRequest(c.req, c.req.valid("param"))
+            )
+          ),
+          200
+        )
+    )
     .get(
       // Serves HEAD too: Hono answers HEAD with the GET handler, without the body.
       "/:libraryId/videos/:videoId/stream",

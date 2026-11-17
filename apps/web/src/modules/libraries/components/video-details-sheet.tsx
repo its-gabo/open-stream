@@ -202,6 +202,7 @@ function VideoDetails({
           {embedSize && (
             <TabsContent value={VIDEO_DETAILS_TABS.EMBED}>
               <VideoEmbedSection
+                organizationSlug={organizationSlug}
                 libraryId={libraryId}
                 video={{ ...video, ...embedSize }}
               />

@@ -6,6 +6,7 @@ import {
   LIBRARY_FIELD_LIMITS,
   LIBRARY_SECURITY_LIMITS,
   PLAYBACK_HOST_PATTERN,
+  PLAYER_ACCENT_COLOR_PATTERN,
   STORAGE_BUCKET_PATTERN,
   STORAGE_FIELD_LIMITS,
   VIDEO_FIELD_LIMITS,
@@ -53,6 +54,30 @@ export const playbackHostSchema = z
   .toLowerCase()
   .max(LIBRARY_SECURITY_LIMITS.PLAYBACK_HOST_MAX_LENGTH)
   .regex(PLAYBACK_HOST_PATTERN)
+
+/** A hex color such as `#E11D48`, stored lowercase. */
+export const playerAccentColorSchema = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .regex(PLAYER_ACCENT_COLOR_PATTERN)
+
+/**
+ * How a library's embedded player looks and which controls it offers. The
+ * one definition of its fields: the type, the API's request and response,
+ * and the dashboard's form all derive from it.
+ */
+export const libraryPlayerSettingsSchema = z.object({
+  /** Colors the seek and volume bars. */
+  accentColor: playerAccentColorSchema,
+  /** Whether embeds show the title; an embed URL's `title` option overrides it. */
+  showTitle: z.boolean(),
+  /** The quality and speed menu. */
+  showSettingsMenu: z.boolean(),
+  showPictureInPicture: z.boolean(),
+  /** The fullscreen button, double-click and the `F` shortcut. */
+  showFullscreen: z.boolean(),
+})
 
 export const libraryApiKeyNameSchema = z
   .string()

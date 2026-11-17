@@ -14,5 +14,6 @@ export type EmbedCodeOptions = {
   muted: boolean
   loop: boolean
   startSeconds: number
-  showTitle: boolean
+  /** Null follows the library's own title setting. */
+  showTitle: boolean | null
 }

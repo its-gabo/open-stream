@@ -1,7 +1,12 @@
+import {
+  DEFAULT_LIBRARY_PLAYER_SETTINGS,
+  libraryPlayerSettingsSchema,
+} from "@workspace/shared"
 import type { VideoRecord } from "../../db/schema"
-import type { LibrarySummary } from "../types/libraries.types"
+import type { LibraryProfile, LibrarySummary } from "../types/libraries.types"
 import type {
   LibraryDto,
+  LibraryPlayerSettingsDto,
   VideoDto,
   VideoStatusDetailsDto,
 } from "./libraries.schemas"
@@ -16,6 +21,15 @@ export const toLibraryDto = (library: LibrarySummary): LibraryDto => ({
   createdAt: library.createdAt.toISOString(),
   updatedAt: library.updatedAt.toISOString(),
 })
+
+/** The stored settings with defaults for keys saved before they existed; keys no longer defined are dropped. */
+export const toLibraryPlayerSettingsDto = (
+  library: Pick<LibraryProfile, "playerSettings">
+): LibraryPlayerSettingsDto =>
+  libraryPlayerSettingsSchema.parse({
+    ...DEFAULT_LIBRARY_PLAYER_SETTINGS,
+    ...library.playerSettings,
+  })
 
 export const toVideoDto = (video: VideoRecord): VideoDto => ({
   id: video.id,

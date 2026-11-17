@@ -19,6 +19,9 @@ import type {
   WEBHOOK_EVENT_TYPES,
 } from "../constants/webhooks.constants"
 
+import type { z } from "zod"
+import type { libraryPlayerSettingsSchema } from "../schemas/libraries.schemas"
+
 type ValueOf<T> = T[keyof T]
 
 export type VideoStatus = ValueOf<typeof VIDEO_STATUSES>
@@ -41,3 +44,12 @@ export type ActivityActorKind = ValueOf<typeof ACTIVITY_ACTOR_KINDS>
 export type ActivityResourceType = ValueOf<typeof ACTIVITY_RESOURCE_TYPES>
 export type ActivityAction = ValueOf<typeof ACTIVITY_ACTIONS>
 export type SignInFailureReason = ValueOf<typeof SIGN_IN_FAILURE_REASONS>
+
+export type LibraryPlayerSettings = z.output<typeof libraryPlayerSettingsSchema>
+
+/** The player's on/off settings, which the dashboard shows as switches. */
+export type LibraryPlayerSwitch = {
+  [
+    Key in keyof LibraryPlayerSettings
+  ]: LibraryPlayerSettings[Key] extends boolean ? Key : never
+}[keyof LibraryPlayerSettings]

@@ -67,6 +67,9 @@
     "transcode_qualities": {
       "required": "Choose at least one quality."
     },
+    "accent_color": {
+      "invalid": "Enter a color such as #e11d48"
+    },
     "webhook_url": {
       "required": "Enter the URL to send events to",
       "invalid": "Enter a full http:// or https:// URL without a username or password"
@@ -177,6 +180,7 @@
       "library.api_key.update.success": "API key updated.",
       "library.api_key.roll.success": "API key has a new secret.",
       "library.encoding.update.success": "Transcoding qualities saved.",
+      "library.player.update.success": "Player settings saved.",
       "video.reprocess.success": "The video will be processed again.",
       "library.webhook.get.success": "Webhook fetched.",
       "library.webhook.save.success": "Webhook saved.",
@@ -480,6 +484,7 @@
       "storage": "Storage",
       "api": "API",
       "encoding": "Encoding",
+      "player": "Player",
       "webhooks": "Webhooks"
     },
     "storage": {
@@ -627,6 +632,52 @@
       "save": "Save qualities",
       "owner_only_title": "Only the owner can change encoding",
       "owner_only_description": "Ask the organization owner to change which qualities this library transcodes to."
+    },
+    "player": {
+      "title": "Player appearance",
+      "description": "Match the embedded player to your brand and choose which controls viewers get.",
+      "accent_color": "Accent color",
+      "accent_color_picker": "Pick an accent color",
+      "accent_color_area": "Saturation and brightness",
+      "accent_color_hue": "Hue",
+      "accent_color_swatches": "Preset colors",
+      "swatches": {
+        "white": "White",
+        "rose": "Rose",
+        "orange": "Orange",
+        "yellow": "Yellow",
+        "green": "Green",
+        "teal": "Teal",
+        "sky": "Sky",
+        "indigo": "Indigo",
+        "fuchsia": "Fuchsia"
+      },
+      "accent_color_hint": "Colors the seek and volume bars. Pick a color that stands out against dark video.",
+      "controls": "Controls",
+      "fields": {
+        "showTitle": {
+          "label": "Title",
+          "hint": "Shows the video's title over the top of the player. An embed's title option overrides this."
+        },
+        "showSettingsMenu": {
+          "label": "Quality and speed menu",
+          "hint": "Lets viewers pick a quality and playback speed. Without it, quality adapts to the connection."
+        },
+        "showPictureInPicture": {
+          "label": "Picture-in-picture",
+          "hint": "Lets viewers keep watching in a floating window."
+        },
+        "showFullscreen": {
+          "label": "Fullscreen",
+          "hint": "The fullscreen button, double-click and the F shortcut."
+        }
+      },
+      "hint": "Changes apply to every embed of this library the next time it loads.",
+      "preview": "Preview",
+      "preview_title": "Product launch",
+      "save": "Save player",
+      "owner_only_title": "Only the owner can change the player",
+      "owner_only_description": "Ask the organization owner to change how this library's player looks."
     },
     "webhooks": {
       "owner_only_title": "Only the owner can manage webhooks",
@@ -1027,6 +1078,7 @@
       "library_storage_changed": "Changed a library's storage",
       "library_encoding_updated": "Changed a library's qualities",
       "library_security_updated": "Changed a library's playback security",
+      "library_player_updated": "Changed a library's player",
       "api_key_created": "Created an API key",
       "api_key_updated": "Changed an API key",
       "api_key_rolled": "Gave an API key a new secret",

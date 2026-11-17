@@ -16,6 +16,7 @@ export const libraryProfileColumns = {
   allowedPlaybackHosts: libraries.allowedPlaybackHosts,
   requireSignedPlayback: libraries.requireSignedPlayback,
   transcodeQualities: libraries.transcodeQualities,
+  playerSettings: libraries.playerSettings,
   createdAt: libraries.createdAt,
   updatedAt: libraries.updatedAt,
 }

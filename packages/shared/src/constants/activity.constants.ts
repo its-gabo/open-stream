@@ -53,6 +53,7 @@ export const ACTIVITY_ACTIONS = {
   LIBRARY_STORAGE_CHANGED: "library.storage_changed",
   LIBRARY_ENCODING_UPDATED: "library.encoding_updated",
   LIBRARY_SECURITY_UPDATED: "library.security_updated",
+  LIBRARY_PLAYER_UPDATED: "library.player_updated",
   API_KEY_CREATED: "api_key.created",
   API_KEY_UPDATED: "api_key.updated",
   API_KEY_ROLLED: "api_key.rolled",

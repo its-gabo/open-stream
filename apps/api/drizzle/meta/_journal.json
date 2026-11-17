@@ -29,6 +29,13 @@
       "when": 1794941355485,
       "tag": "0003_add_video_views",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794947553069,
+      "tag": "0004_add_library_player_settings",
+      "breakpoints": true
     }
   ]
 }

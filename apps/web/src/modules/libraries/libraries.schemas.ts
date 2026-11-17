@@ -5,7 +5,9 @@ import {
   LIBRARY_FIELD_LIMITS,
   LIBRARY_SECURITY_LIMITS,
   PLAYBACK_HOST_PATTERN,
+  PLAYER_ACCENT_COLOR_PATTERN,
   VIDEO_FIELD_LIMITS,
+  libraryPlayerSettingsSchema,
   webhookUrlSchema,
 } from "@workspace/shared"
 import { z } from "zod"
@@ -111,6 +113,16 @@ export const libraryEncodingFormSchema = (t: TranslationFunction) =>
     transcodeQualities: z
       .array(z.enum(VIDEO_QUALITIES))
       .min(1, t("validation.transcode_qualities.required")),
+  })
+
+/** The API's player settings, with a translated message for a mistyped color. */
+export const libraryPlayerFormSchema = (t: TranslationFunction) =>
+  libraryPlayerSettingsSchema.extend({
+    accentColor: z
+      .string()
+      .trim()
+      .toLowerCase()
+      .regex(PLAYER_ACCENT_COLOR_PATTERN, t("validation.accent_color.invalid")),
   })
 
 /** The API also refuses private and plain-HTTP URLs in production. */

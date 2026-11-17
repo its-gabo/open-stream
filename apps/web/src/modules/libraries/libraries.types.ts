@@ -1,3 +1,4 @@
+import type { LibraryPlayerSettings } from "@workspace/shared"
 import type { z } from "zod"
 
 import type {
@@ -8,6 +9,7 @@ import type {
   libraryApiKeyFormSchema,
   libraryEncodingFormSchema,
   libraryFormSchema,
+  libraryPlayerFormSchema,
   librarySecurityFormSchema,
   libraryWebhookFormSchema,
   videoCreateFormSchema,
@@ -16,6 +18,9 @@ import type {
 export type LibraryFormValues = z.infer<ReturnType<typeof libraryFormSchema>>
 export type LibraryEncodingFormValues = z.infer<
   ReturnType<typeof libraryEncodingFormSchema>
+>
+export type LibraryPlayerFormValues = z.infer<
+  ReturnType<typeof libraryPlayerFormSchema>
 >
 export type LibraryApiKeyFormValues = z.infer<
   ReturnType<typeof libraryApiKeyFormSchema>
@@ -90,3 +95,6 @@ export type StoryboardCue = {
 
 export type PlayerSettingsView =
   (typeof PLAYER_SETTINGS_VIEWS)[keyof typeof PLAYER_SETTINGS_VIEWS]
+
+/** The library's accent color and the controls its player offers; whether to show the title is decided by whoever renders the player. */
+export type PlayerControlsSettings = Omit<LibraryPlayerSettings, "showTitle">

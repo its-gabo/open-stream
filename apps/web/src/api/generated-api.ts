@@ -47,6 +47,7 @@ export type ActivityAction =
   | "library.storage_changed"
   | "library.encoding_updated"
   | "library.security_updated"
+  | "library.player_updated"
   | "api_key.created"
   | "api_key.updated"
   | "api_key.rolled"
@@ -545,6 +546,15 @@ export interface GetLibraryParams {
   organizationSlug: string
 }
 
+export interface GetLibraryPlayerParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  organizationSlug: string
+}
+
 export interface GetLibraryStorageParams {
   /**
    * @format uuid
@@ -845,6 +855,32 @@ export interface LibraryListSuccessResponse {
     pagination: Pagination
   }
   message: string
+}
+
+export interface LibraryPlayerSettings {
+  /** @pattern ^#[0-9a-f]{6}$ */
+  accentColor: string
+  showFullscreen: boolean
+  showPictureInPicture: boolean
+  showSettingsMenu: boolean
+  showTitle: boolean
+}
+
+export interface LibraryPlayerSuccessResponse {
+  code: string
+  data: {
+    player: LibraryPlayerSettings
+  }
+  message: string
+}
+
+export interface LibraryPlayerUpdateBody {
+  /** @pattern ^#[0-9a-f]{6}$ */
+  accentColor: string
+  showFullscreen: boolean
+  showPictureInPicture: boolean
+  showSettingsMenu: boolean
+  showTitle: boolean
 }
 
 export interface LibrarySecuritySettings {
@@ -1805,6 +1841,15 @@ export interface UpdateLibraryParams {
   organizationSlug: string
 }
 
+export interface UpdateLibraryPlayerParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  organizationSlug: string
+}
+
 export interface UpdateLibrarySecurityParams {
   /**
    * @format uuid
@@ -1938,6 +1983,7 @@ export interface VideoEmbed {
   height: number
   /** @format uri */
   hlsUrl: string
+  player: LibraryPlayerSettings
   /** @format uri */
   posterUrl: string
   /** @format uri */
@@ -3272,6 +3318,47 @@ export class OpenStreamApi<
     ) =>
       this.request<LibraryEncodingSuccessResponse, ApiErrorResponse>({
         path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/encoding`,
+        method: "PUT",
+        body: data,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Libraries
+     * @name GetLibraryPlayer
+     * @summary Read how the library's embedded player looks
+     * @request GET:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/player
+     */
+    getLibraryPlayer: (
+      { organizationSlug, libraryId }: GetLibraryPlayerParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<LibraryPlayerSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/player`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Libraries
+     * @name UpdateLibraryPlayer
+     * @summary Choose the player's accent color and controls; embeds use them from their next load
+     * @request PUT:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/player
+     */
+    updateLibraryPlayer: (
+      { organizationSlug, libraryId }: UpdateLibraryPlayerParams,
+      data: LibraryPlayerUpdateBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<LibraryPlayerSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/player`,
         method: "PUT",
         body: data,
         type: "application/json",

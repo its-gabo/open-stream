@@ -13,6 +13,7 @@ import {
   libraryApiKeyNameSchema,
   libraryApiKeyScopesSchema,
   libraryNameSchema,
+  libraryPlayerSettingsSchema,
   playbackHostSchema,
   videoQualitiesSchema,
   videoTitleSchema,
@@ -86,6 +87,15 @@ export const libraryEncodingSettingsDtoSchema = z
     transcodeQualities: z.array(videoQualitySchema),
   })
   .meta({ id: "LibraryEncodingSettings" })
+
+/** Every setting is sent each time, so a request names the whole look. */
+export const libraryPlayerUpdateBodySchema = libraryPlayerSettingsSchema.meta({
+  id: "LibraryPlayerUpdateBody",
+})
+
+export const libraryPlayerSettingsDtoSchema = libraryPlayerSettingsSchema.meta({
+  id: "LibraryPlayerSettings",
+})
 
 /** A file of a ready video's HLS output, below `/hls/`. */
 export const videoHlsFileParamSchema = z.object({
@@ -328,6 +338,8 @@ export const videoEmbedDtoSchema = z
     viewsUrl: z.url(),
     /** Hosts allowed to frame the player; empty when any site may. */
     allowedPlaybackHosts: z.array(z.string()),
+    /** How the library's player looks and which controls it offers. */
+    player: libraryPlayerSettingsDtoSchema,
   })
   .meta({ id: "VideoEmbed" })
 
@@ -355,6 +367,11 @@ export const libraryEncodingSuccessResponseSchema =
   createApiSuccessResponseSchema(
     z.object({ encoding: libraryEncodingSettingsDtoSchema })
   ).meta({ id: "LibraryEncodingSuccessResponse" })
+
+export const libraryPlayerSuccessResponseSchema =
+  createApiSuccessResponseSchema(
+    z.object({ player: libraryPlayerSettingsDtoSchema })
+  ).meta({ id: "LibraryPlayerSuccessResponse" })
 
 export const libraryApiAccessSuccessResponseSchema =
   createApiSuccessResponseSchema(
@@ -411,6 +428,12 @@ export type VideoCreateBody = z.infer<typeof videoCreateBodySchema>
 export type VideoUpdateBody = z.infer<typeof videoUpdateBodySchema>
 export type LibraryEncodingUpdateBody = z.infer<
   typeof libraryEncodingUpdateBodySchema
+>
+export type LibraryPlayerUpdateBody = z.infer<
+  typeof libraryPlayerUpdateBodySchema
+>
+export type LibraryPlayerSettingsDto = z.infer<
+  typeof libraryPlayerSettingsDtoSchema
 >
 export type LibrarySecurityUpdateBody = z.infer<
   typeof librarySecurityUpdateBodySchema

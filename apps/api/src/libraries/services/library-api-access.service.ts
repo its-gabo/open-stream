@@ -14,6 +14,7 @@ import { diffActivityValues } from "../../activity/utils/activity-changes.utils"
 import { DomainError } from "../../common/errors/domain-error"
 import { API_BASE_PATH } from "../../common/http/http.constants"
 import type { AppConfig } from "../../config/app.config"
+import type { Transaction } from "../../db/database.types"
 import type { LibraryApiKeyRecord } from "../../db/schema"
 import { ORGANIZATION_ERRORS } from "../../organizations/errors/organizations.errors"
 import {
@@ -117,21 +118,33 @@ export class LibraryApiAccessService {
     input: LibraryApiKeyUpdateBody
   ) {
     const apiKey = await this.findApiKey(library, apiKeyId)
-    const updated = await this.libraryApiKeysRepository.updateApiKey(
-      apiKey.id,
-      input
+    const updated = await this.libraryApiKeysRepository.transaction(
+      async (transaction) => {
+        const changed = await this.libraryApiKeysRepository.updateApiKey(
+          apiKey.id,
+          input,
+          transaction
+        )
+
+        if (!changed) throw new DomainError(LIBRARY_ERRORS.API_KEY_NOT_FOUND)
+
+        await this.recordApiKeyActivity(
+          library,
+          actor,
+          {
+            action: ACTIVITY_ACTIONS.API_KEY_UPDATED,
+            apiKey: changed,
+            ...diffActivityValues(
+              { name: apiKey.name, scopes: apiKey.scopes },
+              { name: changed.name, scopes: changed.scopes }
+            ),
+          },
+          transaction
+        )
+
+        return changed
+      }
     )
-
-    if (!updated) throw new DomainError(LIBRARY_ERRORS.API_KEY_NOT_FOUND)
-
-    await this.recordApiKeyActivity(library, actor, {
-      action: ACTIVITY_ACTIONS.API_KEY_UPDATED,
-      apiKey: updated,
-      ...diffActivityValues(
-        { name: apiKey.name, scopes: apiKey.scopes },
-        { name: updated.name, scopes: updated.scopes }
-      ),
-    })
 
     return { apiKey: this.toApiKeyDto(updated) }
   }
@@ -144,17 +157,26 @@ export class LibraryApiAccessService {
   ) {
     const apiKey = await this.findApiKey(library, apiKeyId)
     const secret = this.generateSecret()
-    const updated = await this.libraryApiKeysRepository.updateApiKey(
-      apiKey.id,
-      { ...this.toStoredSecret(secret), lastUsedAt: null }
+    const updated = await this.libraryApiKeysRepository.transaction(
+      async (transaction) => {
+        const rolled = await this.libraryApiKeysRepository.updateApiKey(
+          apiKey.id,
+          { ...this.toStoredSecret(secret), lastUsedAt: null },
+          transaction
+        )
+
+        if (!rolled) throw new DomainError(LIBRARY_ERRORS.API_KEY_NOT_FOUND)
+
+        await this.recordApiKeyActivity(
+          library,
+          actor,
+          { action: ACTIVITY_ACTIONS.API_KEY_ROLLED, apiKey: rolled },
+          transaction
+        )
+
+        return rolled
+      }
     )
-
-    if (!updated) throw new DomainError(LIBRARY_ERRORS.API_KEY_NOT_FOUND)
-
-    await this.recordApiKeyActivity(library, actor, {
-      action: ACTIVITY_ACTIONS.API_KEY_ROLLED,
-      apiKey: updated,
-    })
 
     return { apiKey: this.toApiKeyDto(updated), secret }
   }
@@ -166,11 +188,18 @@ export class LibraryApiAccessService {
   ) {
     const apiKey = await this.findApiKey(library, apiKeyId)
 
-    await this.libraryApiKeysRepository.deleteApiKey(apiKey.id)
-    await this.recordApiKeyActivity(library, actor, {
-      action: ACTIVITY_ACTIONS.API_KEY_DELETED,
-      apiKey,
-      before: { name: apiKey.name, scopes: apiKey.scopes },
+    await this.libraryApiKeysRepository.transaction(async (transaction) => {
+      await this.libraryApiKeysRepository.deleteApiKey(apiKey.id, transaction)
+      await this.recordApiKeyActivity(
+        library,
+        actor,
+        {
+          action: ACTIVITY_ACTIONS.API_KEY_DELETED,
+          apiKey,
+          before: { name: apiKey.name, scopes: apiKey.scopes },
+        },
+        transaction
+      )
     })
 
     return {}
@@ -181,18 +210,28 @@ export class LibraryApiAccessService {
     actor: ActivityActor,
     input: LibrarySecurityUpdateBody
   ) {
-    await this.librariesRepository.updatePlaybackSecurity(library.id, input)
-    await this.activityLogService.recordActivity(actor, {
-      organizationId: library.organizationId,
-      action: ACTIVITY_ACTIONS.LIBRARY_SECURITY_UPDATED,
-      resource: libraryActivityResource(library),
-      ...diffActivityValues(
+    await this.librariesRepository.transaction(async (transaction) => {
+      await this.librariesRepository.updatePlaybackSecurity(
+        library.id,
+        input,
+        transaction
+      )
+      await this.activityLogService.recordActivity(
+        actor,
         {
-          allowedPlaybackHosts: library.allowedPlaybackHosts,
-          requireSignedPlayback: library.requireSignedPlayback,
+          organizationId: library.organizationId,
+          action: ACTIVITY_ACTIONS.LIBRARY_SECURITY_UPDATED,
+          resource: libraryActivityResource(library),
+          ...diffActivityValues(
+            {
+              allowedPlaybackHosts: library.allowedPlaybackHosts,
+              requireSignedPlayback: library.requireSignedPlayback,
+            },
+            input
+          ),
         },
-        input
-      ),
+        transaction
+      )
     })
 
     const updated = await this.librariesRepository.findLibrary(
@@ -255,15 +294,20 @@ export class LibraryApiAccessService {
       ...changes
     }: Pick<ActivityEntry, "action" | "before" | "after"> & {
       apiKey: LibraryApiKeyRecord
-    }
+    },
+    transaction: Transaction
   ) {
-    await this.activityLogService.recordActivity(actor, {
-      organizationId: library.organizationId,
-      action,
-      resource: apiKeyActivityResource(apiKey),
-      context: libraryActivityContext(library),
-      ...changes,
-    })
+    await this.activityLogService.recordActivity(
+      actor,
+      {
+        organizationId: library.organizationId,
+        action,
+        resource: apiKeyActivityResource(apiKey),
+        context: libraryActivityContext(library),
+        ...changes,
+      },
+      transaction
+    )
   }
 
   private async findApiKey(library: LibraryProfile, apiKeyId: string) {

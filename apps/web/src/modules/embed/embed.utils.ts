@@ -19,12 +19,17 @@ export const toEmbedUnavailableReason = (error: unknown) =>
     )
     .otherwise(() => EMBED_UNAVAILABLE_REASONS.NOT_FOUND)
 
-/** The embed page's URL with only the options that differ from the defaults. */
+/**
+ * The embed page's URL with only the options that differ from the defaults.
+ * `title` is added only against the library's own setting, so embeds that
+ * leave it follow later changes to the library.
+ */
 export function buildEmbedUrl(
   origin: string,
   libraryId: string,
   videoId: string,
-  { autoplay, muted, loop, startSeconds, showTitle }: EmbedCodeOptions
+  { autoplay, muted, loop, startSeconds, showTitle }: EmbedCodeOptions,
+  libraryShowsTitle: boolean | undefined
 ) {
   const url = new URL(videoEmbedPath(libraryId, videoId), origin)
   const flags = [
@@ -41,7 +46,13 @@ export function buildEmbedUrl(
     url.searchParams.set(VIDEO_EMBED_QUERY_KEYS.START, String(startSeconds))
   }
 
-  if (!showTitle) url.searchParams.set(VIDEO_EMBED_QUERY_KEYS.TITLE, "0")
+  if (
+    showTitle !== null &&
+    libraryShowsTitle !== undefined &&
+    showTitle !== libraryShowsTitle
+  ) {
+    url.searchParams.set(VIDEO_EMBED_QUERY_KEYS.TITLE, showTitle ? "1" : "0")
+  }
 
   return url.toString()
 }

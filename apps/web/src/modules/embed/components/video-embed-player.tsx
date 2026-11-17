@@ -45,9 +45,10 @@ export function VideoEmbedPlayer({ result, options }: VideoEmbedPlayerProps) {
         src={embed.hlsUrl}
         poster={embed.posterUrl}
         storyboardUrl={embed.storyboardUrl}
-        title={options.title === false ? undefined : embed.title}
+        title={
+          (options.title ?? embed.player.showTitle) ? embed.title : undefined
+        }
         autoPlay={options.autoplay}
-        // Browsers only autoplay muted video.
         muted={options.muted || options.autoplay}
         loop={options.loop}
         startSeconds={options.t}
@@ -55,6 +56,7 @@ export function VideoEmbedPlayer({ result, options }: VideoEmbedPlayerProps) {
         sendsCredentials={false}
         autoFocus={false}
         viewsUrl={embed.viewsUrl}
+        controls={embed.player}
       />
     </Suspense>
   )

@@ -2,7 +2,11 @@ import type { Logger } from "../../common/logging/logger"
 import type { ActivityLogService } from "../../activity/services/activity-log.service"
 import type { ActivityActor } from "../../activity/types/activity.types"
 import type { StorageCleanupService } from "../../storage/services/storage-cleanup.service"
-import type { LibraryStorageKind, VideoQuality } from "@workspace/shared"
+import type {
+  LibraryPlayerSettings,
+  LibraryStorageKind,
+  VideoQuality,
+} from "@workspace/shared"
 import type { AppConfig } from "../../config/app.config"
 import type {
   LibraryApiKeyRecord,
@@ -42,6 +46,8 @@ export type LibraryProfile = {
   allowedPlaybackHosts: string[]
   requireSignedPlayback: boolean
   transcodeQualities: VideoQuality[]
+  /** As stored; read it through `toLibraryPlayerSettingsDto`, which fills in missing keys. */
+  playerSettings: Partial<LibraryPlayerSettings>
   createdAt: Date
   updatedAt: Date
 }

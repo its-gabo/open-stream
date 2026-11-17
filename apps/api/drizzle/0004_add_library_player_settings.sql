@@ -1,0 +1,1 @@
+ALTER TABLE "libraries" ADD COLUMN "player_settings" jsonb DEFAULT '{"accentColor":"#ffffff","showTitle":true,"showSettingsMenu":true,"showPictureInPicture":true,"showFullscreen":true}'::jsonb NOT NULL;

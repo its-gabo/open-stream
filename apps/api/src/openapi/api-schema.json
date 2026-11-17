@@ -1308,6 +1308,86 @@
         },
         "required": ["transcodeQualities"]
       },
+      "LibraryPlayerSuccessResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "player": {
+                "$ref": "#/components/schemas/LibraryPlayerSettings"
+              }
+            },
+            "required": ["player"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["code", "message", "data"],
+        "additionalProperties": false
+      },
+      "LibraryPlayerSettings": {
+        "type": "object",
+        "properties": {
+          "accentColor": {
+            "type": "string",
+            "pattern": "^#[0-9a-f]{6}$"
+          },
+          "showTitle": {
+            "type": "boolean"
+          },
+          "showSettingsMenu": {
+            "type": "boolean"
+          },
+          "showPictureInPicture": {
+            "type": "boolean"
+          },
+          "showFullscreen": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "accentColor",
+          "showTitle",
+          "showSettingsMenu",
+          "showPictureInPicture",
+          "showFullscreen"
+        ],
+        "additionalProperties": false
+      },
+      "LibraryPlayerUpdateBody": {
+        "type": "object",
+        "properties": {
+          "accentColor": {
+            "type": "string",
+            "pattern": "^#[0-9a-f]{6}$"
+          },
+          "showTitle": {
+            "type": "boolean"
+          },
+          "showSettingsMenu": {
+            "type": "boolean"
+          },
+          "showPictureInPicture": {
+            "type": "boolean"
+          },
+          "showFullscreen": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "accentColor",
+          "showTitle",
+          "showSettingsMenu",
+          "showPictureInPicture",
+          "showFullscreen"
+        ]
+      },
       "LibraryApiAccessSuccessResponse": {
         "type": "object",
         "properties": {
@@ -2625,6 +2705,9 @@
             "items": {
               "type": "string"
             }
+          },
+          "player": {
+            "$ref": "#/components/schemas/LibraryPlayerSettings"
           }
         },
         "required": [
@@ -2637,7 +2720,8 @@
           "posterUrl",
           "storyboardUrl",
           "viewsUrl",
-          "allowedPlaybackHosts"
+          "allowedPlaybackHosts",
+          "player"
         ],
         "additionalProperties": false
       },
@@ -3056,6 +3140,7 @@
           "library.storage_changed",
           "library.encoding_updated",
           "library.security_updated",
+          "library.player_updated",
           "api_key.created",
           "api_key.updated",
           "api_key.rolled",
@@ -6260,6 +6345,172 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/LibraryEncodingUpdateBody"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/player": {
+      "get": {
+        "operationId": "getLibraryPlayer",
+        "tags": ["Libraries"],
+        "summary": "Read how the library's embedded player looks",
+        "responses": {
+          "200": {
+            "description": "Library player settings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryPlayerSuccessResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Organization or library does not exist, or the user is not a member",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Organization is pending deletion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organizationSlug",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "libraryId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          }
+        ]
+      },
+      "put": {
+        "operationId": "updateLibraryPlayer",
+        "tags": ["Libraries"],
+        "summary": "Choose the player's accent color and controls; embeds use them from their next load",
+        "responses": {
+          "200": {
+            "description": "Library player settings saved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryPlayerSuccessResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Only the owner can do this, or the request origin is not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Organization or library does not exist, or the user is not a member",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request body or query is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Organization is pending deletion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organizationSlug",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "libraryId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LibraryPlayerUpdateBody"
               }
             }
           }

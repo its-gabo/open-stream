@@ -9,10 +9,14 @@ import {
   toPaginationDto,
 } from "../../common/http/pagination/pagination.utils"
 import type { OrganizationAccess } from "../../organizations/types/organizations.types"
-import { toLibraryDto } from "../dto/libraries.dto.mappers"
+import {
+  toLibraryDto,
+  toLibraryPlayerSettingsDto,
+} from "../dto/libraries.dto.mappers"
 import type {
   LibraryCreateBody,
   LibraryEncodingUpdateBody,
+  LibraryPlayerUpdateBody,
   LibraryUpdateBody,
 } from "../dto/libraries.schemas"
 import { LIBRARY_ERRORS } from "../errors/libraries.errors"
@@ -51,17 +55,30 @@ export class LibrariesService {
     actor: ActivityActor,
     input: LibraryCreateBody
   ) {
-    const { id } = await this.librariesRepository.insertLibrary({
-      organizationId: access.organization.id,
-      name: input.name,
-    })
+    const id = await this.librariesRepository.transaction(
+      async (transaction) => {
+        const created = await this.librariesRepository.insertLibrary(
+          { organizationId: access.organization.id, name: input.name },
+          transaction
+        )
 
-    await this.activityLogService.recordActivity(actor, {
-      organizationId: access.organization.id,
-      action: ACTIVITY_ACTIONS.LIBRARY_CREATED,
-      resource: libraryActivityResource({ id, name: input.name }),
-      after: { name: input.name },
-    })
+        await this.activityLogService.recordActivity(
+          actor,
+          {
+            organizationId: access.organization.id,
+            action: ACTIVITY_ACTIONS.LIBRARY_CREATED,
+            resource: libraryActivityResource({
+              id: created.id,
+              name: input.name,
+            }),
+            after: { name: input.name },
+          },
+          transaction
+        )
+
+        return created.id
+      }
+    )
 
     return this.reloadLibrary(access.organization.id, id)
   }
@@ -75,12 +92,25 @@ export class LibrariesService {
     actor: ActivityActor,
     input: LibraryUpdateBody
   ) {
-    await this.librariesRepository.updateLibrary(library.id, input)
-    await this.activityLogService.recordActivity(actor, {
-      organizationId: library.organizationId,
-      action: ACTIVITY_ACTIONS.LIBRARY_UPDATED,
-      resource: libraryActivityResource({ id: library.id, name: input.name }),
-      ...diffActivityValues({ name: library.name }, { name: input.name }),
+    await this.librariesRepository.transaction(async (transaction) => {
+      await this.librariesRepository.updateLibrary(
+        library.id,
+        input,
+        transaction
+      )
+      await this.activityLogService.recordActivity(
+        actor,
+        {
+          organizationId: library.organizationId,
+          action: ACTIVITY_ACTIONS.LIBRARY_UPDATED,
+          resource: libraryActivityResource({
+            id: library.id,
+            name: input.name,
+          }),
+          ...diffActivityValues({ name: library.name }, { name: input.name }),
+        },
+        transaction
+      )
     })
 
     return this.reloadLibrary(library.organizationId, library.id)
@@ -96,21 +126,64 @@ export class LibrariesService {
     actor: ActivityActor,
     input: LibraryEncodingUpdateBody
   ) {
-    await this.librariesRepository.updateTranscodeQualities(
-      library.id,
-      input.transcodeQualities
-    )
-    await this.activityLogService.recordActivity(actor, {
-      organizationId: library.organizationId,
-      action: ACTIVITY_ACTIONS.LIBRARY_ENCODING_UPDATED,
-      resource: libraryActivityResource(library),
-      ...diffActivityValues(
-        { transcodeQualities: library.transcodeQualities },
-        { transcodeQualities: input.transcodeQualities }
-      ),
+    await this.librariesRepository.transaction(async (transaction) => {
+      await this.librariesRepository.updateTranscodeQualities(
+        library.id,
+        input.transcodeQualities,
+        transaction
+      )
+      await this.activityLogService.recordActivity(
+        actor,
+        {
+          organizationId: library.organizationId,
+          action: ACTIVITY_ACTIONS.LIBRARY_ENCODING_UPDATED,
+          resource: libraryActivityResource(library),
+          ...diffActivityValues(
+            { transcodeQualities: library.transcodeQualities },
+            { transcodeQualities: input.transcodeQualities }
+          ),
+        },
+        transaction
+      )
     })
 
     return { encoding: { transcodeQualities: input.transcodeQualities } }
+  }
+
+  getPlayerSettings(library: LibrarySummary) {
+    return { player: toLibraryPlayerSettingsDto(library) }
+  }
+
+  /** Embeds pick the new look up on their next load; saving the same settings again changes and records nothing. */
+  async updatePlayerSettings(
+    library: LibrarySummary,
+    actor: ActivityActor,
+    input: LibraryPlayerUpdateBody
+  ) {
+    const current = toLibraryPlayerSettingsDto(library)
+    const changes = diffActivityValues(current, input)
+
+    if (!changes) return { player: current }
+
+    await this.librariesRepository.transaction(async (transaction) => {
+      await this.librariesRepository.updatePlayerSettings(
+        library.id,
+        input,
+        transaction
+      )
+      await this.activityLogService.recordActivity(
+        actor,
+        {
+          organizationId: library.organizationId,
+          action: ACTIVITY_ACTIONS.LIBRARY_PLAYER_UPDATED,
+          resource: libraryActivityResource(library),
+          ...changes,
+        },
+        transaction
+      )
+    })
+
+    return { player: toLibraryPlayerSettingsDto({ playerSettings: input }) }
   }
 
   private async reloadLibrary(organizationId: string, libraryId: string) {

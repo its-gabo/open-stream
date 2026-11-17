@@ -67,6 +67,9 @@
     "transcode_qualities": {
       "required": "Wybierz co najmniej jedną jakość."
     },
+    "accent_color": {
+      "invalid": "Wpisz kolor, np. #e11d48"
+    },
     "webhook_url": {
       "required": "Podaj adres URL, na który mają trafiać zdarzenia",
       "invalid": "Podaj pełny adres http:// lub https:// bez nazwy użytkownika i hasła"
@@ -177,6 +180,7 @@
       "library.api_key.update.success": "Zaktualizowano klucz API.",
       "library.api_key.roll.success": "Klucz API ma nowy sekret.",
       "library.encoding.update.success": "Zapisano jakości transkodowania.",
+      "library.player.update.success": "Zapisano ustawienia odtwarzacza.",
       "video.reprocess.success": "Film zostanie przetworzony ponownie.",
       "library.webhook.get.success": "Pobrano webhook.",
       "library.webhook.save.success": "Zapisano webhook.",
@@ -480,6 +484,7 @@
       "storage": "Magazyn",
       "api": "API",
       "encoding": "Kodowanie",
+      "player": "Odtwarzacz",
       "webhooks": "Webhooki"
     },
     "storage": {
@@ -629,6 +634,52 @@
       "save": "Zapisz jakości",
       "owner_only_title": "Tylko właściciel może zmienić kodowanie",
       "owner_only_description": "Poproś właściciela organizacji o zmianę jakości, do których ta biblioteka transkoduje filmy."
+    },
+    "player": {
+      "title": "Wygląd odtwarzacza",
+      "description": "Dopasuj osadzony odtwarzacz do swojej marki i wybierz, które przyciski widzą widzowie.",
+      "accent_color": "Kolor akcentu",
+      "accent_color_picker": "Wybierz kolor akcentu",
+      "accent_color_area": "Nasycenie i jasność",
+      "accent_color_hue": "Odcień",
+      "accent_color_swatches": "Gotowe kolory",
+      "swatches": {
+        "white": "Biały",
+        "rose": "Różany",
+        "orange": "Pomarańczowy",
+        "yellow": "Żółty",
+        "green": "Zielony",
+        "teal": "Morski",
+        "sky": "Błękitny",
+        "indigo": "Indygo",
+        "fuchsia": "Fuksja"
+      },
+      "accent_color_hint": "Barwi paski przewijania i głośności. Wybierz kolor, który dobrze widać na ciemnym obrazie.",
+      "controls": "Przyciski",
+      "fields": {
+        "showTitle": {
+          "label": "Tytuł",
+          "hint": "Pokazuje tytuł filmu u góry odtwarzacza. Opcja tytułu w kodzie osadzenia ma pierwszeństwo."
+        },
+        "showSettingsMenu": {
+          "label": "Menu jakości i prędkości",
+          "hint": "Pozwala widzom wybrać jakość i prędkość odtwarzania. Bez niego jakość dopasowuje się do łącza."
+        },
+        "showPictureInPicture": {
+          "label": "Obraz w obrazie",
+          "hint": "Pozwala oglądać dalej w pływającym okienku."
+        },
+        "showFullscreen": {
+          "label": "Pełny ekran",
+          "hint": "Przycisk pełnego ekranu, podwójne kliknięcie i skrót F."
+        }
+      },
+      "hint": "Zmiany obejmą każde osadzenie tej biblioteki przy jego następnym wczytaniu.",
+      "preview": "Podgląd",
+      "preview_title": "Premiera produktu",
+      "save": "Zapisz odtwarzacz",
+      "owner_only_title": "Tylko właściciel może zmienić odtwarzacz",
+      "owner_only_description": "Poproś właściciela organizacji o zmianę wyglądu odtwarzacza tej biblioteki."
     },
     "webhooks": {
       "owner_only_title": "Webhookami zarządza tylko właściciel",
@@ -1037,6 +1088,7 @@
       "library_storage_changed": "Zmieniono magazyn biblioteki",
       "library_encoding_updated": "Zmieniono jakości biblioteki",
       "library_security_updated": "Zmieniono zabezpieczenia odtwarzania",
+      "library_player_updated": "Zmieniono odtwarzacz biblioteki",
       "api_key_created": "Utworzono klucz API",
       "api_key_updated": "Zmieniono klucz API",
       "api_key_rolled": "Nadano kluczowi API nowy sekret",

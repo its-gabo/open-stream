@@ -114,8 +114,8 @@ export class StoragesRepository {
     return row?.storage ?? null
   }
 
-  async insertStorage(storage: NewStorageRecord) {
-    const [created] = await this.db
+  async insertStorage(storage: NewStorageRecord, transaction: Transaction) {
+    const [created] = await transaction
       .insert(storages)
       .values(storage)
       .returning({ id: storages.id })

@@ -1,8 +1,11 @@
 import {
+  DEFAULT_LIBRARY_PLAYER_SETTINGS,
   LIBRARY_API_KEY_SCOPES,
   VIDEO_PROCESSING_STATUSES,
   WEBHOOK_EVENT_TYPES,
   type LibraryApiKeyScope,
+  type LibraryPlayerSettings,
+  type LibraryPlayerSwitch,
   type WebhookEventType,
 } from "@workspace/shared"
 
@@ -20,7 +23,7 @@ export const LOCAL_UPLOAD_STATUSES = {
   FAILED: "failed",
 } as const
 
-/** Pages of a library, by path below the library; storage, encoding, API and webhook settings are owner-only. */
+/** Pages of a library, by path below the library; storage, encoding, player, API and webhook settings are owner-only. */
 export const LIBRARY_TABS = [
   { suffix: "", labelKey: "libraries.tabs.videos", isOwnerOnly: false },
   {
@@ -37,6 +40,11 @@ export const LIBRARY_TABS = [
   {
     suffix: "encoding",
     labelKey: "libraries.tabs.encoding",
+    isOwnerOnly: true,
+  },
+  {
+    suffix: "player",
+    labelKey: "libraries.tabs.player",
     isOwnerOnly: true,
   },
   { suffix: "api", labelKey: "libraries.tabs.api", isOwnerOnly: true },
@@ -222,4 +230,27 @@ export const PLAYER_MEDIA_EVENTS = [
   "ratechange",
   "ended",
   "canplay",
+] as const
+
+/** The player's on/off settings, in the order the shared definition lists them; each needs a `libraries.player.fields` translation. */
+export const LIBRARY_PLAYER_SWITCHES = (
+  Object.keys(
+    DEFAULT_LIBRARY_PLAYER_SETTINGS
+  ) as (keyof LibraryPlayerSettings)[]
+).filter(
+  (key): key is LibraryPlayerSwitch =>
+    typeof DEFAULT_LIBRARY_PLAYER_SETTINGS[key] === "boolean"
+)
+
+/** Preset accent colors offered next to the free picker, keyed by their translation key below `libraries.player.swatches`. */
+export const PLAYER_ACCENT_SWATCHES = [
+  { value: "#ffffff", labelKey: "white" },
+  { value: "#e11d48", labelKey: "rose" },
+  { value: "#f97316", labelKey: "orange" },
+  { value: "#facc15", labelKey: "yellow" },
+  { value: "#22c55e", labelKey: "green" },
+  { value: "#14b8a6", labelKey: "teal" },
+  { value: "#0ea5e9", labelKey: "sky" },
+  { value: "#6366f1", labelKey: "indigo" },
+  { value: "#d946ef", labelKey: "fuchsia" },
 ] as const

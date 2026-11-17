@@ -113,23 +113,39 @@ export class StoragesService {
     await this.assertBucketReachable({ ...input, credentials })
 
     const encrypted = this.encryptCredentials(credentials)
-    const { id } = await this.storagesRepository.insertStorage({
-      organizationId: access.organization.id,
-      name: input.name,
-      endpoint: input.endpoint,
-      region: input.region,
-      bucket: input.bucket,
-      forcePathStyle: input.forcePathStyle,
-      pathTemplate: input.pathTemplate,
-      ...encrypted,
-    })
+    const id = await this.storagesRepository.transaction(
+      async (transaction) => {
+        const created = await this.storagesRepository.insertStorage(
+          {
+            organizationId: access.organization.id,
+            name: input.name,
+            endpoint: input.endpoint,
+            region: input.region,
+            bucket: input.bucket,
+            forcePathStyle: input.forcePathStyle,
+            pathTemplate: input.pathTemplate,
+            ...encrypted,
+          },
+          transaction
+        )
 
-    await this.activityLogService.recordActivity(actor, {
-      organizationId: access.organization.id,
-      action: ACTIVITY_ACTIONS.STORAGE_CREATED,
-      resource: storageActivityResource({ id, name: input.name }),
-      after: toStorageActivityValues({ ...input, ...encrypted }),
-    })
+        await this.activityLogService.recordActivity(
+          actor,
+          {
+            organizationId: access.organization.id,
+            action: ACTIVITY_ACTIONS.STORAGE_CREATED,
+            resource: storageActivityResource({
+              id: created.id,
+              name: input.name,
+            }),
+            after: toStorageActivityValues({ ...input, ...encrypted }),
+          },
+          transaction
+        )
+
+        return created.id
+      }
+    )
 
     return this.reloadStorage(access.organization.id, id)
   }

@@ -1,3 +1,4 @@
+import { DEFAULT_LIBRARY_PLAYER_SETTINGS } from "@workspace/shared"
 import { cn } from "@workspace/ui/lib/utils"
 import { useHotkeys } from "@tanstack/react-hotkeys"
 import Hls from "hls.js"
@@ -35,6 +36,9 @@ import { PlayerButton } from "./player-button"
 import { PlayerSettingsMenu } from "./player-settings-menu"
 import { PlayerSlider } from "./player-slider"
 
+import type { CSSProperties } from "react"
+import type { PlayerControlsSettings } from "../libraries.types"
+
 type VideoPlayerProps = {
   /** The HLS master playlist. */
   src: string
@@ -56,6 +60,8 @@ type VideoPlayerProps = {
   autoFocus?: boolean
   /** Where to count views of this video; views are not counted without it. */
   viewsUrl?: string
+  /** The library's accent color and controls; the stock player when left out. */
+  controls?: PlayerControlsSettings
 }
 
 /**
@@ -77,6 +83,7 @@ export function VideoPlayer({
   sendsCredentials = true,
   autoFocus = true,
   viewsUrl,
+  controls = DEFAULT_LIBRARY_PLAYER_SETTINGS,
 }: VideoPlayerProps) {
   const { t } = useTranslation()
   const containerRef = useRef<HTMLDivElement>(null)
@@ -201,7 +208,9 @@ export function VideoPlayer({
         callback: () => changeVolume((media?.volume ?? 1) - PLAYER_VOLUME_STEP),
       },
       { hotkey: "M", callback: toggleMute },
-      { hotkey: "F", callback: toggleFullscreen },
+      ...(controls.showFullscreen
+        ? [{ hotkey: "F" as const, callback: toggleFullscreen }]
+        : []),
     ],
     { target: containerRef, enabled: usesOwnControls, capture: true }
   )
@@ -261,6 +270,7 @@ export function VideoPlayer({
         isFullscreen && "rounded-none",
         !areControlsVisible && "cursor-none"
       )}
+      style={{ "--player-accent": controls.accentColor } as CSSProperties}
       onPointerMove={() => setIsIdle(false)}
       onPointerLeave={() => {
         if (isPlaying) setIsIdle(true)
@@ -276,7 +286,7 @@ export function VideoPlayer({
         muted={muted}
         loop={loop}
         onClick={togglePlay}
-        onDoubleClick={toggleFullscreen}
+        onDoubleClick={controls.showFullscreen ? toggleFullscreen : undefined}
       />
 
       {title && (
@@ -389,37 +399,42 @@ export function VideoPlayer({
             </span>
           </span>
           <div className="ml-auto flex items-center gap-1">
-            <PlayerSettingsMenu
-              qualities={playback.qualities}
-              selectedLevel={playback.selectedLevel}
-              playingHeight={playback.playingHeight}
-              onSelectLevel={playback.selectLevel}
-              playbackRate={media?.playbackRate ?? 1}
-              onSelectRate={(rate) =>
-                withVideo((video) => {
-                  video.playbackRate = rate
-                })
-              }
-              onOpenChange={handleSettingsOpenChange}
-            />
-            {document.pictureInPictureEnabled && (
+            {controls.showSettingsMenu && (
+              <PlayerSettingsMenu
+                qualities={playback.qualities}
+                selectedLevel={playback.selectedLevel}
+                playingHeight={playback.playingHeight}
+                onSelectLevel={playback.selectLevel}
+                playbackRate={media?.playbackRate ?? 1}
+                onSelectRate={(rate) =>
+                  withVideo((video) => {
+                    video.playbackRate = rate
+                  })
+                }
+                onOpenChange={handleSettingsOpenChange}
+              />
+            )}
+            {controls.showPictureInPicture &&
+              document.pictureInPictureEnabled && (
+                <PlayerButton
+                  label={t("videos.player.picture_in_picture")}
+                  onClick={togglePictureInPicture}
+                >
+                  <PictureInPicture2Icon />
+                </PlayerButton>
+              )}
+            {controls.showFullscreen && (
               <PlayerButton
-                label={t("videos.player.picture_in_picture")}
-                onClick={togglePictureInPicture}
+                label={
+                  isFullscreen
+                    ? t("videos.player.exit_fullscreen")
+                    : t("videos.player.fullscreen")
+                }
+                onClick={toggleFullscreen}
               >
-                <PictureInPicture2Icon />
+                {isFullscreen ? <MinimizeIcon /> : <MaximizeIcon />}
               </PlayerButton>
             )}
-            <PlayerButton
-              label={
-                isFullscreen
-                  ? t("videos.player.exit_fullscreen")
-                  : t("videos.player.fullscreen")
-              }
-              onClick={toggleFullscreen}
-            >
-              {isFullscreen ? <MinimizeIcon /> : <MaximizeIcon />}
-            </PlayerButton>
           </div>
         </div>
       </div>

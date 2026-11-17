@@ -1,4 +1,7 @@
-import { type VideoQuality } from "@workspace/shared"
+import {
+  type LibraryPlayerSettings,
+  type VideoQuality,
+} from "@workspace/shared"
 import { and, asc, eq, ilike, isNotNull } from "drizzle-orm"
 import type { PageWindow } from "../../common/http/pagination/pagination.types"
 import type {
@@ -76,9 +79,10 @@ export class LibrariesRepository {
 
   async updatePlaybackSecurity(
     libraryId: string,
-    security: LibraryPlaybackSecurity
+    security: LibraryPlaybackSecurity,
+    transaction: Transaction
   ) {
-    await this.db
+    await transaction
       .update(libraries)
       .set(security)
       .where(eq(libraries.id, libraryId))
@@ -86,16 +90,31 @@ export class LibrariesRepository {
 
   async updateTranscodeQualities(
     libraryId: string,
-    transcodeQualities: VideoQuality[]
+    transcodeQualities: VideoQuality[],
+    transaction: Transaction
   ) {
-    await this.db
+    await transaction
       .update(libraries)
       .set({ transcodeQualities })
       .where(eq(libraries.id, libraryId))
   }
 
-  async insertLibrary(library: { organizationId: string; name: string }) {
-    const [created] = await this.db
+  async updatePlayerSettings(
+    libraryId: string,
+    playerSettings: LibraryPlayerSettings,
+    transaction: Transaction
+  ) {
+    await transaction
+      .update(libraries)
+      .set({ playerSettings })
+      .where(eq(libraries.id, libraryId))
+  }
+
+  async insertLibrary(
+    library: { organizationId: string; name: string },
+    transaction: Transaction
+  ) {
+    const [created] = await transaction
       .insert(libraries)
       .values(library)
       .returning({ id: libraries.id })
@@ -103,8 +122,12 @@ export class LibrariesRepository {
     return created!
   }
 
-  async updateLibrary(libraryId: string, changes: { name: string }) {
-    await this.db
+  async updateLibrary(
+    libraryId: string,
+    changes: { name: string },
+    transaction: Transaction
+  ) {
+    await transaction
       .update(libraries)
       .set(changes)
       .where(eq(libraries.id, libraryId))

@@ -21,6 +21,8 @@ export const LIBRARY_SUCCESS_CODES = {
   PLAYBACK_URL_CREATE: "video.playback_url.create.success",
   ENCODING_GET: "library.encoding.get.success",
   ENCODING_UPDATE: "library.encoding.update.success",
+  PLAYER_GET: "library.player.get.success",
+  PLAYER_UPDATE: "library.player.update.success",
   VIDEO_REPROCESS: "video.reprocess.success",
   VIDEO_STATUS_GET: "video.status.get.success",
   VIDEO_EMBED_GET: "video.embed.get.success",
@@ -110,6 +112,14 @@ export const LIBRARY_SUCCESS_RESULTS = {
   ENCODING_UPDATE: {
     code: LIBRARY_SUCCESS_CODES.ENCODING_UPDATE,
     message: "Library encoding settings saved.",
+  },
+  PLAYER_GET: {
+    code: LIBRARY_SUCCESS_CODES.PLAYER_GET,
+    message: "Library player settings fetched.",
+  },
+  PLAYER_UPDATE: {
+    code: LIBRARY_SUCCESS_CODES.PLAYER_UPDATE,
+    message: "Library player settings saved.",
   },
   VIDEO_REPROCESS: {
     code: LIBRARY_SUCCESS_CODES.VIDEO_REPROCESS,

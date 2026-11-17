@@ -6,6 +6,7 @@ import { createLibraryWebhooksRouter } from "../../webhooks/routers/library-webh
 import { createLibrariesCoreRouter } from "./libraries-core.router"
 import { createLibraryApiAccessRouter } from "./library-api-access.router"
 import { createLibraryEncodingRouter } from "./library-encoding.router"
+import { createLibraryPlayerRouter } from "./library-player.router"
 import { createLibraryStorageRouter } from "./library-storage.router"
 import { createVideoUploadsRouter } from "./video-uploads.router"
 import { createVideosRouter } from "./videos.router"
@@ -40,6 +41,13 @@ export function createLibrariesRouter(module: LibrariesRouterDependencies) {
       .route(
         "/",
         createLibraryEncodingRouter(
+          module.organizationsService,
+          module.librariesService
+        )
+      )
+      .route(
+        "/",
+        createLibraryPlayerRouter(
           module.organizationsService,
           module.librariesService
         )

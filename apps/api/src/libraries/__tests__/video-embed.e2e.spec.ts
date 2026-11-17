@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test"
 
+import { DEFAULT_LIBRARY_PLAYER_SETTINGS } from "@workspace/shared"
+
 import { createLibraryFactory } from "../../../test/factory/library.factory"
 import { createOrganizationFactory } from "../../../test/factory/organization.factory"
 import { createUserFactory } from "../../../test/factory/user.factory"
@@ -96,7 +98,24 @@ describe("Video embeds (e2e)", () => {
       storyboardUrl: `${filesUrl}/thumbnails/storyboard.vtt`,
       viewsUrl: `${filesUrl}/views`,
       allowedPlaybackHosts: [],
+      player: DEFAULT_LIBRARY_PLAYER_SETTINGS,
     })
+  })
+
+  it("gives the player the library's look", async () => {
+    const videoId = await createVideo()
+    const player = {
+      accentColor: "#e11d48",
+      showTitle: false,
+      showSettingsMenu: false,
+      showPictureInPicture: false,
+      showFullscreen: false,
+    }
+
+    await ownerClient.put(`${libraryPath}/player`, player)
+    const response = await readEmbed(videoId)
+
+    expect((await response.json()).data.embed.player).toEqual(player)
   })
 
   it("answers with a conflict until the video is processed", async () => {

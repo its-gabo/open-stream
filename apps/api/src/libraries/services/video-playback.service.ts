@@ -23,6 +23,7 @@ import {
   TEXT_FILE_EXTENSIONS,
 } from "../constants/library-api.constants"
 import { VIDEO_DERIVED_FILES } from "../constants/video-processing.constants"
+import { toLibraryPlayerSettingsDto } from "../dto/libraries.dto.mappers"
 import type { PlaybackUrlCreateBody } from "../dto/libraries.schemas"
 import { LIBRARY_ERRORS } from "../errors/libraries.errors"
 import type { LibrariesRepository } from "../repository/libraries.repository"
@@ -149,6 +150,7 @@ export class VideoPlaybackService {
         storyboardUrl: urls.storyboardUrl,
         viewsUrl: urls.viewsUrl,
         allowedPlaybackHosts: library.allowedPlaybackHosts,
+        player: toLibraryPlayerSettingsDto(library),
       },
     }
   }

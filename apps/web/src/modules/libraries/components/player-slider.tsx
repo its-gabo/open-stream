@@ -106,13 +106,13 @@ export function PlayerSlider({
           />
         )}
         <div
-          className="absolute inset-y-0 left-0 bg-white"
+          className="absolute inset-y-0 left-0 bg-[var(--player-accent,white)]"
           style={{ width: `${value * 100}%` }}
         />
       </div>
       <div
         className={cn(
-          "absolute size-3 -translate-x-1/2 rounded-full bg-white shadow transition-transform group-hover/slider:scale-100 group-focus-visible/slider:scale-100 group-focus-visible/slider:ring-2 group-focus-visible/slider:ring-white/60",
+          "absolute size-3 -translate-x-1/2 rounded-full bg-[var(--player-accent,white)] shadow transition-transform group-hover/slider:scale-100 group-focus-visible/slider:scale-100 group-focus-visible/slider:ring-2 group-focus-visible/slider:ring-white/60",
           isDragging ? "scale-100" : "scale-0"
         )}
         style={{ left: `${value * 100}%` }}

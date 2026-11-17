@@ -40,6 +40,11 @@ export const libraryEncodingQueryKey = (
   libraryId: string
 ) => [...LIBRARIES_QUERY_KEY, "encoding", organizationSlug, libraryId] as const
 
+export const libraryPlayerQueryKey = (
+  organizationSlug: string,
+  libraryId: string
+) => [...LIBRARIES_QUERY_KEY, "player", organizationSlug, libraryId] as const
+
 export const libraryWebhookQueryKey = (
   organizationSlug: string,
   libraryId: string

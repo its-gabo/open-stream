@@ -1,3 +1,5 @@
+import type { LibraryPlayerSettings } from "../types/libraries.types"
+
 export const LIBRARY_FIELD_LIMITS = {
   NAME_MAX_LENGTH: 120,
 } as const
@@ -79,6 +81,18 @@ export const LIBRARY_SECURITY_LIMITS = {
 /** A host a library's videos may be embedded on: `example.com`, `*.example.com` (subdomains only) or `localhost:3000`. */
 export const PLAYBACK_HOST_PATTERN =
   /^(\*\.)?([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)*[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(:\d{1,5})?$/
+
+/** A player accent color: `#` and six lowercase hex digits. */
+export const PLAYER_ACCENT_COLOR_PATTERN = /^#[0-9a-f]{6}$/
+
+/** How a library's embedded player looks before its owner changes anything: the stock white controls, all shown. */
+export const DEFAULT_LIBRARY_PLAYER_SETTINGS = {
+  accentColor: "#ffffff",
+  showTitle: true,
+  showSettingsMenu: true,
+  showPictureInPicture: true,
+  showFullscreen: true,
+} as const satisfies LibraryPlayerSettings
 
 /** How long a signed playback URL stays valid. */
 export const PLAYBACK_URL_TTL_SECONDS = {

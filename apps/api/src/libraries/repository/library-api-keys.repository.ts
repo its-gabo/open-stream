@@ -72,9 +72,10 @@ export class LibraryApiKeysRepository {
         NewLibraryApiKeyRecord,
         "name" | "scopes" | "keyHash" | "keyHint" | "lastUsedAt"
       >
-    >
+    >,
+    transaction: Transaction
   ) {
-    const [updated] = await this.db
+    const [updated] = await transaction
       .update(libraryApiKeys)
       .set(changes)
       .where(eq(libraryApiKeys.id, apiKeyId))
@@ -83,8 +84,10 @@ export class LibraryApiKeysRepository {
     return updated ?? null
   }
 
-  async deleteApiKey(apiKeyId: string) {
-    await this.db.delete(libraryApiKeys).where(eq(libraryApiKeys.id, apiKeyId))
+  async deleteApiKey(apiKeyId: string, transaction: Transaction) {
+    await transaction
+      .delete(libraryApiKeys)
+      .where(eq(libraryApiKeys.id, apiKeyId))
   }
 
   /** Records a use only when the last one is older than `staleBefore`, so busy keys are not written on every request. */

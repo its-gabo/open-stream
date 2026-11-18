@@ -87,6 +87,7 @@ Then open **https://app.openstream.localhost**, sign up, and confirm your email 
 | URL                                  | Service                                        |
 | ------------------------------------ | ---------------------------------------------- |
 | https://app.openstream.localhost     | Web app (`/api/*` goes to the API)             |
+| https://landing.openstream.localhost | Landing page (`bun run dev:landing`)           |
 | https://mailbox.openstream.localhost | Mailpit (sent emails)                          |
 | https://storage.openstream.localhost | RustFS console (`rustfsadmin` / `rustfsadmin`) |
 

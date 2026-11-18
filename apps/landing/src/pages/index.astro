@@ -1,0 +1,41 @@
+---
+import Layout from "../layouts/Layout.astro"
+import Preloader from "../components/Preloader.astro"
+import Header from "../components/Header.astro"
+import Hero from "../components/Hero.astro"
+import Marquee from "../components/Marquee.astro"
+import Statement from "../components/Statement.astro"
+import Pipeline from "../components/Pipeline.astro"
+import Features from "../components/Features.astro"
+import Numbers from "../components/Numbers.astro"
+import Security from "../components/Security.astro"
+import QuickStart from "../components/QuickStart.astro"
+import Faq from "../components/Faq.astro"
+import Footer from "../components/Footer.astro"
+import ScrollTimeline from "../components/ScrollTimeline.astro"
+---
+
+<Layout
+  title="OpenStream · Open-source video hosting and streaming"
+  description="OpenStream is a self-hosted video platform: upload videos, transcode them to adaptive HLS and play them in an embeddable player on your own sites."
+>
+  <Preloader />
+  <Header />
+  <main>
+    <Hero />
+    <Marquee />
+    <Statement />
+    <Pipeline />
+    <Features />
+    <Numbers />
+    <Security />
+    <QuickStart />
+    <Faq />
+  </main>
+  <Footer />
+  <ScrollTimeline />
+</Layout>
+
+<script>
+  import "../scripts/animations"
+</script>

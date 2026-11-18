@@ -5,6 +5,7 @@ Serves the local apps on HTTPS custom domains with [Caddy](https://caddyserver.c
 | URL                                  | Target                                     |
 | ------------------------------------ | ------------------------------------------ |
 | https://app.openstream.localhost     | Web app (`/api/*` is forwarded to the API) |
+| https://landing.openstream.localhost | Landing page (`bun run dev:landing`)       |
 | https://mailbox.openstream.localhost | Mailpit                                    |
 
 Install Caddy (`brew install caddy`) and run `caddy trust` once to add its local certificate authority to your system. From then on it starts automatically with `bun run dev`.

@@ -1,0 +1,90 @@
+---
+import Signet from "./Signet.astro"
+---
+
+<div class="preloader" data-preloader aria-hidden="true">
+  <div class="preloader__mark">
+    <Signet id="preloader-signet" class="preloader__signet" />
+  </div>
+  <div class="preloader__meta">
+    <span>Buffering</span>
+    <span class="preloader__count"><span data-preloader-count>00</span>%</span>
+  </div>
+  <div class="preloader__bar"><span data-preloader-bar></span></div>
+</div>
+
+<script is:inline>
+  try {
+    if (
+      sessionStorage.getItem("os-intro") ||
+      matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      document.documentElement.classList.add("intro-seen")
+    }
+  } catch {
+    document.documentElement.classList.add("intro-seen")
+  }
+</script>
+
+<style>
+  .preloader {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: grid;
+    place-items: center;
+    background: var(--bg);
+    color: var(--fg);
+  }
+
+  :global(.intro-seen) .preloader,
+  :global(html:not(.js)) .preloader {
+    display: none;
+  }
+
+  .preloader__signet {
+    width: clamp(96px, 14vw, 160px);
+    height: auto;
+  }
+
+  .preloader__meta {
+    position: absolute;
+    left: var(--gutter);
+    right: var(--gutter);
+    bottom: calc(var(--gutter) + 1.25rem);
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .preloader__count {
+    font-family: var(--font-heading);
+    font-size: clamp(3rem, 10vw, 7rem);
+    line-height: 0.8;
+    color: var(--fg);
+    letter-spacing: -0.02em;
+  }
+
+  .preloader__bar {
+    position: absolute;
+    left: var(--gutter);
+    right: var(--gutter);
+    bottom: var(--gutter);
+    height: 3px;
+    border-radius: 3px;
+    background: var(--line-strong);
+    overflow: hidden;
+  }
+
+  .preloader__bar span {
+    display: block;
+    height: 100%;
+    background: var(--fg);
+    transform-origin: left;
+    transform: scaleX(0);
+  }
+</style>

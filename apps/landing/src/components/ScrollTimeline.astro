@@ -1,0 +1,153 @@
+---
+// A player timeline that tracks the scroll: the page is the video
+const chapters = [
+  { id: "top", label: "Intro" },
+  { id: "how-it-works", label: "How it works" },
+  { id: "features", label: "Features" },
+  { id: "security", label: "Security" },
+  { id: "quick-start", label: "Quick start" },
+  { id: "faq", label: "FAQ" },
+]
+---
+
+<div class="timeline" data-timeline>
+  <a href="#top" class="timeline__play" aria-label="Back to top">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
+      <path d="M7 4.5v15a1 1 0 0 0 1.52.85l12-7.5a1 1 0 0 0 0-1.7l-12-7.5A1 1 0 0 0 7 4.5Z"></path>
+    </svg>
+  </a>
+  <span class="timeline__time"><span data-timeline-time>0:00</span> / 10:34</span>
+  <div class="timeline__track">
+    <span class="timeline__buffer" data-timeline-buffer></span>
+    <span class="timeline__progress" data-timeline-progress></span>
+    {
+      chapters.map((chapter) => (
+        <a
+          href={`#${chapter.id}`}
+          class="timeline__chapter"
+          data-timeline-chapter={chapter.id}
+        >
+          <span class="timeline__label">{chapter.label}</span>
+        </a>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .timeline {
+    position: fixed;
+    left: 50%;
+    bottom: 18px;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: min(560px, calc(100% - 2 * var(--gutter)));
+    padding: 8px 18px 8px 8px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: rgb(17 18 22 / 0.72);
+    backdrop-filter: blur(14px);
+    translate: -50% 0;
+  }
+
+  :global(.js) .timeline {
+    visibility: hidden;
+  }
+
+  :global(html:not(.js)) .timeline {
+    display: none;
+  }
+
+  .timeline__play {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--fg);
+    color: var(--bg);
+  }
+
+  .timeline__time {
+    flex: none;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--fg-dim);
+  }
+
+  .timeline__track {
+    position: relative;
+    flex: 1;
+    height: 4px;
+    border-radius: 4px;
+    background: var(--line-strong);
+  }
+
+  .timeline__buffer,
+  .timeline__progress {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    transform-origin: left;
+    transform: scaleX(0);
+  }
+
+  .timeline__buffer {
+    background: rgb(255 255 255 / 0.22);
+  }
+
+  .timeline__progress {
+    background: var(--fg);
+  }
+
+  .timeline__chapter {
+    position: absolute;
+    top: 50%;
+    width: 18px;
+    height: 22px;
+    margin-left: -9px;
+    transform: translateY(-50%);
+  }
+
+  .timeline__chapter::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 2px;
+    height: 8px;
+    border-radius: 1px;
+    background: var(--bg);
+    transform: translate(-50%, -50%);
+  }
+
+  .timeline__label {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 10px);
+    padding: 5px 10px;
+    border-radius: 6px;
+    background: var(--fg);
+    color: var(--bg);
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, 6px);
+    transition:
+      opacity 0.25s,
+      transform 0.25s var(--ease-out);
+  }
+
+  .timeline__chapter:hover .timeline__label,
+  .timeline__chapter:focus-visible .timeline__label {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+</style>

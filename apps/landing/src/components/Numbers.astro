@@ -1,0 +1,62 @@
+---
+const numbers = [
+  { value: 20, suffix: " GiB", label: "Maximum upload size" },
+  { value: 4, suffix: "", label: "Qualities, from 360p to 1080p" },
+  { value: 25, suffix: "", label: "API keys per library" },
+  { value: 100, suffix: "%", label: "Open source, MIT-licensed" },
+]
+---
+
+<section class="numbers container" aria-label="OpenStream in numbers">
+  {
+    numbers.map((item) => (
+      <div class="numbers__item" data-reveal="fade">
+        <strong>
+          <span data-count={item.value}>{item.value}</span>
+          {item.suffix}
+        </strong>
+        <p>{item.label}</p>
+      </div>
+    ))
+  }
+</section>
+
+<style>
+  .numbers {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    padding-block: clamp(2rem, 6vw, 4rem);
+  }
+
+  .numbers__item {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 2.5rem;
+    min-height: clamp(11rem, 18vw, 15rem);
+    padding: 1.5rem clamp(1rem, 2vw, 1.75rem);
+    border-left: 1px solid var(--line);
+  }
+
+  .numbers strong {
+    font-family: var(--font-heading);
+    font-size: clamp(2.6rem, 5vw, 4.75rem);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .numbers p {
+    max-width: 22ch;
+    color: var(--muted);
+  }
+
+  @media (max-width: 900px) {
+    .numbers {
+      grid-template-columns: repeat(2, 1fr);
+      row-gap: 1.5rem;
+    }
+  }
+</style>

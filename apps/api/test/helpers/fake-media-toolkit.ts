@@ -5,7 +5,8 @@ import type { MediaToolkit } from "../../src/media/types/media.types"
 
 /**
  * Stands in for ffmpeg: probes every file as a 3-second 640×360 video and
- * writes a small but complete set of HLS files, a poster and a storyboard.
+ * writes a small but complete set of HLS files, a poster and a storyboard;
+ * images it converts all become the same tiny JPEG.
  */
 export const fakeMediaToolkit: MediaToolkit = {
   probe: async () => ({
@@ -43,6 +44,9 @@ export const fakeMediaToolkit: MediaToolkit = {
     await Bun.write(storyboard.outputPath, new Uint8Array([0xff, 0xd8]))
   },
   captureImage: async ({ outputPath }) => {
+    await Bun.write(outputPath, new Uint8Array([0xff, 0xd8]))
+  },
+  convertImage: async ({ outputPath }) => {
     await Bun.write(outputPath, new Uint8Array([0xff, 0xd8]))
   },
 }

@@ -190,7 +190,8 @@
       "library.webhook.delivery_list.success": "Deliveries fetched.",
       "library.webhook.delivery_resend.success": "Delivery queued again.",
       "video.status.get.success": "Video status fetched.",
-      "activity.list.success": "Activity fetched."
+      "activity.list.success": "Activity fetched.",
+      "video.poster.update.success": "Poster saved."
     },
     "error": {
       "fallback": "Oops something went wrong..",
@@ -252,7 +253,10 @@
       "library.webhook.not_found": "This library has no webhook.",
       "library.webhook.url_not_allowed": "The webhook URL must be a public HTTPS address.",
       "library.webhook.delivery_not_found": "This delivery no longer exists.",
-      "library.webhook.delivery_pending": "This delivery is still being sent."
+      "library.webhook.delivery_pending": "This delivery is still being sent.",
+      "video.poster.frame_out_of_range": "That frame is past the end of the video.",
+      "video.poster.image_too_large": "This image is larger than the 5 MB limit.",
+      "video.poster.unsupported_image": "Only real JPEG, PNG and WebP images can be posters."
     }
   },
   "errors": {
@@ -839,6 +843,21 @@
         "uploaded": "Uploaded",
         "processed": "Processed"
       }
+    },
+    "poster": {
+      "title": "Thumbnail",
+      "description": "Players show this image before the video starts, and the library lists the video with it.",
+      "preview_alt": "The video's current thumbnail",
+      "sources": {
+        "automatic": "Picked automatically from early in the video.",
+        "frame": "The frame at {{time}}.",
+        "image": "An uploaded image."
+      },
+      "use_frame": "Use frame at {{time}}",
+      "upload_image": "Upload image",
+      "reset": "Pick automatically",
+      "image_hint": "Pause the player on the frame you want, or upload a JPEG, PNG or WebP image up to {{size}}. Images are scaled down to 1280 pixels on the long side.",
+      "image_too_large": "Choose an image up to {{size}}."
     },
     "player": {
       "failed": "The video could not be played. Try again in a moment.",

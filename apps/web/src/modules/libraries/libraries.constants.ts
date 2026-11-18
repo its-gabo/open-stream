@@ -1,6 +1,7 @@
 import {
   DEFAULT_LIBRARY_PLAYER_SETTINGS,
   LIBRARY_API_KEY_SCOPES,
+  VIDEO_POSTER_IMAGE_LIMITS,
   VIDEO_PROCESSING_STATUSES,
   WEBHOOK_EVENT_TYPES,
   type LibraryApiKeyScope,
@@ -13,6 +14,14 @@ export const VIDEO_UPLOAD_STATE_POLL_INTERVAL_MS = 4000
 
 /** File picker filter; the API still checks each file's bytes. */
 export const VIDEO_FILE_ACCEPT = ".mp4,.mov,video/mp4,video/quicktime"
+
+export const VIDEO_POSTER_IMAGE_ACCEPT = [
+  ".jpg",
+  ".jpeg",
+  ".png",
+  ".webp",
+  ...VIDEO_POSTER_IMAGE_LIMITS.MIME_TYPES,
+].join(",")
 
 /** Waits between automatic retries of a failed upload request, e.g. after a network drop. */
 export const VIDEO_UPLOAD_RETRY_DELAYS_MS = [0, 1000, 3000, 5000, 10000, 20000]
@@ -176,6 +185,7 @@ export const VIDEO_PLAYER_PATHS = {
 /** Tabs below the player in a video's details sheet. */
 export const VIDEO_DETAILS_TABS = {
   DETAILS: "details",
+  THUMBNAIL: "thumbnail",
   ANALYTICS: "analytics",
   EMBED: "embed",
 } as const

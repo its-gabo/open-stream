@@ -50,6 +50,11 @@ export const toVideoDto = (video: VideoRecord): VideoDto => ({
   height: video.height,
   renditions: video.renditions,
   processedAt: video.processedAt?.toISOString() ?? null,
+  poster: {
+    source: video.posterSource,
+    frameSeconds: video.posterFrameSeconds,
+    updatedAt: video.posterUpdatedAt?.toISOString() ?? null,
+  },
 })
 
 export const toVideoStatusDetailsDto = (

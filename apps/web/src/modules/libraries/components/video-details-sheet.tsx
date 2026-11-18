@@ -13,7 +13,7 @@ import {
   TabsTrigger,
 } from "@workspace/ui/components/tabs"
 import { FilmIcon } from "lucide-react"
-import { Suspense, lazy } from "react"
+import { Suspense, lazy, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { VIDEO_DETAILS_TABS, VIDEO_PLAYER_PATHS } from "../libraries.constants"
@@ -23,6 +23,7 @@ import {
   formatDuration,
   formatFileSize,
 } from "../libraries.utils"
+import { VideoPosterSection } from "./video-poster-section"
 
 import type { Video } from "@/api/generated-api"
 import { VideoAnalyticsSection } from "@/modules/analytics/components/video-analytics-section"
@@ -73,6 +74,7 @@ function VideoDetails({
   video,
 }: Omit<VideoDetailsSheetProps, "video" | "onClose"> & { video: Video }) {
   const { t, i18n } = useTranslation()
+  const [playerSeconds, setPlayerSeconds] = useState(0)
   const isPlayable = video.processingStatus === VIDEO_PROCESSING_STATUSES.READY
   const embedSize =
     isPlayable && video.width !== null && video.height !== null
@@ -142,6 +144,7 @@ function VideoDetails({
                 video,
                 VIDEO_PLAYER_PATHS.STORYBOARD
               )}
+              onTimeUpdate={setPlayerSeconds}
             />
           </Suspense>
         ) : (
@@ -161,6 +164,14 @@ function VideoDetails({
             >
               {t("videos.details.title")}
             </TabsTrigger>
+            {isPlayable && (
+              <TabsTrigger
+                value={VIDEO_DETAILS_TABS.THUMBNAIL}
+                className="h-full flex-none px-0"
+              >
+                {t("videos.poster.title")}
+              </TabsTrigger>
+            )}
             {isPlayable && (
               <TabsTrigger
                 value={VIDEO_DETAILS_TABS.ANALYTICS}
@@ -190,6 +201,16 @@ function VideoDetails({
               ))}
             </dl>
           </TabsContent>
+          {isPlayable && (
+            <TabsContent value={VIDEO_DETAILS_TABS.THUMBNAIL}>
+              <VideoPosterSection
+                organizationSlug={organizationSlug}
+                libraryId={libraryId}
+                video={video}
+                currentSeconds={playerSeconds}
+              />
+            </TabsContent>
+          )}
           {isPlayable && (
             <TabsContent value={VIDEO_DETAILS_TABS.ANALYTICS}>
               <VideoAnalyticsSection

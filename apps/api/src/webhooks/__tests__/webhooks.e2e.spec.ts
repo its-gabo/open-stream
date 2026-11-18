@@ -51,6 +51,7 @@ const failingMediaToolkit: MediaToolkit = {
     throw new Error("ffmpeg crashed")
   },
   captureImage: async () => {},
+  convertImage: async () => {},
 }
 
 describe("Library webhooks (e2e)", () => {

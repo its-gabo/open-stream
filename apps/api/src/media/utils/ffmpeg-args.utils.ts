@@ -3,6 +3,7 @@ import { VIDEO_ENCODERS } from "../constants/media.constants"
 import type {
   HlsTranscodeJob,
   ImageCaptureJob,
+  ImageConversionJob,
   VideoEncoder,
   VideoEncoding,
 } from "../types/media.types"
@@ -16,6 +17,8 @@ const MAX_FRAME_RATE = 60
 const FALLBACK_FRAME_RATE = 30
 /** JPEG needs full-range colour; ffmpeg 8 refuses the limited range videos use. */
 const TO_JPEG_COLOURS = "out_range=full,format=yuvj420p"
+/** Images larger than this are refused before they are decoded, so a small file cannot claim gigabytes of memory. */
+const MAX_IMAGE_PIXELS = String(8192 * 8192)
 /** Seconds ffmpeg waits at most between attempts to reconnect to a source URL. */
 const RECONNECT_DELAY_MAX_SECONDS = "10"
 
@@ -203,6 +206,24 @@ export function buildImageCaptureArgs(job: ImageCaptureJob) {
     "1",
     "-vf",
     `scale=${job.width}:${job.height}:${TO_JPEG_COLOURS}`,
+    "-q:v",
+    JPEG_QUALITY,
+    job.outputPath,
+  ]
+}
+
+/** The long side is capped by fitting both sides within it; an odd side would not fit the JPEG's chroma. */
+export function buildImageConversionArgs(job: ImageConversionJob) {
+  return [
+    ...COMMON_ARGS,
+    "-max_pixels",
+    MAX_IMAGE_PIXELS,
+    "-i",
+    job.source,
+    "-frames:v",
+    "1",
+    "-vf",
+    `scale=w=min(iw\\,${job.maxLongSide}):h=min(ih\\,${job.maxLongSide}):force_original_aspect_ratio=decrease:force_divisible_by=2:${TO_JPEG_COLOURS}`,
     "-q:v",
     JPEG_QUALITY,
     job.outputPath,

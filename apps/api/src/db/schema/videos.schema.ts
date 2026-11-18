@@ -3,6 +3,7 @@ import {
   VIDEO_FILE_FORMATS,
   VIDEO_PROCESSING_FAILURE_REASONS,
   VIDEO_PROCESSING_STATUSES,
+  VIDEO_POSTER_SOURCES,
   VIDEO_STATUSES,
 } from "@workspace/shared"
 import type { VideoRendition } from "../../libraries/types/libraries.types"
@@ -92,6 +93,19 @@ export const videos = pgTable(
       .notNull()
       .default([]),
     processedAt: timestamp("processed_at", { withTimezone: true }),
+    posterSource: text("poster_source", {
+      enum: [
+        VIDEO_POSTER_SOURCES.AUTOMATIC,
+        VIDEO_POSTER_SOURCES.FRAME,
+        VIDEO_POSTER_SOURCES.IMAGE,
+      ],
+    })
+      .notNull()
+      .default(VIDEO_POSTER_SOURCES.AUTOMATIC),
+    /** The chosen frame, while the poster source is `frame`. */
+    posterFrameSeconds: doublePrecision("poster_frame_seconds"),
+    /** When the poster file last changed, so its URL can change with it. */
+    posterUpdatedAt: timestamp("poster_updated_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

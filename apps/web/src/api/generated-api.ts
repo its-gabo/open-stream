@@ -1823,6 +1823,19 @@ export interface UpdateLibraryApiVideoParams {
   videoId: string
 }
 
+export interface UpdateLibraryApiVideoPosterParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+}
+
 export interface UpdateLibraryEncodingParams {
   /**
    * @format uuid
@@ -1895,6 +1908,47 @@ export interface UpdateVideoParams {
   videoId: string
 }
 
+export interface UpdateVideoPosterParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  organizationSlug: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+}
+
+export interface UploadLibraryApiVideoPosterImageParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+}
+
+export interface UploadVideoPosterImageParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  organizationSlug: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+}
+
 export interface VerifyEmailParams {
   /** @pattern ^[a-f0-9]{64}$ */
   token: string
@@ -1921,6 +1975,7 @@ export interface Video {
    * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
    */
   libraryId: string
+  poster: VideoPoster
   processedAt: string | null
   processingFailureReason: VideoProcessingFailureReason | null
   processingStatus: VideoProcessingStatus | null
@@ -2031,6 +2086,29 @@ export interface VideoPageSuccessResponse {
   }
   message: string
 }
+
+export interface VideoPoster {
+  frameSeconds: number | null
+  source: VideoPosterSource
+  updatedAt: string | null
+}
+
+export interface VideoPosterImageBody {
+  /** @format binary */
+  image: File
+}
+
+export type VideoPosterSource = "automatic" | "frame" | "image"
+
+export type VideoPosterUpdateBody =
+  | {
+      source: "automatic"
+    }
+  | {
+      /** @min 0 */
+      atSeconds: number
+      source: "frame"
+    }
 
 export type VideoProcessingFailureReason =
   "no_video_stream" | "transcoding_failed"
@@ -3758,6 +3836,50 @@ export class OpenStreamApi<
      * No description
      *
      * @tags Libraries
+     * @name UpdateVideoPoster
+     * @summary Take a processed video's poster from a chosen frame, or back from the automatic one
+     * @request PUT:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/videos/{videoId}/poster
+     */
+    updateVideoPoster: (
+      { organizationSlug, libraryId, videoId }: UpdateVideoPosterParams,
+      data: VideoPosterUpdateBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<VideoSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/videos/${videoId}/poster`,
+        method: "PUT",
+        body: data,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Libraries
+     * @name UploadVideoPosterImage
+     * @summary Make an uploaded JPEG, PNG or WebP image the poster of a processed video
+     * @request PUT:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/videos/{videoId}/poster/image
+     */
+    uploadVideoPosterImage: (
+      { organizationSlug, libraryId, videoId }: UploadVideoPosterImageParams,
+      data: VideoPosterImageBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<VideoSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/videos/${videoId}/poster/image`,
+        method: "PUT",
+        body: data,
+        type: "multipart/form-data",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Libraries
      * @name GetVideoPoster
      * @summary Read a processed video's poster, for previews in the web app
      * @request GET:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/videos/{videoId}/poster.jpg
@@ -4228,6 +4350,54 @@ export class OpenStreamApi<
         path: `/api/v1/libraries/${libraryId}/videos/${videoId}/reprocess`,
         method: "POST",
         secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Needs the `videos:manage` scope.
+     *
+     * @tags Library API
+     * @name UpdateLibraryApiVideoPoster
+     * @summary Take a processed video's poster from a chosen frame, or back from the automatic one
+     * @request PUT:/api/v1/libraries/{libraryId}/videos/{videoId}/poster
+     * @secure
+     */
+    updateLibraryApiVideoPoster: (
+      { libraryId, videoId }: UpdateLibraryApiVideoPosterParams,
+      data: VideoPosterUpdateBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<VideoSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/videos/${videoId}/poster`,
+        method: "PUT",
+        body: data,
+        secure: true,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Needs the `videos:manage` scope.
+     *
+     * @tags Library API
+     * @name UploadLibraryApiVideoPosterImage
+     * @summary Make an uploaded JPEG, PNG or WebP image the poster of a processed video
+     * @request PUT:/api/v1/libraries/{libraryId}/videos/{videoId}/poster/image
+     * @secure
+     */
+    uploadLibraryApiVideoPosterImage: (
+      { libraryId, videoId }: UploadLibraryApiVideoPosterImageParams,
+      data: VideoPosterImageBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<VideoSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/videos/${videoId}/poster/image`,
+        method: "PUT",
+        body: data,
+        secure: true,
+        type: "multipart/form-data",
         format: "json",
         ...params,
       }),

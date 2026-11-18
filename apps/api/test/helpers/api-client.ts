@@ -8,6 +8,8 @@ export type ApiRequestOptions = {
   body?: unknown
   /** Sent as is instead of JSON, e.g. the bytes of a tus upload chunk. */
   rawBody?: Uint8Array<ArrayBuffer>
+  /** Sent as `multipart/form-data`, e.g. an image upload. */
+  formData?: FormData
   headers?: Record<string, string>
 }
 
@@ -20,11 +22,12 @@ export function createApiClient(testApp: TestApp, cookie?: string) {
       method: options.method ?? "GET",
       headers: {
         origin: TEST_WEB_ORIGIN,
-        "content-type": "application/json",
+        ...(options.formData ? {} : { "content-type": "application/json" }),
         ...(cookie ? { cookie } : {}),
         ...options.headers,
       },
       body:
+        options.formData ??
         options.rawBody ??
         (options.body === undefined ? undefined : JSON.stringify(options.body)),
     })

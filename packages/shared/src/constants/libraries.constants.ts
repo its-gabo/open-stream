@@ -168,3 +168,16 @@ export const VIDEO_PROCESSING_FAILURE_REASONS = {
   /** Transcoding failed on every attempt, e.g. a damaged file. */
   TRANSCODING_FAILED: "transcoding_failed",
 } as const
+
+/** Where a video's poster comes from: a frame picked automatically, a frame the owner chose, or their own image. */
+export const VIDEO_POSTER_SOURCES = {
+  AUTOMATIC: "automatic",
+  FRAME: "frame",
+  IMAGE: "image",
+} as const
+
+export const VIDEO_POSTER_IMAGE_LIMITS = {
+  MAX_FILE_SIZE_BYTES: 5 * MIB,
+  /** Accepted by type, though the API checks each file's bytes rather than its stated type. */
+  MIME_TYPES: ["image/jpeg", "image/png", "image/webp"],
+} as const

@@ -24,6 +24,9 @@ export const LIBRARY_ERROR_CODES = {
   PLAYBACK_SIGNATURE_INVALID: "video.playback.signature_invalid",
   PLAYBACK_FILE_NOT_FOUND: "video.playback.file_not_found",
   PLAYBACK_RANGE_NOT_SATISFIABLE: "video.playback.range_not_satisfiable",
+  POSTER_FRAME_OUT_OF_RANGE: "video.poster.frame_out_of_range",
+  POSTER_IMAGE_TOO_LARGE: "video.poster.image_too_large",
+  UNSUPPORTED_POSTER_IMAGE: "video.poster.unsupported_image",
 } as const
 
 export const LIBRARY_ERRORS = {
@@ -159,5 +162,23 @@ export const LIBRARY_ERRORS = {
     code: LIBRARY_ERROR_CODES.PLAYBACK_RANGE_NOT_SATISFIABLE,
     message: "The requested byte range is outside the video file",
     reason: "video.playback_range_not_satisfiable",
+  },
+  POSTER_FRAME_OUT_OF_RANGE: {
+    kind: DOMAIN_ERROR_KINDS.INVALID_INPUT,
+    code: LIBRARY_ERROR_CODES.POSTER_FRAME_OUT_OF_RANGE,
+    message: "The chosen frame is past the end of the video",
+    reason: "video.poster_frame_out_of_range",
+  },
+  POSTER_IMAGE_TOO_LARGE: {
+    kind: DOMAIN_ERROR_KINDS.TOO_LARGE,
+    code: LIBRARY_ERROR_CODES.POSTER_IMAGE_TOO_LARGE,
+    message: "The poster image is too large",
+    reason: "video.poster_image_too_large",
+  },
+  UNSUPPORTED_POSTER_IMAGE: {
+    kind: DOMAIN_ERROR_KINDS.UNSUPPORTED_MEDIA_TYPE,
+    code: LIBRARY_ERROR_CODES.UNSUPPORTED_POSTER_IMAGE,
+    message: "Only JPEG, PNG and WebP images can be posters",
+    reason: "video.unsupported_poster_image",
   },
 } as const satisfies DomainErrorCatalog<typeof LIBRARY_ERROR_CODES>

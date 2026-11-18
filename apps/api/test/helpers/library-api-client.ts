@@ -16,11 +16,12 @@ export function createLibraryApiClient(
     testApp.app.request(`${TEST_WEB_ORIGIN}${API_BASE_PATH}${path}`, {
       method: options.method ?? "GET",
       headers: {
-        "content-type": "application/json",
+        ...(options.formData ? {} : { "content-type": "application/json" }),
         ...(apiKey ? { authorization: `Bearer ${apiKey}` } : {}),
         ...options.headers,
       },
       body:
+        options.formData ??
         options.rawBody ??
         (options.body === undefined ? undefined : JSON.stringify(options.body)),
     })

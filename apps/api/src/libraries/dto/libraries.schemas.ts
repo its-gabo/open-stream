@@ -7,6 +7,7 @@ import {
   VIDEO_FIELD_LIMITS,
   VIDEO_FILE_FORMATS,
   VIDEO_PROCESSING_FAILURE_REASONS,
+  VIDEO_POSTER_SOURCES,
   VIDEO_PROCESSING_STATUSES,
   VIDEO_QUALITIES,
   VIDEO_STATUSES,
@@ -170,6 +171,22 @@ export const videoUpdateBodySchema = z
   .object({ title: videoTitleSchema })
   .meta({ id: "VideoUpdateBody" })
 
+/** A frame of the video, in seconds from its start, or the poster picked automatically. */
+export const videoPosterUpdateBodySchema = z
+  .discriminatedUnion("source", [
+    z.object({ source: z.literal(VIDEO_POSTER_SOURCES.AUTOMATIC) }),
+    z.object({
+      source: z.literal(VIDEO_POSTER_SOURCES.FRAME),
+      atSeconds: z.number().nonnegative(),
+    }),
+  ])
+  .meta({ id: "VideoPosterUpdateBody" })
+
+/** A JPEG, PNG or WebP image; it is scaled down to the poster's size. */
+export const videoPosterImageBodySchema = z
+  .object({ image: z.file() })
+  .meta({ id: "VideoPosterImageBody" })
+
 const libraryStorageKindSchema = z
   .enum(LIBRARY_STORAGE_KINDS)
   .meta({ id: "LibraryStorageKind" })
@@ -196,6 +213,20 @@ export const videoRenditionDtoSchema = z
     bandwidth: z.int().nonnegative(),
   })
   .meta({ id: "VideoRendition" })
+
+const videoPosterSourceSchema = z
+  .enum(VIDEO_POSTER_SOURCES)
+  .meta({ id: "VideoPosterSource" })
+
+export const videoPosterDtoSchema = z
+  .object({
+    source: videoPosterSourceSchema,
+    /** The chosen frame, in seconds from the start; null unless the source is `frame`. */
+    frameSeconds: z.number().nonnegative().nullable(),
+    /** When the poster last changed; null until the video is processed. */
+    updatedAt: z.iso.datetime().nullable(),
+  })
+  .meta({ id: "VideoPoster" })
 
 const videoFileFormatSchema = z
   .enum(VIDEO_FILE_FORMATS)
@@ -249,6 +280,7 @@ export const videoDtoSchema = z
     height: z.int().positive().nullable(),
     renditions: z.array(videoRenditionDtoSchema),
     processedAt: z.iso.datetime().nullable(),
+    poster: videoPosterDtoSchema,
   })
   .meta({ id: "Video" })
 
@@ -426,6 +458,7 @@ export type LibraryStorageUpdateBody = z.infer<
 >
 export type VideoCreateBody = z.infer<typeof videoCreateBodySchema>
 export type VideoUpdateBody = z.infer<typeof videoUpdateBodySchema>
+export type VideoPosterUpdateBody = z.infer<typeof videoPosterUpdateBodySchema>
 export type LibraryEncodingUpdateBody = z.infer<
   typeof libraryEncodingUpdateBodySchema
 >

@@ -75,6 +75,7 @@ cp .env.example .env    # set AUTH_SECRET and STORAGE_ENCRYPTION_KEY
 docker compose up -d    # PostgreSQL, Redis, Mailpit and RustFS
 bun install
 bun run db:migrate
+bun run db:seed         # optional: demo accounts, libraries and videos
 bun run dev             # web app, API, worker and reverse proxy
 ```
 

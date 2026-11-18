@@ -339,6 +339,7 @@ export class VideosRepository {
         processingRunId: null,
         processingHeartbeatAt: null,
         processedAt: new Date(),
+        posterUpdatedAt: new Date(),
       })
       .where(processingRunCondition(videoId, runId))
       .returning()

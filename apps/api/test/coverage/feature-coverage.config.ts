@@ -17,6 +17,7 @@ export const COVERAGE_EXCLUDED_FILES: Record<string, string> = {
   "src/index.ts": "Starts the HTTP server on import",
   "src/worker.ts": "Starts the background worker on import",
   "src/db/migrate.ts": "Runs migrations on import",
+  "src/db/seed/seed.ts": "Seeds the database on import",
   "src/openapi/export-openapi-schema.ts": "Writes the OpenAPI file on import",
 }
 

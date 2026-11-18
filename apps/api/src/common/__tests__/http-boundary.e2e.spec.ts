@@ -180,6 +180,7 @@ describe("HTTP boundary (e2e)", () => {
       "updateLibrary",
       "updateLibraryApiKey",
       "updateLibraryApiVideo",
+      "updateLibraryApiVideoPoster",
       "updateLibraryEncoding",
       "updateLibraryPlayer",
       "updateLibrarySecurity",
@@ -187,6 +188,9 @@ describe("HTTP boundary (e2e)", () => {
       "updateOrganization",
       "updateStorage",
       "updateVideo",
+      "updateVideoPoster",
+      "uploadLibraryApiVideoPosterImage",
+      "uploadVideoPosterImage",
       "verifyEmail",
     ])
   })

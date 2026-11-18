@@ -216,6 +216,22 @@ export type VideoProcessingResult = {
 }
 
 /** Identifies a video only together with the library and organization it must belong to. */
+/** How a video's poster is made; see `VideoPostersService`. */
+export type PosterSettings = Pick<
+  VideoRecord,
+  "posterSource" | "posterFrameSeconds"
+>
+
+/** A processed video whose poster is being replaced, with what making it needs. */
+export type PosterTarget = {
+  id: string
+  location: StorageLocation
+  sourceObjectKey: string
+  durationSeconds: number
+  width: number
+  height: number
+}
+
 export type VideoScope = {
   organizationId: string
   libraryId: string

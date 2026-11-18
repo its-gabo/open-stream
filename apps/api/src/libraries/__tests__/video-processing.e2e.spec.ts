@@ -49,6 +49,7 @@ const failingMediaToolkit: MediaToolkit = {
     throw new Error("ffmpeg crashed")
   },
   captureImage: async () => {},
+  convertImage: async () => {},
 }
 
 /**
@@ -88,6 +89,9 @@ const createGatedMediaToolkit = () => {
       )
     },
     captureImage: async ({ outputPath }) => {
+      await Bun.write(outputPath, new Uint8Array([0xff, 0xd8]))
+    },
+    convertImage: async ({ outputPath }) => {
       await Bun.write(outputPath, new Uint8Array([0xff, 0xd8]))
     },
   }

@@ -15,6 +15,12 @@ export const hlsPrefixOf = (sourceObjectKey: string) =>
 export const thumbnailsPrefixOf = (sourceObjectKey: string) =>
   `${videoFolderOf(sourceObjectKey)}/${VIDEO_DERIVED_FILES.THUMBNAILS_FOLDER}/`
 
+export const posterKeyOf = (sourceObjectKey: string) =>
+  `${thumbnailsPrefixOf(sourceObjectKey)}${VIDEO_DERIVED_FILES.POSTER}`
+
+export const posterImageKeyOf = (sourceObjectKey: string) =>
+  `${videoFolderOf(sourceObjectKey)}/${VIDEO_DERIVED_FILES.POSTER_IMAGE}`
+
 /**
  * Whether `path` names one of the HLS files of a video with these
  * renditions: the master playlist, or a variant playlist or segment.

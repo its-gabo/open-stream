@@ -148,37 +148,55 @@ hls.attachMedia(document.querySelector("video"))`,
     },
   ] as const
 
-/**
- * A file of a processed video as the API serves it to members, e.g. its
- * poster or HLS playlist; `processedAt` changes the URL when the video is
- * processed again.
- */
-export function buildVideoFileUrl(
+/** A file of a video as the API serves it to members; a new `version` gives the file a new URL. */
+function buildVersionedVideoFileUrl(
   organizationSlug: string,
   libraryId: string,
-  video: { id: string; processedAt: string | null },
-  path: string
+  videoId: string,
+  path: string,
+  version: string | null
 ) {
   const url = new URL(
-    `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/videos/${video.id}/${path}`,
+    `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/videos/${videoId}/${path}`,
     API_URL || window.location.origin
   )
 
-  if (video.processedAt) url.searchParams.set("v", video.processedAt)
+  if (version) url.searchParams.set("v", version)
 
   return url.toString()
 }
 
+/**
+ * A file of a processed video as the API serves it to members, e.g. its
+ * HLS playlist; `processedAt` changes the URL when the video is processed
+ * again.
+ */
+export const buildVideoFileUrl = (
+  organizationSlug: string,
+  libraryId: string,
+  video: { id: string; processedAt: string | null },
+  path: string
+) =>
+  buildVersionedVideoFileUrl(
+    organizationSlug,
+    libraryId,
+    video.id,
+    path,
+    video.processedAt
+  )
+
+/** The poster's URL changes whenever the poster does, e.g. after choosing another frame. */
 export const buildVideoPosterUrl = (
   organizationSlug: string,
   libraryId: string,
-  video: { id: string; processedAt: string | null }
+  video: { id: string; poster: { updatedAt: string | null } }
 ) =>
-  buildVideoFileUrl(
+  buildVersionedVideoFileUrl(
     organizationSlug,
     libraryId,
-    video,
-    VIDEO_PLAYER_PATHS.POSTER
+    video.id,
+    VIDEO_PLAYER_PATHS.POSTER,
+    video.poster.updatedAt
   )
 
 /** `1:05` or `1:02:05`. */

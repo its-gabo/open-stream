@@ -43,6 +43,7 @@ const failingMediaToolkit: MediaToolkit = {
     throw new Error("ffmpeg crashed")
   },
   captureImage: async () => {},
+  convertImage: async () => {},
 }
 
 /** Polls until `read` returns something truthy, as the worker runs on its own schedule. */

@@ -6,6 +6,7 @@ import { LibraryApiAccessService } from "./services/library-api-access.service"
 import { LibraryStorageService } from "./services/library-storage.service"
 import { VideoPlaybackService } from "./services/video-playback.service"
 import { VideoFilesCleanupService } from "./services/video-files-cleanup.service"
+import { VideoPostersService } from "./services/video-posters.service"
 import { VideoProcessingService } from "./services/video-processing.service"
 import { VideoStorageService } from "./services/video-storage.service"
 import { VideoUploadsService } from "./services/video-uploads.service"
@@ -45,6 +46,16 @@ export function createLibrariesModule(dependencies: LibraryModuleDependencies) {
     storagesService,
     storageCleanupService
   )
+  const videoPostersService = new VideoPostersService(
+    videosRepository,
+    libraryStorageService,
+    objectStorage,
+    mediaToolkit,
+    webhookEventsService,
+    activityLogService,
+    logger.child("video-posters"),
+    config
+  )
 
   return {
     librariesService: new LibrariesService(
@@ -68,6 +79,7 @@ export function createLibrariesModule(dependencies: LibraryModuleDependencies) {
     ),
     libraryStorageService,
     videoFilesCleanupService,
+    videoPostersService,
     videosService: new VideosService(
       videosRepository,
       videoFilesCleanupService,
@@ -87,6 +99,7 @@ export function createLibrariesModule(dependencies: LibraryModuleDependencies) {
       videosRepository,
       librariesRepository,
       libraryStorageService,
+      videoPostersService,
       objectStorage,
       mediaToolkit,
       outboxService,

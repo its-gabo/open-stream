@@ -61,12 +61,21 @@ export type ImageCaptureJob = {
   height: number
 }
 
+/** An image file as a JPEG, scaled down to fit `maxLongSide` but never up. */
+export type ImageConversionJob = {
+  /** A local path. */
+  source: string
+  outputPath: string
+  maxLongSide: number
+}
+
 /** Reads and transcodes media files, from the local disk or a URL. */
 export type MediaToolkit = {
   /** Null when the file has no video stream. */
   probe(source: string): Promise<MediaProbe | null>
   transcodeToHls(job: HlsTranscodeJob): Promise<void>
   captureImage(job: ImageCaptureJob): Promise<void>
+  convertImage(job: ImageConversionJob): Promise<void>
 }
 
 export type MediaModuleDependencies = {

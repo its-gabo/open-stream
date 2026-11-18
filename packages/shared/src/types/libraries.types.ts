@@ -6,6 +6,7 @@ import type {
   LIBRARY_STORAGE_KINDS,
   STORAGE_PATH_VARIABLES,
   VIDEO_FILE_FORMATS,
+  VIDEO_POSTER_SOURCES,
   VIDEO_STATUSES,
 } from "../constants/libraries.constants"
 import type {
@@ -27,6 +28,7 @@ type ValueOf<T> = T[keyof T]
 export type VideoStatus = ValueOf<typeof VIDEO_STATUSES>
 export type LibraryStorageKind = ValueOf<typeof LIBRARY_STORAGE_KINDS>
 export type VideoFileFormat = ValueOf<typeof VIDEO_FILE_FORMATS>
+export type VideoPosterSource = ValueOf<typeof VIDEO_POSTER_SOURCES>
 
 export type StoragePathValues = Record<
   ValueOf<typeof STORAGE_PATH_VARIABLES>,

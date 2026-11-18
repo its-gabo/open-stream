@@ -190,7 +190,8 @@
       "library.webhook.delivery_list.success": "Pobrano dostarczenia.",
       "library.webhook.delivery_resend.success": "Dostarczenie zostanie wysłane ponownie.",
       "video.status.get.success": "Pobrano status filmu.",
-      "activity.list.success": "Pobrano aktywność."
+      "activity.list.success": "Pobrano aktywność.",
+      "video.poster.update.success": "Zapisano miniaturę."
     },
     "error": {
       "fallback": "Ups, coś poszło nie tak..",
@@ -252,7 +253,10 @@
       "library.webhook.not_found": "Ta biblioteka nie ma webhooka.",
       "library.webhook.url_not_allowed": "Adres webhooka musi być publicznym adresem HTTPS.",
       "library.webhook.delivery_not_found": "To dostarczenie już nie istnieje.",
-      "library.webhook.delivery_pending": "To dostarczenie jest jeszcze wysyłane."
+      "library.webhook.delivery_pending": "To dostarczenie jest jeszcze wysyłane.",
+      "video.poster.frame_out_of_range": "Ta klatka wypada po końcu filmu.",
+      "video.poster.image_too_large": "Ten obraz przekracza limit 5 MB.",
+      "video.poster.unsupported_image": "Miniaturą może być tylko prawdziwy obraz JPEG, PNG lub WebP."
     }
   },
   "errors": {
@@ -843,6 +847,21 @@
         "uploaded": "Przesłano",
         "processed": "Przetworzono"
       }
+    },
+    "poster": {
+      "title": "Miniatura",
+      "description": "Odtwarzacze pokazują ten obraz przed startem filmu, a biblioteka wyświetla go na liście filmów.",
+      "preview_alt": "Obecna miniatura filmu",
+      "sources": {
+        "automatic": "Wybrana automatycznie z wczesnej części filmu.",
+        "frame": "Klatka z {{time}}.",
+        "image": "Przesłany obraz."
+      },
+      "use_frame": "Użyj klatki z {{time}}",
+      "upload_image": "Prześlij obraz",
+      "reset": "Wybierz automatycznie",
+      "image_hint": "Zatrzymaj odtwarzacz na wybranej klatce albo prześlij obraz JPEG, PNG lub WebP do {{size}}. Obrazy są zmniejszane do 1280 pikseli na dłuższym boku.",
+      "image_too_large": "Wybierz obraz do {{size}}."
     },
     "player": {
       "failed": "Nie udało się odtworzyć filmu. Spróbuj ponownie za chwilę.",

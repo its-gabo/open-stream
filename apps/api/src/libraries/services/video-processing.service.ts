@@ -28,8 +28,6 @@ import type {
 import {
   DERIVED_FILE_UPLOAD_CONCURRENCY,
   HLS_SEGMENT_SECONDS,
-  POSTER_MAX_LONG_SIDE,
-  POSTER_POSITION,
   TRANSCODING_PROGRESS_LOG_STEP_PERCENT,
   VIDEO_DERIVED_FILES,
 } from "../constants/video-processing.constants"
@@ -59,11 +57,11 @@ import {
   thumbnailsPrefixOf,
 } from "../utils/video-files.utils"
 import {
-  fitWithin,
   planRenditions,
   readVariantBandwidths,
 } from "../utils/video-renditions.utils"
 import type { LibraryStorageService } from "./library-storage.service"
+import type { VideoPostersService } from "./video-posters.service"
 import { UnplayableVideoError } from "../errors/unplayable-video.error"
 
 /**
@@ -77,6 +75,7 @@ export class VideoProcessingService {
     private readonly videosRepository: VideosRepository,
     private readonly librariesRepository: LibrariesRepository,
     private readonly libraryStorageService: LibraryStorageService,
+    private readonly videoPostersService: VideoPostersService,
     private readonly objectStorage: ObjectStorage,
     private readonly mediaToolkit: MediaToolkit,
     private readonly outboxService: OutboxService,
@@ -438,7 +437,12 @@ export class VideoProcessingService {
         renditions,
         storyboard,
       }),
-      this.capturePoster(video.id, source, thumbnailsDir, probe),
+      this.writePoster(video, thumbnailsDir, {
+        source,
+        location: storage.location,
+        sourceObjectKey,
+        ...probe,
+      }),
     ])
     await Bun.write(
       join(thumbnailsDir, VIDEO_DERIVED_FILES.STORYBOARD_VTT),
@@ -569,24 +573,23 @@ export class VideoProcessingService {
     this.logger.info("Transcoded", { videoId, took: formatElapsed(startedAt) })
   }
 
-  /** Seeks to the frame, so it is quick enough to run beside the transcode. */
-  private async capturePoster(
-    videoId: string,
-    source: string,
+  /** The frame or image the video's poster settings name; seeking to a frame is quick enough to run beside the transcode. */
+  private async writePoster(
+    video: VideoRecord,
     thumbnailsDir: string,
-    probe: MediaProbe
+    source: Parameters<VideoPostersService["writePoster"]>[1]
   ) {
     const startedAt = performance.now()
 
     await mkdir(thumbnailsDir, { recursive: true })
-    await this.mediaToolkit.captureImage({
+    await this.videoPostersService.writePoster(
+      video,
       source,
-      outputPath: join(thumbnailsDir, VIDEO_DERIVED_FILES.POSTER),
-      atSeconds: probe.durationSeconds * POSTER_POSITION,
-      ...fitWithin(probe, POSTER_MAX_LONG_SIDE),
-    })
+      join(thumbnailsDir, VIDEO_DERIVED_FILES.POSTER)
+    )
     this.logger.info("Poster created", {
-      videoId,
+      videoId: video.id,
+      source: video.posterSource,
       took: formatElapsed(startedAt),
     })
   }

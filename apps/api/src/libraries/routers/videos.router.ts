@@ -22,6 +22,8 @@ import {
   videoCreateBodySchema,
   videoListSuccessResponseSchema,
   videoParamSchema,
+  videoPosterImageBodySchema,
+  videoPosterUpdateBodySchema,
   videoSuccessResponseSchema,
   videoUpdateBodySchema,
   memberVideoHlsFileParamSchema,
@@ -30,6 +32,7 @@ import {
 import { requireLibrary } from "../middleware/library-access.middleware"
 import type { LibrariesService } from "../services/libraries.service"
 import type { VideoPlaybackService } from "../services/video-playback.service"
+import type { VideoPostersService } from "../services/video-posters.service"
 import type { VideoProcessingService } from "../services/video-processing.service"
 import type { VideosService } from "../services/videos.service"
 import type { LibraryEnv } from "../types/libraries.types"
@@ -41,7 +44,8 @@ export function createVideosRouter(
   librariesService: LibrariesService,
   videosService: VideosService,
   videoProcessingService: VideoProcessingService,
-  videoPlaybackService: VideoPlaybackService
+  videoPlaybackService: VideoPlaybackService,
+  videoPostersService: VideoPostersService
 ) {
   const requireMemberOfLibrary = [
     requireOrganizationMembership(organizationsService),
@@ -236,6 +240,76 @@ export function createVideosRouter(
             queued
           ),
           202
+        )
+      }
+    )
+    .put(
+      "/:organizationSlug/libraries/:libraryId/videos/:videoId/poster",
+      describeRoute({
+        tags: [OPENAPI_TAGS.LIBRARIES],
+        operationId: "updateVideoPoster",
+        summary:
+          "Take a processed video's poster from a chosen frame, or back from the automatic one",
+        responses: {
+          200: describeJsonResponse("Poster saved", videoSuccessResponseSchema),
+          ...describeApiErrorResponses(
+            LIBRARY_ROUTE_ERROR_DESCRIPTIONS.VIDEO_POSTER_UPDATE
+          ),
+        },
+      }),
+      validateRequest("param", videoParamSchema),
+      validateRequest("json", videoPosterUpdateBodySchema),
+      ...requireMemberOfLibrary,
+      async (c) => {
+        const updated = await videoPostersService.updateVideoPoster(
+          c.get("library"),
+          c.get("activityActor"),
+          c.req.valid("param").videoId,
+          c.req.valid("json")
+        )
+
+        return c.json(
+          createApiSuccessResponse(
+            LIBRARY_SUCCESS_RESULTS.VIDEO_POSTER_UPDATE,
+            updated
+          ),
+          200
+        )
+      }
+    )
+    .put(
+      "/:organizationSlug/libraries/:libraryId/videos/:videoId/poster/image",
+      describeRoute({
+        tags: [OPENAPI_TAGS.LIBRARIES],
+        operationId: "uploadVideoPosterImage",
+        summary:
+          "Make an uploaded JPEG, PNG or WebP image the poster of a processed video",
+        responses: {
+          200: describeJsonResponse("Poster saved", videoSuccessResponseSchema),
+          ...describeApiErrorResponses(
+            LIBRARY_ROUTE_ERROR_DESCRIPTIONS.VIDEO_POSTER_UPDATE
+          ),
+        },
+      }),
+      validateRequest("param", videoParamSchema),
+      validateRequest("form", videoPosterImageBodySchema, {
+        media: "multipart/form-data",
+      }),
+      ...requireMemberOfLibrary,
+      async (c) => {
+        const updated = await videoPostersService.uploadPosterImage(
+          c.get("library"),
+          c.get("activityActor"),
+          c.req.valid("param").videoId,
+          c.req.valid("form").image
+        )
+
+        return c.json(
+          createApiSuccessResponse(
+            LIBRARY_SUCCESS_RESULTS.VIDEO_POSTER_UPDATE,
+            updated
+          ),
+          200
         )
       }
     )

@@ -5,11 +5,13 @@ import { ERROR_OUTPUT_TAIL_LENGTH } from "../constants/media.constants"
 import type {
   HlsTranscodeJob,
   ImageCaptureJob,
+  ImageConversionJob,
   MediaToolkit,
 } from "../types/media.types"
 import {
   buildHlsTranscodeArgs,
   buildImageCaptureArgs,
+  buildImageConversionArgs,
   buildProbeArgs,
   redactUrlQueries,
 } from "../utils/ffmpeg-args.utils"
@@ -65,6 +67,12 @@ export class FfmpegMediaToolkitService implements MediaToolkit {
   async captureImage(job: ImageCaptureJob) {
     await mkdir(dirname(job.outputPath), { recursive: true })
     await this.run(this.config.FFMPEG_PATH, buildImageCaptureArgs(job))
+    await assertOutputWritten(job.outputPath)
+  }
+
+  async convertImage(job: ImageConversionJob) {
+    await mkdir(dirname(job.outputPath), { recursive: true })
+    await this.run(this.config.FFMPEG_PATH, buildImageConversionArgs(job))
     await assertOutputWritten(job.outputPath)
   }
 

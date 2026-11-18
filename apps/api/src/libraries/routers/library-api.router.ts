@@ -66,7 +66,8 @@ export function createLibraryApiRouter(
           module.libraryApiAccessService,
           module.videosService,
           module.videoPlaybackService,
-          module.videoProcessingService
+          module.videoProcessingService,
+          module.videoPostersService
         )
       )
       .route(

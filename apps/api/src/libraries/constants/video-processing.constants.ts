@@ -21,6 +21,8 @@ export const VIDEO_DERIVED_FILES = {
   VARIANT_PLAYLIST: "playlist.m3u8",
   SEGMENT_PATTERN: "segment_%05d.ts",
   POSTER: "poster.jpg",
+  /** An uploaded poster, outside `thumbnails/` so processing the video again keeps it. */
+  POSTER_IMAGE: "poster-image.jpg",
   STORYBOARD_IMAGE: "storyboard.jpg",
   STORYBOARD_VTT: "storyboard.vtt",
 } as const

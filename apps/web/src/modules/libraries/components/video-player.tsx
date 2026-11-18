@@ -62,6 +62,8 @@ type VideoPlayerProps = {
   viewsUrl?: string
   /** The library's accent color and controls; the stock player when left out. */
   controls?: PlayerControlsSettings
+  /** Told where playback is whenever it moves, e.g. to pick the frame shown. */
+  onTimeUpdate?: (seconds: number) => void
 }
 
 /**
@@ -84,6 +86,7 @@ export function VideoPlayer({
   autoFocus = true,
   viewsUrl,
   controls = DEFAULT_LIBRARY_PLAYER_SETTINGS,
+  onTimeUpdate,
 }: VideoPlayerProps) {
   const { t } = useTranslation()
   const containerRef = useRef<HTMLDivElement>(null)
@@ -106,6 +109,11 @@ export function VideoPlayer({
   const isPlaying = media?.isPlaying ?? false
   const duration = media?.duration ?? 0
   const areControlsVisible = !isPlaying || !isIdle || isSettingsOpen
+  const currentTime = media?.currentTime ?? 0
+
+  useEffect(() => {
+    onTimeUpdate?.(currentTime)
+  }, [currentTime, onTimeUpdate])
 
   useEffect(() => {
     if (!autoFocus) return

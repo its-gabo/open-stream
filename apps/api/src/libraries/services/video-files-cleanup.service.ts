@@ -4,13 +4,17 @@ import type { StorageCleanupService } from "../../storage/services/storage-clean
 import type { StoragesService } from "../../storage/services/storages.service"
 import type { StorageCleanupRequest } from "../../storage/types/storage.types"
 import type { VideosRepository } from "../repository/videos.repository"
-import { hlsPrefixOf, thumbnailsPrefixOf } from "../utils/video-files.utils"
+import {
+  hlsPrefixOf,
+  posterImageKeyOf,
+  thumbnailsPrefixOf,
+} from "../utils/video-files.utils"
 import type { VideoFiles } from "../types/libraries.types"
 
 /**
  * Schedules the removal of videos' files from storage when their records are
- * deleted: the source, its HLS renditions and thumbnails, and an unfinished
- * upload. The worker removes them, retrying while the storage is unreachable.
+ * deleted: the source, its HLS renditions and thumbnails, an uploaded
+ * poster image, and an unfinished upload. The worker removes them, retrying while the storage is unreachable.
  */
 export class VideoFilesCleanupService {
   constructor(
@@ -69,7 +73,9 @@ export class VideoFilesCleanupService {
     await this.storageCleanupService.scheduleCleanups(
       videos.map((video): StorageCleanupRequest => ({
         storage: storagesByLibrary.get(video.libraryId) ?? null,
-        objectKeys: video.sourceObjectKey ? [video.sourceObjectKey] : [],
+        objectKeys: video.sourceObjectKey
+          ? [video.sourceObjectKey, posterImageKeyOf(video.sourceObjectKey)]
+          : [],
         prefixes: video.sourceObjectKey
           ? [
               hlsPrefixOf(video.sourceObjectKey),

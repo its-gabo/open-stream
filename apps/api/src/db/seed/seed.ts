@@ -1,0 +1,269 @@
+import { eq } from "drizzle-orm"
+import type { ActivityRequestSource } from "../../activity/types/activity.types"
+import { activityActorOfUser } from "../../activity/utils/activity-actor.utils"
+import { createAppModule, type AppModule } from "../../app.module"
+import type { AuthUserSession } from "../../auth/types/auth.types"
+import { readConfig } from "../../config/app.config"
+import type { LibraryProfile } from "../../libraries/types/libraries.types"
+import type { OrganizationAccess } from "../../organizations/types/organizations.types"
+import { users, videoViews, type NewVideoViewRecord } from "../schema"
+import { createSeedVideoFile } from "./seed-media.utils"
+import {
+  SEED_API_KEY,
+  SEED_DEVICE_TYPES,
+  SEED_LIBRARIES,
+  SEED_ORGANIZATION,
+  SEED_PASSWORD,
+  SEED_USERS,
+  SEED_VIEW_DAYS,
+  type SeedLibrary,
+  type SeedVideo,
+} from "./seed.constants"
+
+const SEED_REQUEST_SOURCE: ActivityRequestSource = {
+  ipAddress: null,
+  userAgent: null,
+}
+const DAY_MS = 24 * 60 * 60 * 1000
+
+/** The same pseudo-random numbers on every run, so seeded analytics look alike each time. */
+function createRandom(seed: number) {
+  let state = seed
+
+  return () => {
+    state = (state + 0x6d2b79f5) | 0
+    let mixed = Math.imul(state ^ (state >>> 15), 1 | state)
+    mixed = (mixed + Math.imul(mixed ^ (mixed >>> 7), 61 | mixed)) ^ mixed
+
+    return ((mixed ^ (mixed >>> 14)) >>> 0) / 4294967296
+  }
+}
+
+const random = createRandom(42)
+const pick = <T>(items: readonly T[]) =>
+  items[Math.floor(random() * items.length)]!
+
+/** Registers a verified account; seeding skips the verification email's link. */
+async function createSeedUser(
+  appModule: AppModule,
+  user: { name: string; email: string }
+): Promise<AuthUserSession> {
+  await appModule.authRegistrationService.signUpWithEmail(
+    { ...user, password: SEED_PASSWORD },
+    SEED_REQUEST_SOURCE
+  )
+
+  const [created] = await appModule.db
+    .update(users)
+    .set({ emailVerified: true })
+    .where(eq(users.email, user.email))
+    .returning()
+
+  return {
+    userId: created!.id,
+    email: created!.email,
+    name: created!.name,
+    emailVerified: true,
+    expiresAt: new Date(Date.now() + DAY_MS),
+  }
+}
+
+async function createSeedOrganization(
+  appModule: AppModule,
+  owner: AuthUserSession,
+  member: AuthUserSession
+) {
+  const ownerActor = activityActorOfUser(owner, SEED_REQUEST_SOURCE)
+
+  await appModule.organizationsService.createOrganization(
+    owner,
+    ownerActor,
+    SEED_ORGANIZATION
+  )
+
+  const access = await appModule.organizationsService.findAccess(
+    owner.userId,
+    SEED_ORGANIZATION.slug
+  )
+  const { invitation } = await appModule.organizationTeamService.inviteMember(
+    access!,
+    owner,
+    ownerActor,
+    { email: member.email }
+  )
+
+  await appModule.organizationInvitationsService.acceptInvitation(
+    member,
+    activityActorOfUser(member, SEED_REQUEST_SOURCE),
+    invitation.invitationId
+  )
+
+  return access!
+}
+
+async function createSeedLibrary(
+  appModule: AppModule,
+  access: OrganizationAccess,
+  owner: AuthUserSession,
+  seedLibrary: SeedLibrary
+) {
+  const actor = activityActorOfUser(owner, SEED_REQUEST_SOURCE)
+  const { library: created } = await appModule.librariesService.createLibrary(
+    access,
+    actor,
+    { name: seedLibrary.name }
+  )
+  const library = (await appModule.librariesService.findLibrary(
+    access.organization.id,
+    created.id
+  ))!
+
+  if (seedLibrary.security) {
+    await appModule.libraryApiAccessService.updateSecurity(
+      library,
+      actor,
+      seedLibrary.security
+    )
+  }
+
+  if (seedLibrary.player) {
+    await appModule.librariesService.updatePlayerSettings(
+      library,
+      actor,
+      seedLibrary.player
+    )
+  }
+
+  return library
+}
+
+/** Creates the video and, when it has a file, uploads it in one chunk, which queues it for processing. */
+async function createSeedVideo(
+  appModule: AppModule,
+  library: LibraryProfile,
+  owner: AuthUserSession,
+  seedVideo: SeedVideo
+) {
+  const actor = activityActorOfUser(owner, SEED_REQUEST_SOURCE)
+  const { video } = await appModule.videosService.createVideo(library, actor, {
+    title: seedVideo.title,
+  })
+
+  if (!seedVideo.file) return video
+
+  const bytes = await createSeedVideoFile(
+    appModule.config.FFMPEG_PATH,
+    seedVideo.file
+  )
+  const { uploadId } = await appModule.videoUploadsService.startUpload(
+    library,
+    video.id,
+    { fileName: `${seedVideo.title}.mp4`, uploadLength: bytes.byteLength }
+  )
+
+  await appModule.videoUploadsService.appendChunk(
+    library,
+    actor,
+    video.id,
+    uploadId,
+    { uploadOffset: 0, bytes }
+  )
+
+  return video
+}
+
+/** Views as the player would have recorded them, from the last `SEED_VIEW_DAYS` days. */
+function buildSeedViews(
+  library: LibraryProfile,
+  videoId: string,
+  seedLibrary: SeedLibrary,
+  seedVideo: SeedVideo
+): NewVideoViewRecord[] {
+  if (!seedVideo.file?.pattern) return []
+
+  const { seconds } = seedVideo.file
+  const now = Date.now()
+
+  return Array.from({ length: seedVideo.viewCount }, () => {
+    const startedAt = new Date(now - random() * SEED_VIEW_DAYS * DAY_MS)
+    // Most viewers drop off early; about a third watch to the end.
+    const furthestPositionSeconds =
+      random() < 0.35 ? seconds : seconds * random() ** 1.5
+    const watchedSeconds = furthestPositionSeconds * (0.8 + random() * 0.2)
+
+    return {
+      organizationId: library.organizationId,
+      libraryId: library.id,
+      videoId,
+      deviceType: pick(SEED_DEVICE_TYPES),
+      embeddingHost: pick(seedLibrary.embeddingHosts),
+      watchedSeconds,
+      furthestPositionSeconds,
+      startedAt,
+      lastReportedAt: new Date(startedAt.getTime() + watchedSeconds * 1000),
+    }
+  })
+}
+
+async function seed(appModule: AppModule) {
+  const [existing] = await appModule.db
+    .select({ id: users.id })
+    .from(users)
+    .where(eq(users.email, SEED_USERS.OWNER.email))
+
+  if (existing) {
+    console.log(
+      `Already seeded: ${SEED_USERS.OWNER.email} exists. Reset the database to seed again.`
+    )
+
+    return
+  }
+
+  const owner = await createSeedUser(appModule, SEED_USERS.OWNER)
+  const member = await createSeedUser(appModule, SEED_USERS.MEMBER)
+  const access = await createSeedOrganization(appModule, owner, member)
+  let apiKeySecret: string | null = null
+
+  for (const seedLibrary of SEED_LIBRARIES) {
+    const library = await createSeedLibrary(
+      appModule,
+      access,
+      owner,
+      seedLibrary
+    )
+
+    apiKeySecret ??= (
+      await appModule.libraryApiAccessService.createApiKey(
+        library,
+        activityActorOfUser(owner, SEED_REQUEST_SOURCE),
+        SEED_API_KEY
+      )
+    ).secret
+
+    for (const seedVideo of seedLibrary.videos) {
+      const video = await createSeedVideo(appModule, library, owner, seedVideo)
+      const views = buildSeedViews(library, video.id, seedLibrary, seedVideo)
+
+      if (views.length > 0) await appModule.db.insert(videoViews).values(views)
+
+      console.log(`  ${seedLibrary.name} / ${seedVideo.title}`)
+    }
+  }
+
+  console.log(`
+Seeded ${SEED_ORGANIZATION.name}. Sign in with password "${SEED_PASSWORD}" as:
+  ${SEED_USERS.OWNER.email} (owner)
+  ${SEED_USERS.MEMBER.email} (member)
+
+API key of "${SEED_LIBRARIES[0]!.name}", shown only now: ${apiKeySecret}
+
+The worker transcodes the uploaded videos; start it with \`bun run dev\`.`)
+}
+
+const appModule = createAppModule(readConfig())
+
+try {
+  await seed(appModule)
+} finally {
+  await appModule.close()
+}

@@ -25,6 +25,8 @@ import {
   publicVideoParamSchema,
   videoCreateBodySchema,
   videoPageSuccessResponseSchema,
+  videoPosterImageBodySchema,
+  videoPosterUpdateBodySchema,
   videoStatusSuccessResponseSchema,
   videoSuccessResponseSchema,
   videoUpdateBodySchema,
@@ -32,6 +34,7 @@ import {
 import { requireLibraryApiKey } from "../middleware/library-api-key.middleware"
 import type { LibraryApiAccessService } from "../services/library-api-access.service"
 import type { VideoPlaybackService } from "../services/video-playback.service"
+import type { VideoPostersService } from "../services/video-posters.service"
 import type { VideoProcessingService } from "../services/video-processing.service"
 import type { VideosService } from "../services/videos.service"
 import type { LibraryApiEnv } from "../types/libraries.types"
@@ -41,7 +44,8 @@ export function createLibraryApiVideosRouter(
   libraryApiAccessService: LibraryApiAccessService,
   videosService: VideosService,
   videoPlaybackService: VideoPlaybackService,
-  videoProcessingService: VideoProcessingService
+  videoProcessingService: VideoProcessingService,
+  videoPostersService: VideoPostersService
 ) {
   const requireScope = (scope: LibraryApiKeyScope) =>
     requireLibraryApiKey(libraryApiAccessService, scope)
@@ -324,6 +328,80 @@ export function createLibraryApiVideosRouter(
             queued
           ),
           202
+        )
+      }
+    )
+    .put(
+      "/:libraryId/videos/:videoId/poster",
+      describeRoute({
+        tags: [OPENAPI_TAGS.LIBRARY_API],
+        security: API_KEY_SECURITY,
+        operationId: "updateLibraryApiVideoPoster",
+        description: "Needs the `videos:manage` scope.",
+        summary:
+          "Take a processed video's poster from a chosen frame, or back from the automatic one",
+        responses: {
+          200: describeJsonResponse("Poster saved", videoSuccessResponseSchema),
+          ...describeApiErrorResponses(
+            LIBRARY_ROUTE_ERROR_DESCRIPTIONS.API_VIDEO_POSTER_UPDATE
+          ),
+        },
+      }),
+      validateRequest("param", publicVideoParamSchema),
+      validateRequest("json", videoPosterUpdateBodySchema),
+      requireScope(LIBRARY_API_KEY_SCOPES.VIDEOS_MANAGE),
+      async (c) => {
+        const updated = await videoPostersService.updateVideoPoster(
+          c.get("library"),
+          c.get("activityActor"),
+          c.req.valid("param").videoId,
+          c.req.valid("json")
+        )
+
+        return c.json(
+          createApiSuccessResponse(
+            LIBRARY_SUCCESS_RESULTS.VIDEO_POSTER_UPDATE,
+            updated
+          ),
+          200
+        )
+      }
+    )
+    .put(
+      "/:libraryId/videos/:videoId/poster/image",
+      describeRoute({
+        tags: [OPENAPI_TAGS.LIBRARY_API],
+        security: API_KEY_SECURITY,
+        operationId: "uploadLibraryApiVideoPosterImage",
+        description: "Needs the `videos:manage` scope.",
+        summary:
+          "Make an uploaded JPEG, PNG or WebP image the poster of a processed video",
+        responses: {
+          200: describeJsonResponse("Poster saved", videoSuccessResponseSchema),
+          ...describeApiErrorResponses(
+            LIBRARY_ROUTE_ERROR_DESCRIPTIONS.API_VIDEO_POSTER_UPDATE
+          ),
+        },
+      }),
+      validateRequest("param", publicVideoParamSchema),
+      validateRequest("form", videoPosterImageBodySchema, {
+        media: "multipart/form-data",
+      }),
+      requireScope(LIBRARY_API_KEY_SCOPES.VIDEOS_MANAGE),
+      async (c) => {
+        const updated = await videoPostersService.uploadPosterImage(
+          c.get("library"),
+          c.get("activityActor"),
+          c.req.valid("param").videoId,
+          c.req.valid("form").image
+        )
+
+        return c.json(
+          createApiSuccessResponse(
+            LIBRARY_SUCCESS_RESULTS.VIDEO_POSTER_UPDATE,
+            updated
+          ),
+          200
         )
       }
     )

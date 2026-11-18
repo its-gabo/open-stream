@@ -1,7 +1,7 @@
 /** What a library's webhook is told about; `video.processing.*` follow a video's processing status. */
 export const WEBHOOK_EVENT_TYPES = {
   VIDEO_CREATED: "video.created",
-  /** The title changed. */
+  /** The title or the poster changed. */
   VIDEO_UPDATED: "video.updated",
   /** The video is gone; its files are removed from storage shortly after. */
   VIDEO_DELETED: "video.deleted",

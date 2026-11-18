@@ -1,3 +1,6 @@
+import { mkdtemp, rm } from "node:fs/promises"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
 import { eq } from "drizzle-orm"
 import type { ActivityRequestSource } from "../../activity/types/activity.types"
 import { activityActorOfUser } from "../../activity/utils/activity-actor.utils"
@@ -7,7 +10,6 @@ import { readConfig } from "../../config/app.config"
 import type { LibraryProfile } from "../../libraries/types/libraries.types"
 import type { OrganizationAccess } from "../../organizations/types/organizations.types"
 import { users, videoViews, type NewVideoViewRecord } from "../schema"
-import { createSeedVideoFile } from "./seed-media.utils"
 import {
   SEED_API_KEY,
   SEED_DEVICE_TYPES,
@@ -18,6 +20,7 @@ import {
   SEED_VIEW_DAYS,
   type SeedLibrary,
   type SeedVideo,
+  type SeedVideoFile,
 } from "./seed.constants"
 
 const SEED_REQUEST_SOURCE: ActivityRequestSource = {
@@ -42,6 +45,58 @@ function createRandom(seed: number) {
 const random = createRandom(42)
 const pick = <T>(items: readonly T[]) =>
   items[Math.floor(random() * items.length)]!
+
+/** An MP4 of an ffmpeg test pattern and a tone, small enough to make in a second or two. */
+export async function createSeedVideoFile(
+  ffmpegPath: string,
+  { pattern, width, height, seconds, toneHz }: SeedVideoFile
+) {
+  const dir = await mkdtemp(join(tmpdir(), "openstream-seed-"))
+  const outputPath = join(dir, "seed.mp4")
+  const videoArgs = pattern
+    ? [
+        "-f",
+        "lavfi",
+        "-i",
+        `${pattern}=size=${width}x${height}:rate=24:duration=${seconds}`,
+      ]
+    : []
+  const child = Bun.spawn(
+    [
+      ffmpegPath,
+      "-hide_banner",
+      "-loglevel",
+      "error",
+      ...videoArgs,
+      "-f",
+      "lavfi",
+      "-i",
+      `sine=frequency=${toneHz}:duration=${seconds}`,
+      ...(pattern
+        ? ["-c:v", "libx264", "-preset", "ultrafast", "-pix_fmt", "yuv420p"]
+        : []),
+      "-c:a",
+      "aac",
+      "-movflags",
+      "+faststart",
+      "-shortest",
+      outputPath,
+    ],
+    { stderr: "pipe" }
+  )
+
+  try {
+    if ((await child.exited) !== 0) {
+      throw new Error(
+        `ffmpeg could not make a seed video: ${await new Response(child.stderr).text()}`
+      )
+    }
+
+    return await Bun.file(outputPath).bytes()
+  } finally {
+    await rm(dir, { recursive: true, force: true })
+  }
+}
 
 /** Registers a verified account; seeding skips the verification email's link. */
 async function createSeedUser(

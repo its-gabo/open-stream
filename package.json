@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "build": "turbo build",
-    "dev": "turbo run dev dev:worker",
+    "dev": "turbo run dev dev:worker --filter=!landing",
+    "dev:landing": "turbo run dev --filter=landing --filter=reverse-proxy",
     "lint": "turbo lint",
     "format": "turbo format",
     "typecheck": "turbo typecheck",

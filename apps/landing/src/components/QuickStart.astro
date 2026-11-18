@@ -1,0 +1,143 @@
+---
+import { DOCS_URL } from "../lib/links"
+
+const lines = [
+  { command: "git clone https://github.com/its-gabo/open-stream.git" },
+  { command: "cd open-stream" },
+  { command: "caddy trust", comment: "once, for the local HTTPS domains" },
+  { command: "cp .env.example .env", comment: "set AUTH_SECRET and STORAGE_ENCRYPTION_KEY" },
+  { command: "docker compose up -d", comment: "PostgreSQL, Redis, Mailpit, RustFS" },
+  { command: "bun install" },
+  { command: "bun run db:migrate" },
+  { command: "bun run dev", comment: "web app, API, worker and proxy" },
+]
+const script = lines.map((line) => line.command).join("\n")
+---
+
+<section class="quick container" id="quick-start">
+  <div class="quick__copy">
+    <p class="eyebrow">Quick start</p>
+    <h2 class="section-title" data-reveal="lines">Running in eight commands</h2>
+    <p class="quick__lead" data-reveal="fade">
+      All you need is Bun, Docker, Caddy and ffmpeg. Then open
+      <code>app.openstream.localhost</code> and sign up.
+    </p>
+    <a href={DOCS_URL} class="btn" data-reveal="fade" data-magnetic>Read the full guide</a>
+  </div>
+
+  <div class="terminal" data-terminal>
+    <div class="terminal__bar">
+      <span></span><span></span><span></span>
+      <p>~/open-stream</p>
+      <button type="button" class="terminal__copy" data-copy={script}>Copy</button>
+    </div>
+    {/* Inside <pre> every space shows, so each line is written on one line */}
+    <pre class="terminal__body"><code>{lines.map((line) => <span class="terminal__line" data-terminal-line><span class="terminal__prompt">$ </span><span data-typed>{line.command}</span>{line.comment && <span class="terminal__comment">  # {line.comment}</span>}{"\n"}</span>)}<span class="terminal__cursor" data-terminal-cursor></span></code></pre>
+  </div>
+</section>
+
+<style>
+  .quick {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    align-items: center;
+    gap: clamp(2.5rem, 6vw, 6rem);
+    padding-block: clamp(4rem, 10vw, 8rem);
+  }
+
+  .quick__copy {
+    display: grid;
+    justify-items: start;
+    gap: 1.5rem;
+  }
+
+  .quick__lead {
+    max-width: 38ch;
+    color: var(--fg-dim);
+  }
+
+  .terminal {
+    border: 1px solid var(--line-strong);
+    border-radius: 18px;
+    background: #08090b;
+    overflow: hidden;
+    box-shadow: 0 40px 100px -40px rgb(0 0 0 / 0.9);
+  }
+
+  .terminal__bar {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    height: 44px;
+    padding-inline: 16px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .terminal__bar > span {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--line-strong);
+  }
+
+  .terminal__bar p {
+    margin-left: 12px;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+
+  .terminal__copy {
+    margin-left: auto;
+    padding: 4px 12px;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    background: none;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  .terminal__copy:hover {
+    background: var(--fg);
+    color: var(--bg);
+  }
+
+  .terminal__body {
+    margin: 0;
+    padding: 1.25rem 1.25rem 1.5rem;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: clamp(0.72rem, 1.1vw, 0.85rem);
+    line-height: 1.9;
+  }
+
+  .terminal__prompt {
+    color: var(--muted);
+  }
+
+  .terminal__comment {
+    color: #5d5f66;
+  }
+
+  .terminal__cursor {
+    display: inline-block;
+    width: 0.6em;
+    height: 1.1em;
+    vertical-align: text-bottom;
+    background: var(--fg);
+    animation: blink 1s steps(1) infinite;
+  }
+
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .quick {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

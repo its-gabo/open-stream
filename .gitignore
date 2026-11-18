@@ -21,3 +21,6 @@ todos.json
 
 # test coverage reports
 /apps/*/coverage/
+
+# astro
+.astro

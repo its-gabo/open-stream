@@ -8,6 +8,10 @@ app.openstream.localhost {
 	}
 }
 
+landing.openstream.localhost {
+	reverse_proxy localhost:3002
+}
+
 mailbox.openstream.localhost {
 	reverse_proxy localhost:8025
 }

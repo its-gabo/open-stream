@@ -1,0 +1,191 @@
+---
+const features = [
+  {
+    tag: "Libraries",
+    title: "Every video, ready in every quality",
+    points: [
+      "Group videos into libraries, each with its own qualities, player style and allowed sites.",
+      "Pick a thumbnail from any frame, or upload your own image.",
+      "Thumbnail previews while viewers scrub through a video.",
+    ],
+    image: "/media/feature-upload.png",
+    width: 1200,
+    height: 521,
+    alt: "A library with processed videos",
+  },
+  {
+    tag: "Analytics",
+    title: "Real viewing data, not guesses",
+    points: [
+      "Views, watch time and completion over the last 7, 30 or 90 days.",
+      "See exactly where viewers stop watching.",
+      "Devices and sites, without tracking individual viewers.",
+    ],
+    image: "/media/feature-analytics.png",
+    width: 1200,
+    height: 981,
+    alt: "Library analytics with daily views, top videos, devices and sites",
+  },
+  {
+    tag: "API and webhooks",
+    title: "Built for your backend",
+    points: [
+      "Up to 25 named keys per library, with the access you choose for each.",
+      "Signed webhooks for every upload and processing step, retried until they arrive.",
+      "A documented API with a ready-made TypeScript client.",
+    ],
+    image: "/media/feature-api.png",
+    width: 1200,
+    height: 981,
+    alt: "Library API keys and playback security",
+  },
+  {
+    tag: "Organizations",
+    title: "Multi-tenant from day one",
+    points: [
+      "Members, invitations, ownership transfer and scheduled deletion.",
+      "Use your own S3-compatible storage, with credentials kept encrypted.",
+      "An activity log of every change and who made it.",
+    ],
+    image: "/media/feature-activity.png",
+    width: 1200,
+    height: 960,
+    alt: "The organization activity log",
+  },
+]
+---
+
+<section class="features container" id="features">
+  <div class="features__head">
+    <p class="eyebrow">Features</p>
+    <h2 class="section-title" data-reveal="lines">Everything between the upload and the view</h2>
+  </div>
+
+  {
+    features.map((feature, index) => (
+      <article class:list={["feature", { "feature--flip": index % 2 === 1 }]}>
+        <div class="feature__copy">
+          <p class="feature__tag" data-reveal="fade">
+            <span>{String(index + 1).padStart(2, "0")}</span>
+            {feature.tag}
+          </p>
+          <h3 data-reveal="lines">{feature.title}</h3>
+          <ul>
+            {feature.points.map((point) => (
+              <li data-reveal="fade">{point}</li>
+            ))}
+          </ul>
+        </div>
+        <div class="feature__media" data-media-reveal>
+          <img
+            src={feature.image}
+            alt={feature.alt}
+            width={feature.width}
+            height={feature.height}
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+      </article>
+    ))
+  }
+</section>
+
+<style>
+  .features {
+    display: grid;
+    gap: clamp(5rem, 12vw, 10rem);
+    padding-block: clamp(6rem, 12vw, 10rem);
+  }
+
+  .features__head {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .features__head h2 {
+    max-width: 16ch;
+  }
+
+  .feature {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    align-items: center;
+    gap: clamp(2rem, 6vw, 6rem);
+  }
+
+  .feature--flip .feature__copy {
+    order: 2;
+  }
+
+  .feature__copy {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .feature__tag {
+    display: flex;
+    gap: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .feature__tag span {
+    color: var(--fg);
+  }
+
+  .feature h3 {
+    font-size: clamp(2rem, 3.8vw, 3.4rem);
+    line-height: 1.02;
+  }
+
+  .feature ul {
+    display: grid;
+    gap: 0.9rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .feature li {
+    position: relative;
+    padding: 0.9rem 0 0 1.75rem;
+    border-top: 1px solid var(--line);
+    color: var(--fg-dim);
+  }
+
+  .feature li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 1.4rem;
+    width: 10px;
+    height: 10px;
+    border: 1.5px solid var(--fg);
+    border-radius: 50%;
+  }
+
+  .feature__media {
+    overflow: hidden;
+    border-radius: 22px;
+  }
+
+  .feature__media img {
+    width: 100%;
+    height: auto;
+    will-change: transform;
+  }
+
+  @media (max-width: 900px) {
+    .feature {
+      grid-template-columns: 1fr;
+    }
+
+    .feature--flip .feature__copy {
+      order: 0;
+    }
+  }
+</style>

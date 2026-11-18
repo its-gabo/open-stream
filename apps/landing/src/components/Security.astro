@@ -1,0 +1,126 @@
+---
+const items = [
+  {
+    title: "Tenant isolation",
+    text: "Every organization sees only its own data, and each API key works only on its own library.",
+    icon: "M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5Zm-3 8V7a3 3 0 1 1 6 0v3H9Z",
+  },
+  {
+    title: "Secrets at rest",
+    text: "API keys are hashed, and storage credentials and webhook secrets are encrypted. None of them can be read back.",
+    icon: "M14.5 2a7.5 7.5 0 0 0-7.18 9.68L2.3 16.7a1 1 0 0 0-.3.71V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1h1a1 1 0 0 0 1-1v-1h1a1 1 0 0 0 .7-.3l1.62-1.6A7.5 7.5 0 1 0 14.5 2Zm2 7a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3Z",
+  },
+  {
+    title: "Secure sessions",
+    text: "Dashboard requests are protected against cross-site forgery, and the API uses keys instead of cookies.",
+    icon: "M12 2 4 5v6c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V5l-8-3Zm0 2.2 6 2.25V11c0 3.9-2.5 7.6-6 8.9-3.5-1.3-6-5-6-8.9V6.45l6-2.25Z",
+  },
+  {
+    title: "Safe webhooks",
+    text: "Webhooks are only sent to public HTTPS addresses, never into your private network.",
+    icon: "M12 3a4 4 0 0 0-3.46 6l-3.3 5.7a3.5 3.5 0 1 0 1.73 1l3.3-5.7A4 4 0 0 0 16 7a4 4 0 0 0-4-4Zm0 2a2 2 0 1 1 0 4 2 2 0 0 1 0-4Zm4.5 8a3.5 3.5 0 0 0-3.03 1.75H9v2h4.47A3.5 3.5 0 1 0 16.5 13Zm0 2a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z",
+  },
+]
+---
+
+<section class="security container" id="security">
+  <div class="security__head">
+    <p class="eyebrow">Security</p>
+    <h2 class="section-title" data-reveal="lines">Your media, behind your rules</h2>
+  </div>
+  <div class="security__grid">
+    {
+      items.map((item) => (
+        <article class="security__card" data-spotlight data-reveal="card">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true">
+            <path d={item.icon} />
+          </svg>
+          <h3>{item.title}</h3>
+          <p>{item.text}</p>
+        </article>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .security {
+    display: grid;
+    gap: clamp(2.5rem, 5vw, 4rem);
+    padding-block: clamp(6rem, 12vw, 10rem);
+  }
+
+  .security__head {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .security__head h2 {
+    max-width: 14ch;
+  }
+
+  .security__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .security__card {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 1rem;
+    min-height: 260px;
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    background: var(--bg-raised);
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  /* A soft light that follows the pointer */
+  .security__card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(
+      420px circle at var(--x, 50%) var(--y, -20%),
+      rgb(236 235 230 / 0.09),
+      transparent 60%
+    );
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+
+  .security__card:hover::before {
+    opacity: 1;
+  }
+
+  .security__card svg {
+    margin-bottom: auto;
+  }
+
+  .security__card h3 {
+    margin-top: 2.5rem;
+    font-family: var(--font-heading);
+    font-size: clamp(1.5rem, 2.4vw, 2rem);
+    letter-spacing: -0.01em;
+  }
+
+  .security__card p {
+    max-width: 44ch;
+    color: var(--fg-dim);
+  }
+
+  @media (max-width: 760px) {
+    .security__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .security__card {
+      min-height: 0;
+    }
+  }
+</style>

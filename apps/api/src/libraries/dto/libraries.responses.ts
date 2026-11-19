@@ -24,6 +24,7 @@ export const LIBRARY_SUCCESS_CODES = {
   PLAYER_GET: "library.player.get.success",
   PLAYER_UPDATE: "library.player.update.success",
   VIDEO_REPROCESS: "video.reprocess.success",
+  VIDEO_IMPORT: "video.import.success",
   VIDEO_STATUS_GET: "video.status.get.success",
   VIDEO_EMBED_GET: "video.embed.get.success",
   VIDEO_POSTER_UPDATE: "video.poster.update.success",
@@ -125,6 +126,10 @@ export const LIBRARY_SUCCESS_RESULTS = {
   VIDEO_REPROCESS: {
     code: LIBRARY_SUCCESS_CODES.VIDEO_REPROCESS,
     message: "Video queued for processing.",
+  },
+  VIDEO_IMPORT: {
+    code: LIBRARY_SUCCESS_CODES.VIDEO_IMPORT,
+    message: "Video import started.",
   },
   VIDEO_STATUS_GET: {
     code: LIBRARY_SUCCESS_CODES.VIDEO_STATUS_GET,

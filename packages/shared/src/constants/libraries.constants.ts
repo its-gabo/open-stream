@@ -19,6 +19,12 @@ export const VIDEO_STATUSES = {
 
 export const VIDEO_FAILURE_REASONS = {
   INVALID_FILE_TYPE: "invalid_file_type",
+  /** The import URL answered with an error, redirected too often, or could not be reached. */
+  IMPORT_UNREACHABLE: "import_unreachable",
+  IMPORT_TOO_LARGE: "import_too_large",
+  IMPORT_TIMED_OUT: "import_timed_out",
+  /** Anything else that stopped an import on its last attempt, e.g. the storage was unavailable. */
+  IMPORT_FAILED: "import_failed",
 } as const
 
 export const VIDEO_FILE_FORMATS = {
@@ -37,6 +43,10 @@ export const VIDEO_UPLOAD_LIMITS = {
   MAX_FILE_SIZE_BYTES: 20 * 1024 * MIB,
   /** Every upload request but the last carries exactly this many bytes. */
   CHUNK_SIZE_BYTES: 16 * MIB,
+} as const
+
+export const VIDEO_IMPORT_LIMITS = {
+  URL_MAX_LENGTH: 2048,
 } as const
 
 export const TUS_VERSION = "1.0.0"

@@ -2305,7 +2305,13 @@
       },
       "VideoFailureReason": {
         "type": "string",
-        "enum": ["invalid_file_type"]
+        "enum": [
+          "invalid_file_type",
+          "import_unreachable",
+          "import_too_large",
+          "import_timed_out",
+          "import_failed"
+        ]
       },
       "VideoProcessingStatus": {
         "type": "string",
@@ -2470,6 +2476,9 @@
             "minimum": 0,
             "maximum": 9007199254740991
           },
+          "importHost": {
+            "type": ["string", "null"]
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time",
@@ -2574,6 +2583,7 @@
           "fileFormat",
           "sizeBytes",
           "uploadedBytes",
+          "importHost",
           "createdAt",
           "uploadedAt",
           "processingStatus",
@@ -2676,6 +2686,16 @@
           }
         },
         "required": ["title"]
+      },
+      "VideoImportBody": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "maxLength": 2048
+          }
+        },
+        "required": ["url"]
       },
       "VideoPosterUpdateBody": {
         "oneOf": [
@@ -3236,6 +3256,7 @@
           "video.deleted",
           "video.uploaded",
           "video.upload_canceled",
+          "video.import_started",
           "video.reprocess_requested"
         ]
       },
@@ -8555,6 +8576,125 @@
         ]
       }
     },
+    "/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/videos/{videoId}/import": {
+      "post": {
+        "operationId": "importVideo",
+        "tags": ["Libraries"],
+        "summary": "Import a video's file from a URL instead of uploading it; the worker downloads it",
+        "responses": {
+          "202": {
+            "description": "Video import started",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoSuccessResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Request did not come from the web app origin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Organization, library or video does not exist, or the user is not a member",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The video already has a file, or the library storage changed meanwhile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the URL is not a public HTTP or HTTPS address",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Organization is pending deletion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organizationSlug",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "libraryId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "videoId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VideoImportBody"
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/videos/{videoId}/poster": {
       "put": {
         "operationId": "updateVideoPoster",
@@ -10106,7 +10246,7 @@
           }
         ],
         "description": "Needs the `videos:upload` scope.",
-        "summary": "Create a draft video; upload its file to `/videos/{videoId}/uploads` with tus",
+        "summary": "Create a draft video; upload its file to `/videos/{videoId}/uploads` with tus, or import it with `/videos/{videoId}/import`",
         "responses": {
           "201": {
             "description": "Video created",
@@ -10176,6 +10316,123 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/VideoCreateBody"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/libraries/{libraryId}/videos/{videoId}/import": {
+      "post": {
+        "operationId": "importLibraryApiVideo",
+        "tags": ["Library API"],
+        "security": [
+          {
+            "libraryApiKey": []
+          }
+        ],
+        "description": "Needs the `videos:upload` scope. The URL must link straight to an MP4 or MOV file on a public HTTP or HTTPS address; redirects are followed. The worker downloads it, so follow its progress with the status endpoint or the `video.uploaded` and `video.upload_failed` webhook events.",
+        "summary": "Import a draft video's file from a URL instead of uploading it",
+        "responses": {
+          "202": {
+            "description": "Video import started",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoSuccessResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The API key is missing, wrong, or belongs to another library",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The API key lacks the scope this needs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The video does not exist in this library",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The video already has a file, or the library storage changed meanwhile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the URL is not a public HTTP or HTTPS address",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Organization is pending deletion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "libraryId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "videoId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VideoImportBody"
               }
             }
           }

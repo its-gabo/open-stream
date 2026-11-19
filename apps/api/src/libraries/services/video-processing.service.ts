@@ -141,7 +141,7 @@ export class VideoProcessingService {
       }
     )
 
-    return { video: toVideoDto(requested) }
+    return { video: toVideoDto(requested, null) }
   }
 
   /**

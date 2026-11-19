@@ -68,7 +68,8 @@ function LibraryLayoutRoute() {
                     ORGANIZATION_ROLES.OWNER
                   }
                 />
-                <Outlet />
+                {/* Remounted per library, so no tab keeps another library's form values or local state. */}
+                <Outlet key={libraryId} />
               </>
             ))
             .exhaustive()}

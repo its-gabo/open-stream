@@ -2,6 +2,7 @@ import {
   LIBRARY_API_KEY_SCOPES,
   VIDEO_UPLOAD_LIMITS,
   videoFileFormatFromName,
+  videoImportUrlSchema,
 } from "@workspace/shared"
 import { DetailedError } from "tus-js-client"
 
@@ -84,6 +85,24 @@ export function validateVideoFile(file: File, t: TranslationFunction) {
   }
 
   return null
+}
+
+export function validateVideoImportUrl(url: string, t: TranslationFunction) {
+  return videoImportUrlSchema.safeParse(url).success
+    ? null
+    : t("videos.create.import_url_invalid")
+}
+
+/** What a video imported without a title is named after: the file in the URL's path, or else its host. */
+export function videoFileNameFromImportUrl(url: string) {
+  const parsed = URL.parse(url)
+  const segment = parsed?.pathname.split("/").at(-1) ?? ""
+
+  try {
+    return decodeURIComponent(segment) || parsed?.hostname
+  } catch {
+    return segment || parsed?.hostname
+  }
 }
 
 export function buildLibraryPath(

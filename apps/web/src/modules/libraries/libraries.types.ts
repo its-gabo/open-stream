@@ -4,6 +4,7 @@ import type { z } from "zod"
 import type {
   LOCAL_UPLOAD_STATUSES,
   PLAYER_SETTINGS_VIEWS,
+  VIDEO_SOURCES,
 } from "./libraries.constants"
 import type {
   libraryApiKeyFormSchema,
@@ -34,6 +35,8 @@ export type LibrarySecurityFormValues = z.output<
 export type VideoCreateFormValues = z.infer<
   ReturnType<typeof videoCreateFormSchema>
 >
+
+export type VideoSource = (typeof VIDEO_SOURCES)[keyof typeof VIDEO_SOURCES]
 
 export type LocalUploadStatus =
   (typeof LOCAL_UPLOAD_STATUSES)[keyof typeof LOCAL_UPLOAD_STATUSES]

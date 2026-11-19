@@ -4,6 +4,7 @@ import {
 } from "@workspace/shared"
 import type { VideoRecord } from "../../db/schema"
 import type { LibraryProfile, LibrarySummary } from "../types/libraries.types"
+import { importHostOf } from "../utils/video-import-url.utils"
 import type {
   LibraryDto,
   LibraryPlayerSettingsDto,
@@ -31,7 +32,10 @@ export const toLibraryPlayerSettingsDto = (
     ...library.playerSettings,
   })
 
-export const toVideoDto = (video: VideoRecord): VideoDto => ({
+export const toVideoDto = (
+  video: VideoRecord,
+  importUrl: string | null
+): VideoDto => ({
   id: video.id,
   libraryId: video.libraryId,
   title: video.title,
@@ -41,6 +45,7 @@ export const toVideoDto = (video: VideoRecord): VideoDto => ({
   fileFormat: video.fileFormat,
   sizeBytes: video.sizeBytes,
   uploadedBytes: video.uploadedBytes,
+  importHost: importHostOf(importUrl),
   createdAt: video.createdAt.toISOString(),
   uploadedAt: video.uploadedAt?.toISOString() ?? null,
   processingStatus: video.processingStatus,

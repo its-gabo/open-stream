@@ -18,6 +18,10 @@ const API_KEY_INVALID =
   "The API key is missing, wrong, or belongs to another library"
 const API_KEY_SCOPE_MISSING = "The API key lacks the scope this needs"
 const VIDEO_NOT_FOUND_IN_LIBRARY = "The video does not exist in this library"
+const VIDEO_IMPORT_CONFLICT =
+  "The video already has a file, or the library storage changed meanwhile"
+const VIDEO_IMPORT_INVALID =
+  "Validation failed, or the URL is not a public HTTP or HTTPS address"
 
 export const LIBRARY_ROUTE_ERROR_DESCRIPTIONS = {
   API_ACCESS: {
@@ -53,6 +57,22 @@ export const LIBRARY_ROUTE_ERROR_DESCRIPTIONS = {
     403: API_KEY_SCOPE_MISSING,
     404: VIDEO_NOT_FOUND_IN_LIBRARY,
     409: "The video has no uploaded file yet, or is already being processed",
+    423: PENDING_DELETION,
+  },
+  VIDEO_IMPORT: {
+    401: SESSION_REQUIRED,
+    403: API_ERROR_RESPONSE_DESCRIPTIONS.ORIGIN_NOT_ALLOWED,
+    404: VIDEO_NOT_FOUND,
+    409: VIDEO_IMPORT_CONFLICT,
+    422: VIDEO_IMPORT_INVALID,
+    423: PENDING_DELETION,
+  },
+  API_VIDEO_IMPORT: {
+    401: API_KEY_INVALID,
+    403: API_KEY_SCOPE_MISSING,
+    404: VIDEO_NOT_FOUND_IN_LIBRARY,
+    409: VIDEO_IMPORT_CONFLICT,
+    422: VIDEO_IMPORT_INVALID,
     423: PENDING_DELETION,
   },
   MEMBER_PLAYBACK_FILE: {

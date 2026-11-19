@@ -1,5 +1,6 @@
 import type {
   LIBRARY_API_KEY_SCOPES,
+  VIDEO_FAILURE_REASONS,
   VIDEO_PROCESSING_FAILURE_REASONS,
   VIDEO_PROCESSING_STATUSES,
   VIDEO_QUALITIES,
@@ -26,6 +27,7 @@ import type { libraryPlayerSettingsSchema } from "../schemas/libraries.schemas"
 type ValueOf<T> = T[keyof T]
 
 export type VideoStatus = ValueOf<typeof VIDEO_STATUSES>
+export type VideoFailureReason = ValueOf<typeof VIDEO_FAILURE_REASONS>
 export type LibraryStorageKind = ValueOf<typeof LIBRARY_STORAGE_KINDS>
 export type VideoFileFormat = ValueOf<typeof VIDEO_FILE_FORMATS>
 export type VideoPosterSource = ValueOf<typeof VIDEO_POSTER_SOURCES>

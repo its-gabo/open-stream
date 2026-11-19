@@ -43,7 +43,13 @@ export const videos = pgTable(
       .notNull()
       .default(VIDEO_STATUSES.DRAFT),
     failureReason: text("failure_reason", {
-      enum: [VIDEO_FAILURE_REASONS.INVALID_FILE_TYPE],
+      enum: [
+        VIDEO_FAILURE_REASONS.INVALID_FILE_TYPE,
+        VIDEO_FAILURE_REASONS.IMPORT_UNREACHABLE,
+        VIDEO_FAILURE_REASONS.IMPORT_TOO_LARGE,
+        VIDEO_FAILURE_REASONS.IMPORT_TIMED_OUT,
+        VIDEO_FAILURE_REASONS.IMPORT_FAILED,
+      ],
     }),
     fileName: text("file_name"),
     /** Detected from the file's bytes, not from its name. */

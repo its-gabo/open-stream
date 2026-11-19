@@ -94,6 +94,7 @@ describe("Videos (e2e)", () => {
         fileFormat: null,
         sizeBytes: null,
         uploadedBytes: 0,
+        importHost: null,
         createdAt: expect.any(String),
         uploadedAt: null,
         processingStatus: null,

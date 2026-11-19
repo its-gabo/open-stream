@@ -20,6 +20,7 @@ import {
   libraryEmptySuccessResponseSchema,
   libraryParamSchema,
   videoCreateBodySchema,
+  videoImportBodySchema,
   videoListSuccessResponseSchema,
   videoParamSchema,
   videoPosterImageBodySchema,
@@ -31,6 +32,7 @@ import {
 } from "../dto/libraries.schemas"
 import { requireLibrary } from "../middleware/library-access.middleware"
 import type { LibrariesService } from "../services/libraries.service"
+import type { VideoImportsService } from "../services/video-imports.service"
 import type { VideoPlaybackService } from "../services/video-playback.service"
 import type { VideoPostersService } from "../services/video-posters.service"
 import type { VideoProcessingService } from "../services/video-processing.service"
@@ -45,7 +47,8 @@ export function createVideosRouter(
   videosService: VideosService,
   videoProcessingService: VideoProcessingService,
   videoPlaybackService: VideoPlaybackService,
-  videoPostersService: VideoPostersService
+  videoPostersService: VideoPostersService,
+  videoImportsService: VideoImportsService
 ) {
   const requireMemberOfLibrary = [
     requireOrganizationMembership(organizationsService),
@@ -238,6 +241,43 @@ export function createVideosRouter(
           createApiSuccessResponse(
             LIBRARY_SUCCESS_RESULTS.VIDEO_REPROCESS,
             queued
+          ),
+          202
+        )
+      }
+    )
+    .post(
+      "/:organizationSlug/libraries/:libraryId/videos/:videoId/import",
+      describeRoute({
+        tags: [OPENAPI_TAGS.LIBRARIES],
+        operationId: "importVideo",
+        summary:
+          "Import a video's file from a URL instead of uploading it; the worker downloads it",
+        responses: {
+          202: describeJsonResponse(
+            "Video import started",
+            videoSuccessResponseSchema
+          ),
+          ...describeApiErrorResponses(
+            LIBRARY_ROUTE_ERROR_DESCRIPTIONS.VIDEO_IMPORT
+          ),
+        },
+      }),
+      validateRequest("param", videoParamSchema),
+      validateRequest("json", videoImportBodySchema),
+      ...requireMemberOfLibrary,
+      async (c) => {
+        const started = await videoImportsService.startImport(
+          c.get("library"),
+          c.get("activityActor"),
+          c.req.valid("param").videoId,
+          c.req.valid("json")
+        )
+
+        return c.json(
+          createApiSuccessResponse(
+            LIBRARY_SUCCESS_RESULTS.VIDEO_IMPORT,
+            started
           ),
           202
         )

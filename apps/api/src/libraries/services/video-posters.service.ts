@@ -304,7 +304,7 @@ export class VideoPostersService {
         await this.removePosterImage(storage.location, after)
       }
 
-      return { video: toVideoDto(after) }
+      return { video: toVideoDto(after, null) }
     } finally {
       await rm(workDir, { recursive: true, force: true })
     }

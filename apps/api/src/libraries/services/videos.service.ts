@@ -49,7 +49,11 @@ export class VideosService {
       library.id
     )
 
-    return { videos: videos.map(toVideoDto) }
+    return {
+      videos: videos.map(({ video, importUrl }) =>
+        toVideoDto(video, importUrl)
+      ),
+    }
   }
 
   async listVideoPage(library: LibraryProfile, query: PaginationQuery) {
@@ -64,7 +68,9 @@ export class VideosService {
     ])
 
     return {
-      videos: videos.map(toVideoDto),
+      videos: videos.map(({ video, importUrl }) =>
+        toVideoDto(video, importUrl)
+      ),
       pagination: toPaginationDto(query, totalItems),
     }
   }
@@ -103,11 +109,13 @@ export class VideosService {
       }
     )
 
-    return { video: toVideoDto(video) }
+    return { video: toVideoDto(video, null) }
   }
 
   async getVideo(library: LibraryProfile, videoId: string) {
-    return { video: toVideoDto(await this.findVideo(library, videoId)) }
+    const video = await this.findVideo(library, videoId)
+
+    return { video: await this.toVideoDtoWithImport(video) }
   }
 
   /** Upload and processing state only; also what `video.processing.*` webhook events carry. */
@@ -153,7 +161,7 @@ export class VideosService {
       }
     )
 
-    return { video: toVideoDto(renamed) }
+    return { video: await this.toVideoDtoWithImport(renamed) }
   }
 
   /**
@@ -227,6 +235,12 @@ export class VideosService {
       },
       transaction
     )
+  }
+
+  private async toVideoDtoWithImport(video: VideoRecord) {
+    const videoImport = await this.videosRepository.findImportOfVideo(video.id)
+
+    return toVideoDto(video, videoImport?.url ?? null)
   }
 
   private async findVideo(library: LibraryProfile, videoId: string) {

@@ -17,7 +17,7 @@ type VideoUploadStateProps = {
   localUpload: LocalVideoUpload | undefined
 }
 
-/** Where the video's file is: waiting, uploading live, paused after a reload, rejected, or uploaded and being processed. */
+/** Where the video's file is: waiting, uploading live, imported by the server, paused after a reload, rejected, or uploaded and being processed. */
 export function VideoUploadState({
   video,
   localUpload,
@@ -50,6 +50,26 @@ export function VideoUploadState({
           </div>
         )
       }
+    )
+    .with(
+      { video: { status: VIDEO_STATUSES.UPLOADING, importHost: P.string } },
+      ({ video: { importHost, uploadedBytes, sizeBytes } }) => (
+        <div className="flex min-w-40 flex-col gap-1.5">
+          <div className="flex items-center justify-between gap-2 text-xs">
+            <span className="truncate font-medium">
+              {t("videos.upload_state.importing", { host: importHost })}
+            </span>
+            <span className="shrink-0 text-muted-foreground">
+              {sizeBytes === null
+                ? formatFileSize(uploadedBytes, i18n.language)
+                : formatProgress(uploadedBytes, sizeBytes)}
+            </span>
+          </div>
+          <UploadProgressBar
+            percentage={toUploadPercentage(uploadedBytes, sizeBytes ?? 0)}
+          />
+        </div>
+      )
     )
     .with(
       { video: { status: VIDEO_STATUSES.UPLOADING, sizeBytes: P.number } },

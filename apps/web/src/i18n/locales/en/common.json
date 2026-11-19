@@ -182,6 +182,7 @@
       "library.encoding.update.success": "Transcoding qualities saved.",
       "library.player.update.success": "Player settings saved.",
       "video.reprocess.success": "The video will be processed again.",
+      "video.import.success": "Import started. The list shows its progress.",
       "library.webhook.get.success": "Webhook fetched.",
       "library.webhook.save.success": "Webhook saved.",
       "library.webhook.delete.success": "Webhook removed.",
@@ -235,6 +236,7 @@
       "video.upload.file_too_large": "This file is larger than the upload limit.",
       "video.upload.unsupported_file_type": "Only real MP4 and MOV videos can be uploaded.",
       "video.upload.offset_mismatch": "The upload got out of sync. Please try again.",
+      "video.import.url_not_allowed": "Videos can only be imported from public HTTP or HTTPS addresses.",
       "storage.not_found": "The storage could not be found.",
       "storage.endpoint_not_allowed": "Use a public HTTPS address for the storage endpoint.",
       "storage.unreachable": "We could not reach the bucket with these settings. Check the endpoint, bucket and keys.",
@@ -543,7 +545,7 @@
           },
           "upload": {
             "label": "Upload",
-            "description": "Send the file in resumable chunks with tus."
+            "description": "Send the file in resumable chunks with tus, or POST a link to it to /videos/{videoId}/import and the server downloads it."
           },
           "status": {
             "label": "Wait",
@@ -701,7 +703,7 @@
         "video_updated": "A video was renamed.",
         "video_deleted": "A video was deleted. Its files are removed from storage shortly after.",
         "video_uploaded": "The whole file arrived and passed the checks.",
-        "video_upload_failed": "The file was rejected, e.g. it is not really an MP4 or MOV.",
+        "video_upload_failed": "The file was rejected, e.g. it is not really an MP4 or MOV, or an import could not download it.",
         "video_processing_queued": "The video is waiting for a worker: just uploaded, or sent to be processed again.",
         "video_processing_started": "Transcoding started. Sent once, not again on retries.",
         "video_processing_ready": "HLS, poster and storyboard are ready to play.",
@@ -759,17 +761,24 @@
     }
   },
   "videos": {
-    "description": "Upload MP4 or MOV files, or create a video now and add its file later.",
+    "description": "Upload or import MP4 or MOV files, or create a video now and add its file later.",
     "fields": {
       "title": "Title",
       "title_placeholder": "Leave empty to use the file name",
-      "file": "Video file"
+      "file": "Video file",
+      "import_url": "File URL",
+      "import_url_placeholder": "https://example.com/video.mp4"
     },
     "create": {
       "trigger": "Add video",
       "title": "Add video",
-      "description": "Choose a file to upload it right away, or enter a title to create the video and upload its file later.",
+      "description": "Upload a file or import one from a link right away, or enter a title to create the video and add its file later.",
+      "source_file": "Upload a file",
+      "source_url": "Import from URL",
       "submit_upload": "Upload",
+      "submit_import": "Import",
+      "import_url_hint": "A direct link to an MP4 or MOV file, up to {{size}}. The server downloads it, so you can close this page.",
+      "import_url_invalid": "Enter an http:// or https:// link to the file.",
       "submit_draft": "Create video",
       "title_or_file_required": "Enter a title or choose a file.",
       "file_hint": "MP4 or MOV, up to {{size}}.",
@@ -789,10 +798,15 @@
       "failed": "Upload failed"
     },
     "failure_reasons": {
-      "invalid_file_type": "The file is not a real MP4 or MOV video."
+      "invalid_file_type": "The file is not a real MP4 or MOV video.",
+      "import_unreachable": "The file could not be downloaded from its link.",
+      "import_too_large": "The linked file is larger than the upload limit.",
+      "import_timed_out": "Downloading the linked file took too long.",
+      "import_failed": "The file could not be imported. Please try again."
     },
     "upload_state": {
       "uploading": "Uploading {{percentage}}%",
+      "importing": "Importing from {{host}}",
       "paused": "Paused at {{percentage}}%",
       "paused_hint": "Choose the same file again to resume.",
       "progress": "{{uploaded}} of {{total}}"
@@ -1113,6 +1127,7 @@
       "video_deleted": "Deleted a video",
       "video_uploaded": "Uploaded a video's file",
       "video_upload_canceled": "Canceled an upload",
+      "video_import_started": "Started importing a video's file",
       "video_reprocess_requested": "Asked to process a video again",
       "account_signed_up": "Created the account",
       "account_email_verified": "Verified the email address",

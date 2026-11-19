@@ -84,7 +84,8 @@ export function createLibrariesRouter(module: LibrariesRouterDependencies) {
           module.videosService,
           module.videoProcessingService,
           module.videoPlaybackService,
-          module.videoPostersService
+          module.videoPostersService,
+          module.videoImportsService
         )
       )
       .route(

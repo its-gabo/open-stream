@@ -14,6 +14,7 @@ export const LIBRARY_ERROR_CODES = {
   FILE_TOO_LARGE: "video.upload.file_too_large",
   UNSUPPORTED_FILE_TYPE: "video.upload.unsupported_file_type",
   OFFSET_MISMATCH: "video.upload.offset_mismatch",
+  IMPORT_URL_NOT_ALLOWED: "video.import.url_not_allowed",
   API_KEY_INVALID: "library.api_key.invalid",
   API_KEY_SCOPE_MISSING: "library.api_key.scope_missing",
   API_KEY_NOT_FOUND: "library.api_key.not_found",
@@ -101,6 +102,12 @@ export const LIBRARY_ERRORS = {
     code: LIBRARY_ERROR_CODES.OFFSET_MISMATCH,
     message: "The upload offset does not match the received bytes",
     reason: "video.upload_offset_mismatch",
+  },
+  IMPORT_URL_NOT_ALLOWED: {
+    kind: DOMAIN_ERROR_KINDS.INVALID_INPUT,
+    code: LIBRARY_ERROR_CODES.IMPORT_URL_NOT_ALLOWED,
+    message: "Videos can only be imported from public HTTP or HTTPS addresses",
+    reason: "video.import_url_not_allowed",
   },
   API_KEY_INVALID: {
     kind: DOMAIN_ERROR_KINDS.UNAUTHENTICATED,

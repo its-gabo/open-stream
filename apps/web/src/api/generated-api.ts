@@ -63,6 +63,7 @@ export type ActivityAction =
   | "video.deleted"
   | "video.uploaded"
   | "video.upload_canceled"
+  | "video.import_started"
   | "video.reprocess_requested"
 
 export type ActivityActorKind = "user" | "api_key" | "anonymous" | "system"
@@ -659,6 +660,33 @@ export interface GetVideoPosterParams {
 export interface GetVideoThumbnailParams {
   /** @maxLength 32 */
   fileName: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  organizationSlug: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+}
+
+export interface ImportLibraryApiVideoParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+}
+
+export interface ImportVideoParams {
   /**
    * @format uuid
    * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
@@ -1970,6 +1998,7 @@ export interface Video {
    * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
    */
   id: string
+  importHost: string | null
   /**
    * @format uuid
    * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
@@ -2066,9 +2095,19 @@ export interface VideoEmbedSuccessResponse {
   message: string
 }
 
-export type VideoFailureReason = "invalid_file_type"
+export type VideoFailureReason =
+  | "invalid_file_type"
+  | "import_unreachable"
+  | "import_too_large"
+  | "import_timed_out"
+  | "import_failed"
 
 export type VideoFileFormat = "mp4" | "mov"
+
+export interface VideoImportBody {
+  /** @maxLength 2048 */
+  url: string
+}
 
 export interface VideoListSuccessResponse {
   code: string
@@ -3836,6 +3875,28 @@ export class OpenStreamApi<
      * No description
      *
      * @tags Libraries
+     * @name ImportVideo
+     * @summary Import a video's file from a URL instead of uploading it; the worker downloads it
+     * @request POST:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/videos/{videoId}/import
+     */
+    importVideo: (
+      { organizationSlug, libraryId, videoId }: ImportVideoParams,
+      data: VideoImportBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<VideoSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/videos/${videoId}/import`,
+        method: "POST",
+        body: data,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Libraries
      * @name UpdateVideoPoster
      * @summary Take a processed video's poster from a chosen frame, or back from the automatic one
      * @request PUT:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/videos/{videoId}/poster
@@ -4203,7 +4264,7 @@ export class OpenStreamApi<
      *
      * @tags Library API
      * @name CreateLibraryApiVideo
-     * @summary Create a draft video; upload its file to `/videos/{videoId}/uploads` with tus
+     * @summary Create a draft video; upload its file to `/videos/{videoId}/uploads` with tus, or import it with `/videos/{videoId}/import`
      * @request POST:/api/v1/libraries/{libraryId}/videos
      * @secure
      */
@@ -4214,6 +4275,30 @@ export class OpenStreamApi<
     ) =>
       this.request<VideoSuccessResponse, ApiErrorResponse>({
         path: `/api/v1/libraries/${libraryId}/videos`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Needs the `videos:upload` scope. The URL must link straight to an MP4 or MOV file on a public HTTP or HTTPS address; redirects are followed. The worker downloads it, so follow its progress with the status endpoint or the `video.uploaded` and `video.upload_failed` webhook events.
+     *
+     * @tags Library API
+     * @name ImportLibraryApiVideo
+     * @summary Import a draft video's file from a URL instead of uploading it
+     * @request POST:/api/v1/libraries/{libraryId}/videos/{videoId}/import
+     * @secure
+     */
+    importLibraryApiVideo: (
+      { libraryId, videoId }: ImportLibraryApiVideoParams,
+      data: VideoImportBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<VideoSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/videos/${videoId}/import`,
         method: "POST",
         body: data,
         secure: true,

@@ -6,6 +6,7 @@ import { createLibraryFactory } from "../../test/factory/library.factory"
 import { createOrganizationFactory } from "../../test/factory/organization.factory"
 import { createUserFactory } from "../../test/factory/user.factory"
 import { createApiClient, signInAsUser } from "../../test/helpers/api-client"
+import { startFileServer } from "../../test/helpers/file-server"
 import { endDeletionGracePeriods } from "../../test/helpers/organization-records"
 import { startSmtpServer } from "../../test/helpers/smtp-server"
 import {
@@ -74,6 +75,8 @@ describe("Worker (e2e)", () => {
   let worker: ReturnType<typeof createWorkerModule>
   let smtpServer: ReturnType<typeof startSmtpServer>
   let webhookReceiver: ReturnType<typeof startWebhookReceiver>
+  let fileServer: ReturnType<typeof startFileServer>
+  let fileRequestCount: number
   let owner: UserCredentials
   let ownerClient: ApiClient
   let libraryPath: string
@@ -86,6 +89,16 @@ describe("Worker (e2e)", () => {
 
     smtpServer = startSmtpServer()
     webhookReceiver = startWebhookReceiver()
+    fileRequestCount = 0
+    fileServer = startFileServer({
+      "/clip.mp4": () => {
+        fileRequestCount += 1
+
+        return fileRequestCount === 1
+          ? new Response(null, { status: 503 })
+          : new Response(createFileBytes(VIDEO_FILE_HEADERS.MP4, 1024))
+      },
+    })
 
     const config = {
       REDIS_URL: TEST_REDIS_URL,
@@ -96,6 +109,8 @@ describe("Worker (e2e)", () => {
       WEBHOOK_RETRY_DELAY_MS: "20",
       VIDEO_PROCESSING_MAX_ATTEMPTS: "2",
       VIDEO_PROCESSING_RETRY_DELAY_MS: "20",
+      VIDEO_IMPORT_MAX_ATTEMPTS: "2",
+      VIDEO_IMPORT_RETRY_DELAY_MS: "20",
       ORGANIZATION_SWEEP_INTERVAL_MS: "50",
     }
 
@@ -122,6 +137,7 @@ describe("Worker (e2e)", () => {
     await testApp.close()
     smtpServer.stop()
     webhookReceiver.stop()
+    fileServer.stop()
   })
 
   const emailsTo = (recipient: string) =>
@@ -205,6 +221,32 @@ describe("Worker (e2e)", () => {
     }, "processing to fail")
 
     expect(video.processingFailureReason).toBe("transcoding_failed")
+  })
+
+  it("imports a video through its queue, retrying a busy server, then processes it", async () => {
+    const { video } = (
+      await (
+        await ownerClient.post(`${libraryPath}/videos`, { title: "Clip" })
+      ).json()
+    ).data
+
+    await ownerClient.post(`${libraryPath}/videos/${video.id}/import`, {
+      url: fileServer.url("/clip.mp4"),
+    })
+
+    const processed = await waitFor(async () => {
+      const response = await ownerClient.get(
+        `${libraryPath}/videos/${video.id}`
+      )
+      const { video: current } = (await response.json()).data
+
+      return current.processingStatus === "failed" && current
+    }, "the import to finish and processing to run")
+
+    expect(processed).toEqual(
+      expect.objectContaining({ status: "uploaded", sizeBytes: 1024 })
+    )
+    expect(fileRequestCount).toBe(2)
   })
 
   it("removes a deleted video's file from storage", async () => {

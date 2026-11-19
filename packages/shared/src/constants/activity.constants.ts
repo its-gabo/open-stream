@@ -69,6 +69,7 @@ export const ACTIVITY_ACTIONS = {
   VIDEO_DELETED: "video.deleted",
   VIDEO_UPLOADED: "video.uploaded",
   VIDEO_UPLOAD_CANCELED: "video.upload_canceled",
+  VIDEO_IMPORT_STARTED: "video.import_started",
   VIDEO_REPROCESS_REQUESTED: "video.reprocess_requested",
 } as const
 

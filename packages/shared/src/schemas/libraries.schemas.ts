@@ -10,6 +10,7 @@ import {
   STORAGE_BUCKET_PATTERN,
   STORAGE_FIELD_LIMITS,
   VIDEO_FIELD_LIMITS,
+  VIDEO_IMPORT_LIMITS,
 } from "../constants/libraries.constants"
 import { WEBHOOK_LIMITS } from "../constants/webhooks.constants"
 import { isValidStoragePathTemplate } from "../utils/storage-path.utils"
@@ -25,6 +26,17 @@ export const videoTitleSchema = z
   .trim()
   .min(1)
   .max(VIDEO_FIELD_LIMITS.TITLE_MAX_LENGTH)
+
+export const videoImportUrlSchema = z
+  .string()
+  .trim()
+  .max(VIDEO_IMPORT_LIMITS.URL_MAX_LENGTH)
+  .pipe(z.url({ protocol: /^https?$/ }))
+  .refine((value) => {
+    const url = URL.parse(value)
+
+    return Boolean(url) && !url?.username && !url?.password
+  })
 
 export const storageNameSchema = z
   .string()

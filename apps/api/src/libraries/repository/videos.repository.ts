@@ -20,8 +20,10 @@ import type {
   Transaction,
 } from "../../db/database.types"
 import {
+  videoImports,
   videoUploads,
   videos,
+  type NewVideoImportRecord,
   type NewVideoRecord,
   type NewVideoUploadRecord,
 } from "../../db/schema"
@@ -42,8 +44,9 @@ export class VideosRepository {
 
   listVideos(organizationId: string, libraryId: string) {
     return this.db
-      .select()
+      .select({ video: videos, importUrl: videoImports.url })
       .from(videos)
+      .leftJoin(videoImports, eq(videoImports.videoId, videos.id))
       .where(
         and(
           eq(videos.organizationId, organizationId),
@@ -55,8 +58,9 @@ export class VideosRepository {
 
   listVideoPage(filter: VideoListFilter, window: PageWindow) {
     return this.db
-      .select()
+      .select({ video: videos, importUrl: videoImports.url })
       .from(videos)
+      .leftJoin(videoImports, eq(videoImports.videoId, videos.id))
       .where(videoListCondition(filter))
       .orderBy(desc(videos.createdAt), desc(videos.id))
       .limit(window.limit)
@@ -104,6 +108,97 @@ export class VideosRepository {
       .returning()
 
     return video ?? null
+  }
+
+  async findImportingVideo(videoId: string, importId: string) {
+    const [row] = await this.db
+      .select({ video: videos, videoImport: videoImports })
+      .from(videoImports)
+      .innerJoin(videos, eq(videos.id, videoImports.videoId))
+      .where(
+        and(eq(videoImports.id, importId), eq(videoImports.videoId, videoId))
+      )
+
+    return row ?? null
+  }
+
+  /**
+   * Null once a newer import or upload replaced import `importId`, or the
+   * video was deleted. The video's row lock is taken first, as everything
+   * replacing an import takes it, so the check holds until the update.
+   */
+  updateImportingVideo(
+    videoId: string,
+    importId: string,
+    changes: Partial<NewVideoRecord>,
+    transaction?: Transaction
+  ) {
+    const updateUnderLock = async (executor: Transaction) => {
+      const [locked] = await executor
+        .select({ id: videos.id })
+        .from(videos)
+        .where(eq(videos.id, videoId))
+        .for("update")
+
+      if (!locked || !(await this.findImport(importId, videoId, executor))) {
+        return null
+      }
+
+      return this.updateVideo(videoId, changes, executor)
+    }
+
+    return transaction
+      ? updateUnderLock(transaction)
+      : this.db.transaction(updateUnderLock)
+  }
+
+  async findImportOfVideo(
+    videoId: string,
+    executor: DatabaseExecutor = this.db
+  ) {
+    const [videoImport] = await executor
+      .select()
+      .from(videoImports)
+      .where(eq(videoImports.videoId, videoId))
+
+    return videoImport ?? null
+  }
+
+  async insertImport(
+    videoImport: NewVideoImportRecord,
+    transaction: Transaction
+  ) {
+    const [created] = await transaction
+      .insert(videoImports)
+      .values(videoImport)
+      .returning()
+
+    return created!
+  }
+
+  async deleteImport(importId: string, transaction: Transaction) {
+    await transaction.delete(videoImports).where(eq(videoImports.id, importId))
+  }
+
+  async deleteImportOfVideo(videoId: string, transaction: Transaction) {
+    await transaction
+      .delete(videoImports)
+      .where(eq(videoImports.videoId, videoId))
+  }
+
+  private async findImport(
+    importId: string,
+    videoId: string,
+    executor: DatabaseExecutor
+  ) {
+    const [videoImport] = await executor
+      .select({ id: videoImports.id })
+      .from(videoImports)
+      .where(
+        and(eq(videoImports.id, importId), eq(videoImports.videoId, videoId))
+      )
+
+    return videoImport ?? null
   }
 
   async deleteVideo(videoId: string, transaction: Transaction) {

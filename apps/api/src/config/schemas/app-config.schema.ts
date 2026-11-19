@@ -12,6 +12,7 @@ import { organizationsConfigSchema } from "./organizations-config.schema"
 import { outboxConfigSchema } from "./outbox-config.schema"
 import { serverConfigSchema } from "./server-config.schema"
 import { storageConfigSchema } from "./storage-config.schema"
+import { videoImportConfigSchema } from "./video-import-config.schema"
 import { videoProcessingConfigSchema } from "./video-processing-config.schema"
 import { webhooksConfigSchema } from "./webhooks-config.schema"
 
@@ -25,6 +26,7 @@ const environmentSchema = z.object({
   ...organizationsConfigSchema.shape,
   ...storageConfigSchema.shape,
   ...videoProcessingConfigSchema.shape,
+  ...videoImportConfigSchema.shape,
   ...webhooksConfigSchema.shape,
 })
 
@@ -49,6 +51,9 @@ export const appConfigSchema = environmentSchema
         : LOG_FORMATS.PRETTY),
     WEBHOOK_ALLOW_PRIVATE_URLS:
       environment.WEBHOOK_ALLOW_PRIVATE_URLS ??
+      environment.NODE_ENV !== APP_ENVIRONMENTS.PRODUCTION,
+    VIDEO_IMPORT_ALLOW_PRIVATE_URLS:
+      environment.VIDEO_IMPORT_ALLOW_PRIVATE_URLS ??
       environment.NODE_ENV !== APP_ENVIRONMENTS.PRODUCTION,
   }))
   .refine(

@@ -1,6 +1,7 @@
 export const OUTBOX_MESSAGE_TYPES = {
   SEND_EMAIL: "email.send",
   PROCESS_VIDEO: "video.process",
+  IMPORT_VIDEO: "video.import",
   DELIVER_WEBHOOK: "webhook.deliver",
   CLEAN_UP_STORAGE: "storage.clean_up",
 } as const

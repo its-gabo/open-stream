@@ -143,6 +143,8 @@ describe("HTTP boundary (e2e)", () => {
       "getVideoHlsFile",
       "getVideoPoster",
       "getVideoThumbnail",
+      "importLibraryApiVideo",
+      "importVideo",
       "inviteOrganizationMember",
       "leaveOrganization",
       "listAccountActivity",

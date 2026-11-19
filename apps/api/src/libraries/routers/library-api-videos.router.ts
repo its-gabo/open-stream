@@ -24,6 +24,7 @@ import {
   publicLibraryParamSchema,
   publicVideoParamSchema,
   videoCreateBodySchema,
+  videoImportBodySchema,
   videoPageSuccessResponseSchema,
   videoPosterImageBodySchema,
   videoPosterUpdateBodySchema,
@@ -33,6 +34,7 @@ import {
 } from "../dto/libraries.schemas"
 import { requireLibraryApiKey } from "../middleware/library-api-key.middleware"
 import type { LibraryApiAccessService } from "../services/library-api-access.service"
+import type { VideoImportsService } from "../services/video-imports.service"
 import type { VideoPlaybackService } from "../services/video-playback.service"
 import type { VideoPostersService } from "../services/video-posters.service"
 import type { VideoProcessingService } from "../services/video-processing.service"
@@ -45,7 +47,8 @@ export function createLibraryApiVideosRouter(
   videosService: VideosService,
   videoPlaybackService: VideoPlaybackService,
   videoProcessingService: VideoProcessingService,
-  videoPostersService: VideoPostersService
+  videoPostersService: VideoPostersService,
+  videoImportsService: VideoImportsService
 ) {
   const requireScope = (scope: LibraryApiKeyScope) =>
     requireLibraryApiKey(libraryApiAccessService, scope)
@@ -89,7 +92,7 @@ export function createLibraryApiVideosRouter(
         operationId: "createLibraryApiVideo",
         description: "Needs the `videos:upload` scope.",
         summary:
-          "Create a draft video; upload its file to `/videos/{videoId}/uploads` with tus",
+          "Create a draft video; upload its file to `/videos/{videoId}/uploads` with tus, or import it with `/videos/{videoId}/import`",
         responses: {
           201: describeJsonResponse(
             "Video created",
@@ -116,6 +119,46 @@ export function createLibraryApiVideosRouter(
             created
           ),
           201
+        )
+      }
+    )
+    .post(
+      "/:libraryId/videos/:videoId/import",
+      describeRoute({
+        tags: [OPENAPI_TAGS.LIBRARY_API],
+        security: API_KEY_SECURITY,
+        operationId: "importLibraryApiVideo",
+        description:
+          "Needs the `videos:upload` scope. The URL must link straight to an MP4 or MOV file on a public HTTP or HTTPS address; redirects are followed. The worker downloads it, so follow its progress with the status endpoint or the `video.uploaded` and `video.upload_failed` webhook events.",
+        summary:
+          "Import a draft video's file from a URL instead of uploading it",
+        responses: {
+          202: describeJsonResponse(
+            "Video import started",
+            videoSuccessResponseSchema
+          ),
+          ...describeApiErrorResponses(
+            LIBRARY_ROUTE_ERROR_DESCRIPTIONS.API_VIDEO_IMPORT
+          ),
+        },
+      }),
+      validateRequest("param", publicVideoParamSchema),
+      validateRequest("json", videoImportBodySchema),
+      requireScope(LIBRARY_API_KEY_SCOPES.VIDEOS_UPLOAD),
+      async (c) => {
+        const started = await videoImportsService.startImport(
+          c.get("library"),
+          c.get("activityActor"),
+          c.req.valid("param").videoId,
+          c.req.valid("json")
+        )
+
+        return c.json(
+          createApiSuccessResponse(
+            LIBRARY_SUCCESS_RESULTS.VIDEO_IMPORT,
+            started
+          ),
+          202
         )
       }
     )

@@ -16,6 +16,7 @@ import {
   libraryNameSchema,
   libraryPlayerSettingsSchema,
   playbackHostSchema,
+  videoImportUrlSchema,
   videoQualitiesSchema,
   videoTitleSchema,
 } from "@workspace/shared"
@@ -167,6 +168,11 @@ export const videoCreateBodySchema = z
   .refine((body) => body.title !== undefined || body.fileName !== undefined)
   .meta({ id: "VideoCreateBody" })
 
+/** A direct link to the video's MP4 or MOV file; the worker downloads it. */
+export const videoImportBodySchema = z
+  .object({ url: videoImportUrlSchema })
+  .meta({ id: "VideoImportBody" })
+
 export const videoUpdateBodySchema = z
   .object({ title: videoTitleSchema })
   .meta({ id: "VideoUpdateBody" })
@@ -268,8 +274,11 @@ export const videoDtoSchema = z
     failureReason: videoFailureReasonSchema.nullable(),
     fileName: z.string().nullable(),
     fileFormat: videoFileFormatSchema.nullable(),
+    /** Null while an import's size is unknown, until its server sends it or the download ends. */
     sizeBytes: z.int().nonnegative().nullable(),
     uploadedBytes: z.int().nonnegative(),
+    /** Host of the URL the file is being imported from; null otherwise. */
+    importHost: z.string().nullable(),
     createdAt: z.iso.datetime(),
     uploadedAt: z.iso.datetime().nullable(),
     /** HLS transcoding, once the file is uploaded; null before that. */
@@ -458,6 +467,7 @@ export type LibraryStorageUpdateBody = z.infer<
 >
 export type VideoCreateBody = z.infer<typeof videoCreateBodySchema>
 export type VideoUpdateBody = z.infer<typeof videoUpdateBodySchema>
+export type VideoImportBody = z.infer<typeof videoImportBodySchema>
 export type VideoPosterUpdateBody = z.infer<typeof videoPosterUpdateBodySchema>
 export type LibraryEncodingUpdateBody = z.infer<
   typeof libraryEncodingUpdateBodySchema

@@ -182,6 +182,7 @@
       "library.encoding.update.success": "Zapisano jakości transkodowania.",
       "library.player.update.success": "Zapisano ustawienia odtwarzacza.",
       "video.reprocess.success": "Film zostanie przetworzony ponownie.",
+      "video.import.success": "Rozpoczęto import. Postęp widać na liście.",
       "library.webhook.get.success": "Pobrano webhook.",
       "library.webhook.save.success": "Zapisano webhook.",
       "library.webhook.delete.success": "Usunięto webhook.",
@@ -235,6 +236,7 @@
       "video.upload.file_too_large": "Ten plik przekracza limit przesyłania.",
       "video.upload.unsupported_file_type": "Można przesyłać tylko prawdziwe filmy MP4 i MOV.",
       "video.upload.offset_mismatch": "Przesyłanie straciło synchronizację. Spróbuj ponownie.",
+      "video.import.url_not_allowed": "Filmy można importować tylko z publicznych adresów HTTP lub HTTPS.",
       "storage.not_found": "Nie znaleziono magazynu.",
       "storage.endpoint_not_allowed": "Użyj publicznego adresu HTTPS jako endpointu magazynu.",
       "storage.unreachable": "Nie udało się połączyć z bucketem przy tych ustawieniach. Sprawdź endpoint, bucket i klucze.",
@@ -545,7 +547,7 @@
           },
           "upload": {
             "label": "Prześlij",
-            "description": "Wyślij plik w częściach przez tus, z możliwością wznowienia."
+            "description": "Wyślij plik w częściach przez tus, z możliwością wznowienia, albo wyślij link do niego na /videos/{videoId}/import, a serwer go pobierze."
           },
           "status": {
             "label": "Poczekaj",
@@ -703,7 +705,7 @@
         "video_updated": "Zmieniono nazwę filmu.",
         "video_deleted": "Usunięto film. Jego pliki zostaną wkrótce usunięte z magazynu.",
         "video_uploaded": "Cały plik dotarł i przeszedł sprawdzenie.",
-        "video_upload_failed": "Plik odrzucono, np. nie jest naprawdę MP4 ani MOV.",
+        "video_upload_failed": "Plik odrzucono, np. nie jest naprawdę MP4 ani MOV, albo importu nie udało się pobrać.",
         "video_processing_queued": "Film czeka na przetworzenie: właśnie przesłany albo zlecony ponownie.",
         "video_processing_started": "Rozpoczęło się transkodowanie. Wysyłane raz, nie przy ponowieniach.",
         "video_processing_ready": "HLS, miniatura i storyboard są gotowe do odtwarzania.",
@@ -763,17 +765,24 @@
     }
   },
   "videos": {
-    "description": "Prześlij pliki MP4 lub MOV albo utwórz film teraz i dodaj plik później.",
+    "description": "Prześlij lub zaimportuj pliki MP4 lub MOV albo utwórz film teraz i dodaj plik później.",
     "fields": {
       "title": "Tytuł",
       "title_placeholder": "Zostaw puste, aby użyć nazwy pliku",
-      "file": "Plik wideo"
+      "file": "Plik wideo",
+      "import_url": "Adres pliku",
+      "import_url_placeholder": "https://example.com/film.mp4"
     },
     "create": {
       "trigger": "Dodaj film",
       "title": "Dodaj film",
-      "description": "Wybierz plik, aby od razu go przesłać, albo podaj tytuł, aby utworzyć film i przesłać plik później.",
+      "description": "Prześlij plik lub zaimportuj go z linku od razu, albo podaj tytuł, aby utworzyć film i dodać plik później.",
+      "source_file": "Prześlij plik",
+      "source_url": "Importuj z adresu",
       "submit_upload": "Prześlij",
+      "submit_import": "Importuj",
+      "import_url_hint": "Bezpośredni link do pliku MP4 lub MOV, do {{size}}. Serwer sam go pobierze, więc możesz zamknąć tę stronę.",
+      "import_url_invalid": "Podaj link http:// lub https:// do pliku.",
       "submit_draft": "Utwórz film",
       "title_or_file_required": "Podaj tytuł lub wybierz plik.",
       "file_hint": "MP4 lub MOV, do {{size}}.",
@@ -793,10 +802,15 @@
       "failed": "Przesyłanie nie powiodło się"
     },
     "failure_reasons": {
-      "invalid_file_type": "Plik nie jest prawdziwym filmem MP4 ani MOV."
+      "invalid_file_type": "Plik nie jest prawdziwym filmem MP4 ani MOV.",
+      "import_unreachable": "Nie udało się pobrać pliku z podanego linku.",
+      "import_too_large": "Plik pod linkiem przekracza limit przesyłania.",
+      "import_timed_out": "Pobieranie pliku z linku trwało zbyt długo.",
+      "import_failed": "Nie udało się zaimportować pliku. Spróbuj ponownie."
     },
     "upload_state": {
       "uploading": "Przesyłanie {{percentage}}%",
+      "importing": "Import z {{host}}",
       "paused": "Wstrzymano przy {{percentage}}%",
       "paused_hint": "Wybierz ten sam plik ponownie, aby wznowić.",
       "progress": "{{uploaded}} z {{total}}"
@@ -1123,6 +1137,7 @@
       "video_deleted": "Usunięto film",
       "video_uploaded": "Przesłano plik filmu",
       "video_upload_canceled": "Anulowano przesyłanie",
+      "video_import_started": "Rozpoczęto import pliku filmu",
       "video_reprocess_requested": "Zlecono ponowne przetworzenie filmu",
       "account_signed_up": "Utworzono konto",
       "account_email_verified": "Potwierdzono adres e-mail",

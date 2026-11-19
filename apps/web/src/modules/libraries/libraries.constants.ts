@@ -15,6 +15,11 @@ export const VIDEO_UPLOAD_STATE_POLL_INTERVAL_MS = 4000
 /** File picker filter; the API still checks each file's bytes. */
 export const VIDEO_FILE_ACCEPT = ".mp4,.mov,video/mp4,video/quicktime"
 
+export const VIDEO_SOURCES = {
+  FILE: "file",
+  URL: "url",
+} as const
+
 export const VIDEO_POSTER_IMAGE_ACCEPT = [
   ".jpg",
   ".jpeg",

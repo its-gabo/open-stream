@@ -131,6 +131,10 @@ export function VideoTable({
             const canReceiveFile =
               !isUploadingHere && video.status !== VIDEO_STATUSES.UPLOADED
 
+            const canResumeUpload =
+              video.status === VIDEO_STATUSES.UPLOADING &&
+              video.importHost === null
+
             return (
               <TableRow
                 key={video.id}
@@ -205,22 +209,18 @@ export function VideoTable({
                         variant="ghost"
                         size="icon-sm"
                         aria-label={
-                          video.status === VIDEO_STATUSES.UPLOADING
+                          canResumeUpload
                             ? t("videos.actions.resume_upload")
                             : t("videos.actions.upload_file")
                         }
                         title={
-                          video.status === VIDEO_STATUSES.UPLOADING
+                          canResumeUpload
                             ? t("videos.actions.resume_upload")
                             : t("videos.actions.upload_file")
                         }
                         onClick={() => chooseFileFor(video)}
                       >
-                        {video.status === VIDEO_STATUSES.UPLOADING ? (
-                          <RotateCwIcon />
-                        ) : (
-                          <UploadIcon />
-                        )}
+                        {canResumeUpload ? <RotateCwIcon /> : <UploadIcon />}
                       </Button>
                     )}
                     {REPROCESSABLE_STATUSES.has(video.processingStatus) && (

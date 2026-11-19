@@ -310,6 +310,9 @@ export class VideoUploadsService {
         video.id,
         transaction
       )
+
+      await this.videosRepository.deleteImportOfVideo(video.id, transaction)
+
       const created = await this.videosRepository.insertUpload(
         {
           videoId: video.id,

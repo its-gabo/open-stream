@@ -1,3 +1,5 @@
+import type { IncomingMessage } from "node:http"
+import type { LookupFunction } from "node:net"
 import type { Logger } from "../../common/logging/logger"
 import type { ActivityLogService } from "../../activity/services/activity-log.service"
 import type { ActivityActor } from "../../activity/types/activity.types"
@@ -5,6 +7,7 @@ import type { StorageCleanupService } from "../../storage/services/storage-clean
 import type {
   LibraryPlayerSettings,
   LibraryStorageKind,
+  VideoFileFormat,
   VideoQuality,
 } from "@workspace/shared"
 import type { AppConfig } from "../../config/app.config"
@@ -25,6 +28,7 @@ import type {
   ObjectStorage,
   StorageByteRange,
   StorageLocation,
+  StorageMultipartPart,
 } from "../../storage/types/storage.types"
 import type { StoragesService } from "../../storage/services/storages.service"
 import type { WebhookEventsService } from "../../webhooks/services/webhook-events.service"
@@ -203,6 +207,41 @@ export type PlannedRendition = Omit<VideoRendition, "bandwidth"> & {
 export type ProcessVideoPayload = {
   videoId: string
   requestId: string
+}
+
+export type ImportVideoPayload = {
+  videoId: string
+  importId: string
+}
+
+export type ImportMultipartUpload = {
+  location: StorageLocation
+  objectKey: string
+  multipartUploadId: string
+}
+
+export type StoredImportParts = {
+  multipartUpload: ImportMultipartUpload
+  parts: StorageMultipartPart[]
+  format: VideoFileFormat
+  sizeBytes: number
+}
+
+export type ImportDownloadOptions = {
+  isAllowedUrl: (url: string) => boolean
+  lookup?: LookupFunction
+  timeoutMs: number
+}
+
+export type ImportHttpResponse = Omit<ImportDownload, "contentLength"> & {
+  message: IncomingMessage
+}
+
+export type ImportDownload = {
+  /** From `Content-Length`; null when the server sends the file without one. */
+  contentLength: number | null
+  chunks: AsyncIterable<Uint8Array>
+  cancel(): void
 }
 
 /** What processing learned about a video and produced from it. */

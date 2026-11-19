@@ -139,6 +139,7 @@ The API describes itself at `https://app.openstream.localhost/api/v1/openapi.jso
 ### <img src="docs/assets/icons/upload.svg" width="20" height="20" align="absmiddle" alt="" /> Upload and processing
 
 - **Resumable uploads.** Files go up with the tus protocol and straight into an object storage multipart upload, so an interrupted upload continues where it stopped.
+- **Import from a URL.** Paste a link to an MP4 or MOV file, or send it to the API, and the worker downloads it straight into storage. Redirects are followed, and every hop is checked so imports cannot reach private addresses.
 - **Adaptive streaming.** One ffmpeg pass turns each video into HLS in the qualities its library chooses, measured on the short side so portrait videos get the same ladder. Nothing is upscaled.
 - **Seek previews.** Every video gets a poster and a storyboard sprite with a WebVTT index, shown when you scrub.
 - **CPU or GPU.** Encode with x264, or switch `VIDEO_ENCODER` to `videotoolbox` or `nvenc`.

@@ -8,7 +8,10 @@ import { OUTBOX_MESSAGE_TYPES } from "../../src/outbox/constants/outbox.constant
 
 import type { OrganizationNotificationEmailProps } from "@workspace/email-templates"
 import type { SendEmailPayload } from "../../src/email/types/email.types"
-import type { ProcessVideoPayload } from "../../src/libraries/types/libraries.types"
+import type {
+  ImportVideoPayload,
+  ProcessVideoPayload,
+} from "../../src/libraries/types/libraries.types"
 import type { StorageCleanupPayload } from "../../src/storage/types/storage.types"
 import type { DeliverWebhookPayload } from "../../src/webhooks/types/webhooks.types"
 import type { TestApp } from "./test-app"
@@ -143,6 +146,18 @@ export async function findVideoProcessingRequests(testApp: TestApp) {
   return messages
     .filter((message) => message.type === OUTBOX_MESSAGE_TYPES.PROCESS_VIDEO)
     .map((message) => message.payload as ProcessVideoPayload)
+}
+
+/** Import requests published to the outbox, oldest first. */
+export async function findVideoImportRequests(testApp: TestApp) {
+  const messages = await testApp.appModule.db
+    .select()
+    .from(outboxMessages)
+    .orderBy(asc(outboxMessages.createdAt))
+
+  return messages
+    .filter((message) => message.type === OUTBOX_MESSAGE_TYPES.IMPORT_VIDEO)
+    .map((message) => message.payload as ImportVideoPayload)
 }
 
 /** Webhook delivery requests published to the outbox, oldest first. */

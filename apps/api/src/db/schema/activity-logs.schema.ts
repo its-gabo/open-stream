@@ -6,7 +6,9 @@ import {
   type ActivityActorKind,
   type ActivityResourceType,
 } from "@workspace/shared"
+import { sql } from "drizzle-orm"
 import {
+  check,
   index,
   jsonb,
   pgTable,
@@ -15,6 +17,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core"
 import type { ActivityValues } from "../../activity/types/activity.types"
+import { checkOneOf } from "../database.utils"
 import { users } from "./users.schema"
 
 /**
@@ -80,6 +83,25 @@ export const activityLogs = pgTable(
       .defaultNow(),
   },
   (table) => [
+    checkOneOf(
+      "activity_logs_actor_kind_check",
+      table.actorKind,
+      Object.values(ACTIVITY_ACTOR_KINDS)
+    ),
+    checkOneOf(
+      "activity_logs_action_check",
+      table.action,
+      Object.values(ACTIVITY_ACTIONS)
+    ),
+    checkOneOf(
+      "activity_logs_resource_type_check",
+      table.resourceType,
+      Object.values(ACTIVITY_RESOURCE_TYPES)
+    ),
+    check(
+      "activity_logs_actor_check",
+      sql`(${table.actorKind} = 'api_key') = (${table.actorApiKeyId} is not null) and (${table.actorUserId} is null or ${table.actorKind} = 'user')`
+    ),
     index("activity_logs_organization_id_created_at_idx").on(
       table.organizationId,
       table.createdAt

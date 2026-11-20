@@ -1,0 +1,46 @@
+ALTER TABLE "video_views" DROP CONSTRAINT "video_views_organization_id_organizations_id_fk";
+--> statement-breakpoint
+ALTER TABLE "video_views" DROP CONSTRAINT "video_views_video_id_videos_id_fk";
+--> statement-breakpoint
+ALTER TABLE "storages" ADD COLUMN "credentials" jsonb;--> statement-breakpoint
+ALTER TABLE "organizations" DROP COLUMN "status";--> statement-breakpoint
+ALTER TABLE "videos" ADD CONSTRAINT "videos_id_library_organization_unique" UNIQUE("id","library_id","organization_id");--> statement-breakpoint
+ALTER TABLE "activity_logs" ADD CONSTRAINT "activity_logs_actor_kind_check" CHECK ("activity_logs"."actor_kind" in ('user', 'api_key', 'anonymous', 'system'));--> statement-breakpoint
+ALTER TABLE "activity_logs" ADD CONSTRAINT "activity_logs_action_check" CHECK ("activity_logs"."action" in ('account.signed_up', 'account.email_verified', 'account.signed_in', 'account.sign_in_failed', 'account.signed_out', 'account.password_reset_requested', 'account.password_reset', 'organization.created', 'organization.updated', 'organization.deletion_scheduled', 'organization.deletion_canceled', 'organization.deleted', 'organization.ownership_transferred', 'invitation.created', 'invitation.resent', 'invitation.canceled', 'invitation.accepted', 'invitation.declined', 'membership.removed', 'membership.left', 'storage.created', 'storage.updated', 'storage.deleted', 'library.created', 'library.updated', 'library.storage_changed', 'library.encoding_updated', 'library.security_updated', 'library.player_updated', 'api_key.created', 'api_key.updated', 'api_key.rolled', 'api_key.deleted', 'webhook.created', 'webhook.updated', 'webhook.deleted', 'webhook.secret_rolled', 'webhook.test_sent', 'webhook.delivery_resent', 'video.created', 'video.updated', 'video.deleted', 'video.uploaded', 'video.upload_canceled', 'video.import_started', 'video.reprocess_requested'));--> statement-breakpoint
+ALTER TABLE "activity_logs" ADD CONSTRAINT "activity_logs_resource_type_check" CHECK ("activity_logs"."resource_type" in ('account', 'organization', 'invitation', 'membership', 'storage', 'library', 'api_key', 'webhook', 'video'));--> statement-breakpoint
+ALTER TABLE "activity_logs" ADD CONSTRAINT "activity_logs_actor_check" CHECK (("activity_logs"."actor_kind" = 'api_key') = ("activity_logs"."actor_api_key_id" is not null) and ("activity_logs"."actor_user_id" is null or "activity_logs"."actor_kind" = 'user'));--> statement-breakpoint
+ALTER TABLE "auth_tokens" ADD CONSTRAINT "auth_tokens_purpose_check" CHECK ("auth_tokens"."purpose" in ('verify-email', 'reset-password'));--> statement-breakpoint
+ALTER TABLE "libraries" ADD CONSTRAINT "libraries_name_check" CHECK (btrim("libraries"."name") <> '');--> statement-breakpoint
+ALTER TABLE "libraries" ADD CONSTRAINT "libraries_transcode_qualities_check" CHECK (cardinality("libraries"."transcode_qualities") > 0 and "libraries"."transcode_qualities" <@ array['360p', '480p', '720p', '1080p']::text[]);--> statement-breakpoint
+ALTER TABLE "library_api_keys" ADD CONSTRAINT "library_api_keys_name_check" CHECK (btrim("library_api_keys"."name") <> '');--> statement-breakpoint
+ALTER TABLE "library_api_keys" ADD CONSTRAINT "library_api_keys_scopes_check" CHECK (cardinality("library_api_keys"."scopes") > 0 and "library_api_keys"."scopes" <@ array['videos:read', 'videos:upload', 'videos:manage', 'playback:sign', 'analytics:read']::text[]);--> statement-breakpoint
+ALTER TABLE "webhook_deliveries" ADD CONSTRAINT "webhook_deliveries_event_type_check" CHECK ("webhook_deliveries"."event_type" in ('video.created', 'video.updated', 'video.deleted', 'video.uploaded', 'video.upload_failed', 'video.processing.queued', 'video.processing.started', 'video.processing.ready', 'video.processing.failed', 'webhook.test'));--> statement-breakpoint
+ALTER TABLE "webhook_deliveries" ADD CONSTRAINT "webhook_deliveries_status_check" CHECK ("webhook_deliveries"."status" in ('pending', 'succeeded', 'failed'));--> statement-breakpoint
+ALTER TABLE "webhook_deliveries" ADD CONSTRAINT "webhook_deliveries_attempts_check" CHECK ("webhook_deliveries"."attempts" >= 0);--> statement-breakpoint
+ALTER TABLE "organization_invitations" ADD CONSTRAINT "organization_invitations_status_check" CHECK ("organization_invitations"."status" in ('pending', 'accepted', 'declined', 'canceled', 'expired'));--> statement-breakpoint
+ALTER TABLE "organization_invitations" ADD CONSTRAINT "organization_invitations_email_check" CHECK ("organization_invitations"."email" = lower("organization_invitations"."email"));--> statement-breakpoint
+ALTER TABLE "organization_memberships" ADD CONSTRAINT "organization_memberships_role_check" CHECK ("organization_memberships"."role" in ('owner', 'member'));--> statement-breakpoint
+ALTER TABLE "organizations" ADD CONSTRAINT "organizations_name_check" CHECK (btrim("organizations"."name") <> '');--> statement-breakpoint
+ALTER TABLE "organizations" ADD CONSTRAINT "organizations_slug_check" CHECK ("organizations"."slug" ~ '^[a-z0-9]+(-[a-z0-9]+)*$' and char_length("organizations"."slug") between 2 and 63);--> statement-breakpoint
+ALTER TABLE "outbox_messages" ADD CONSTRAINT "outbox_messages_type_check" CHECK ("outbox_messages"."type" in ('email.send', 'video.process', 'video.import', 'webhook.deliver', 'storage.clean_up'));--> statement-breakpoint
+ALTER TABLE "storage_cleanups" ADD CONSTRAINT "storage_cleanups_attempts_check" CHECK ("storage_cleanups"."attempts" >= 0);--> statement-breakpoint
+ALTER TABLE "storages" ADD CONSTRAINT "storages_name_check" CHECK (btrim("storages"."name") <> '');--> statement-breakpoint
+ALTER TABLE "users" ADD CONSTRAINT "users_email_check" CHECK ("users"."email" = lower("users"."email"));--> statement-breakpoint
+ALTER TABLE "users" ADD CONSTRAINT "users_name_check" CHECK (btrim("users"."name") <> '');--> statement-breakpoint
+ALTER TABLE "video_uploads" ADD CONSTRAINT "video_uploads_offset_check" CHECK ("video_uploads"."upload_offset" between 0 and "video_uploads"."upload_length");--> statement-breakpoint
+ALTER TABLE "video_uploads" ADD CONSTRAINT "video_uploads_next_part_number_check" CHECK ("video_uploads"."next_part_number" >= 1);--> statement-breakpoint
+ALTER TABLE "video_views" ADD CONSTRAINT "video_views_device_type_check" CHECK ("video_views"."device_type" in ('desktop', 'mobile', 'tablet'));--> statement-breakpoint
+ALTER TABLE "video_views" ADD CONSTRAINT "video_views_progress_check" CHECK ("video_views"."watched_seconds" >= 0 and "video_views"."furthest_position_seconds" >= 0 and "video_views"."last_reported_at" >= "video_views"."started_at");--> statement-breakpoint
+ALTER TABLE "videos" ADD CONSTRAINT "videos_status_check" CHECK ("videos"."status" in ('draft', 'uploading', 'uploaded', 'failed'));--> statement-breakpoint
+ALTER TABLE "videos" ADD CONSTRAINT "videos_file_format_check" CHECK ("videos"."file_format" in ('mp4', 'mov'));--> statement-breakpoint
+ALTER TABLE "videos" ADD CONSTRAINT "videos_processing_status_value_check" CHECK ("videos"."processing_status" in ('pending', 'processing', 'ready', 'failed'));--> statement-breakpoint
+ALTER TABLE "videos" ADD CONSTRAINT "videos_poster_source_check" CHECK ("videos"."poster_source" in ('automatic', 'frame', 'image'));--> statement-breakpoint
+ALTER TABLE "videos" ADD CONSTRAINT "videos_failure_reason_value_check" CHECK ("videos"."failure_reason" in ('invalid_file_type', 'import_unreachable', 'import_too_large', 'import_timed_out', 'import_failed'));--> statement-breakpoint
+ALTER TABLE "videos" ADD CONSTRAINT "videos_processing_failure_reason_value_check" CHECK ("videos"."processing_failure_reason" in ('no_video_stream', 'transcoding_failed'));--> statement-breakpoint
+ALTER TABLE "videos" ADD CONSTRAINT "videos_failure_reason_check" CHECK (("videos"."status" = 'failed') = ("videos"."failure_reason" is not null));--> statement-breakpoint
+ALTER TABLE "videos" ADD CONSTRAINT "videos_processing_status_check" CHECK (("videos"."status" = 'uploaded') = ("videos"."processing_status" is not null));--> statement-breakpoint
+ALTER TABLE "videos" ADD CONSTRAINT "videos_processing_failure_reason_check" CHECK (coalesce("videos"."processing_status" = 'failed', false) = ("videos"."processing_failure_reason" is not null));--> statement-breakpoint
+ALTER TABLE "videos" ADD CONSTRAINT "videos_uploaded_at_check" CHECK (("videos"."status" = 'uploaded') = ("videos"."uploaded_at" is not null));--> statement-breakpoint
+ALTER TABLE "videos" ADD CONSTRAINT "videos_processing_run_check" CHECK (("videos"."processing_run_id" is null and "videos"."processing_heartbeat_at" is null) or "videos"."processing_status" = 'processing');--> statement-breakpoint
+ALTER TABLE "videos" ADD CONSTRAINT "videos_media_check" CHECK ("videos"."uploaded_bytes" >= 0 and "videos"."size_bytes" >= 0 and "videos"."duration_seconds" >= 0 and "videos"."width" > 0 and "videos"."height" > 0);--> statement-breakpoint
+ALTER TABLE "videos" ADD CONSTRAINT "videos_poster_frame_seconds_check" CHECK (("videos"."poster_source" = 'frame') = ("videos"."poster_frame_seconds" is not null) and "videos"."poster_frame_seconds" >= 0);

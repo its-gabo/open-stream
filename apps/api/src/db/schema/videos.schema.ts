@@ -7,8 +7,10 @@ import {
   VIDEO_STATUSES,
 } from "@workspace/shared"
 import type { VideoRendition } from "../../libraries/types/libraries.types"
+import { sql } from "drizzle-orm"
 import {
   bigint,
+  check,
   doublePrecision,
   foreignKey,
   index,
@@ -17,9 +19,11 @@ import {
   pgTable,
   text,
   timestamp,
+  unique,
   uuid,
 } from "drizzle-orm/pg-core"
 import { libraries } from "./libraries.schema"
+import { checkOneOf } from "../database.utils"
 import { organizations } from "./organizations.schema"
 import { users } from "./users.schema"
 
@@ -126,6 +130,69 @@ export const videos = pgTable(
       columns: [table.libraryId, table.organizationId],
       foreignColumns: [libraries.id, libraries.organizationId],
     }).onDelete("cascade"),
+    unique("videos_id_library_organization_unique").on(
+      table.id,
+      table.libraryId,
+      table.organizationId
+    ),
+    checkOneOf(
+      "videos_status_check",
+      table.status,
+      Object.values(VIDEO_STATUSES)
+    ),
+    checkOneOf(
+      "videos_file_format_check",
+      table.fileFormat,
+      Object.values(VIDEO_FILE_FORMATS)
+    ),
+    checkOneOf(
+      "videos_processing_status_value_check",
+      table.processingStatus,
+      Object.values(VIDEO_PROCESSING_STATUSES)
+    ),
+    checkOneOf(
+      "videos_poster_source_check",
+      table.posterSource,
+      Object.values(VIDEO_POSTER_SOURCES)
+    ),
+    checkOneOf(
+      "videos_failure_reason_value_check",
+      table.failureReason,
+      Object.values(VIDEO_FAILURE_REASONS)
+    ),
+    checkOneOf(
+      "videos_processing_failure_reason_value_check",
+      table.processingFailureReason,
+      Object.values(VIDEO_PROCESSING_FAILURE_REASONS)
+    ),
+    check(
+      "videos_failure_reason_check",
+      sql`(${table.status} = 'failed') = (${table.failureReason} is not null)`
+    ),
+    check(
+      "videos_processing_status_check",
+      sql`(${table.status} = 'uploaded') = (${table.processingStatus} is not null)`
+    ),
+    check(
+      "videos_processing_failure_reason_check",
+      sql`coalesce(${table.processingStatus} = 'failed', false) = (${table.processingFailureReason} is not null)`
+    ),
+    check(
+      "videos_uploaded_at_check",
+      sql`(${table.status} = 'uploaded') = (${table.uploadedAt} is not null)`
+    ),
+    check(
+      "videos_processing_run_check",
+      sql`(${table.processingRunId} is null and ${table.processingHeartbeatAt} is null) or ${table.processingStatus} = 'processing'`
+    ),
+    check(
+      "videos_media_check",
+      sql`${table.uploadedBytes} >= 0 and ${table.sizeBytes} >= 0 and ${table.durationSeconds} >= 0 and ${table.width} > 0 and ${table.height} > 0`
+    ),
+    check(
+      "videos_poster_frame_seconds_check",
+      sql`(${table.posterSource} = 'frame') = (${table.posterFrameSeconds} is not null) and ${table.posterFrameSeconds} >= 0`
+    ),
     index("videos_library_id_created_at_idx").on(
       table.libraryId,
       table.createdAt

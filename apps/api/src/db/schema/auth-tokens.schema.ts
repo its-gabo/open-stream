@@ -1,5 +1,6 @@
 import { index, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core"
 import { AUTH_TOKEN_PURPOSES } from "../../auth/constants/auth.constants"
+import { checkOneOf } from "../database.utils"
 import { users } from "./users.schema"
 
 export const authTokens = pgTable(
@@ -17,7 +18,14 @@ export const authTokens = pgTable(
     }).notNull(),
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
   },
-  (table) => [index("auth_tokens_user_id_idx").on(table.userId)]
+  (table) => [
+    checkOneOf(
+      "auth_tokens_purpose_check",
+      table.purpose,
+      Object.values(AUTH_TOKEN_PURPOSES)
+    ),
+    index("auth_tokens_user_id_idx").on(table.userId),
+  ]
 )
 
 export type AuthTokenRecord = typeof authTokens.$inferSelect

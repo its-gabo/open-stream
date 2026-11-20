@@ -2,7 +2,16 @@ import {
   LIBRARY_API_KEY_SCOPES,
   type LibraryApiKeyScope,
 } from "@workspace/shared"
-import { index, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core"
+import { sql } from "drizzle-orm"
+import {
+  check,
+  index,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from "drizzle-orm/pg-core"
+import { checkNonEmptySubsetOf } from "../database.utils"
 import { libraries } from "./libraries.schema"
 
 /** Keys that authenticate a library's public API, each limited to its scopes; only their hashes are stored. */
@@ -40,6 +49,12 @@ export const libraryApiKeys = pgTable(
       .$onUpdate(() => new Date()),
   },
   (table) => [
+    check("library_api_keys_name_check", sql`btrim(${table.name}) <> ''`),
+    checkNonEmptySubsetOf(
+      "library_api_keys_scopes_check",
+      table.scopes,
+      Object.values(LIBRARY_API_KEY_SCOPES)
+    ),
     index("library_api_keys_library_id_created_at_idx").on(
       table.libraryId,
       table.createdAt

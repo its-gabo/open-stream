@@ -97,12 +97,6 @@ export class OrganizationDeletionService {
 
       if (!request) throw new DomainError(ORGANIZATION_ERRORS.PENDING_DELETION)
 
-      await this.organizationsRepository.updateOrganization(
-        organization.id,
-        { status: ORGANIZATION_STATUSES.PENDING_DELETION },
-        transaction
-      )
-
       await this.activityLogService.recordActivity(
         actor,
         {
@@ -333,12 +327,6 @@ export class OrganizationDeletionService {
       transaction
     )
 
-    await this.organizationsRepository.updateOrganization(
-      organization.id,
-      { status: ORGANIZATION_STATUSES.ACTIVE },
-      transaction
-    )
-
     await this.activityLogService.recordActivity(
       actor,
       {
@@ -346,7 +334,7 @@ export class OrganizationDeletionService {
         action: ACTIVITY_ACTIONS.ORGANIZATION_DELETION_CANCELED,
         resource: organizationActivityResource(organization),
         before: {
-          status: organization.status,
+          status: ORGANIZATION_STATUSES.PENDING_DELETION,
           scheduledFor: request.scheduledFor.toISOString(),
         },
         after: { status: ORGANIZATION_STATUSES.ACTIVE },

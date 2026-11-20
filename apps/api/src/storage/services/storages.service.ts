@@ -299,14 +299,7 @@ export class StoragesService {
       region: storage.region,
       bucket: storage.bucket,
       forcePathStyle: storage.forcePathStyle,
-      credentials: {
-        ciphertext: storage.credentialsCiphertext,
-        iv: storage.credentialsIv,
-        tag: storage.credentialsTag,
-        encryptedKey: storage.credentialsEncryptedKey,
-        keyIv: storage.credentialsKeyIv,
-        keyTag: storage.credentialsKeyTag,
-      },
+      credentials: storage.credentials,
     }
   }
 
@@ -372,20 +365,13 @@ export class StoragesService {
   }
 
   private encryptCredentials(credentials: StorageCredentials) {
-    const encrypted = this.storageSecretCipherService.encrypt(
-      JSON.stringify(credentials)
-    )
-
     return {
       accessKeyIdHint: credentials.accessKeyId.slice(
         -ACCESS_KEY_ID_HINT_LENGTH
       ),
-      credentialsCiphertext: encrypted.ciphertext,
-      credentialsIv: encrypted.iv,
-      credentialsTag: encrypted.tag,
-      credentialsEncryptedKey: encrypted.encryptedKey,
-      credentialsKeyIv: encrypted.keyIv,
-      credentialsKeyTag: encrypted.keyTag,
+      credentials: this.storageSecretCipherService.encrypt(
+        JSON.stringify(credentials)
+      ),
     }
   }
 }

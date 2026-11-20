@@ -6,6 +6,7 @@ import {
   timestamp,
   uuid,
 } from "drizzle-orm/pg-core"
+import { checkOneOf } from "../database.utils"
 import { OUTBOX_MESSAGE_TYPES } from "../../outbox/constants/outbox.constants"
 import type { OutboxMessagePayload } from "../../outbox/types/outbox.types"
 
@@ -27,7 +28,14 @@ export const outboxMessages = pgTable(
       .notNull()
       .defaultNow(),
   },
-  (table) => [index("outbox_messages_created_at_idx").on(table.createdAt)]
+  (table) => [
+    checkOneOf(
+      "outbox_messages_type_check",
+      table.type,
+      Object.values(OUTBOX_MESSAGE_TYPES)
+    ),
+    index("outbox_messages_created_at_idx").on(table.createdAt),
+  ]
 )
 
 export type OutboxMessageRecord = typeof outboxMessages.$inferSelect

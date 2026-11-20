@@ -3,6 +3,7 @@ import {
   ORGANIZATION_FIELD_LIMITS,
   ORGANIZATION_MEMBERSHIP_LIMIT,
   ORGANIZATION_ROLES,
+  ORGANIZATION_STATUSES,
   isValidOrganizationSlug,
   normalizeOrganizationSlug,
 } from "@workspace/shared"
@@ -146,6 +147,7 @@ export class OrganizationsService {
       return {
         organization: toOrganizationSummaryDto({
           ...organization,
+          status: ORGANIZATION_STATUSES.ACTIVE,
           scheduledDeletionAt: null,
         }),
         membership: {
@@ -212,6 +214,7 @@ export class OrganizationsService {
           return {
             organization: toOrganizationSummaryDto({
               ...organization!,
+              status: before.status,
               scheduledDeletionAt: null,
             }),
           }

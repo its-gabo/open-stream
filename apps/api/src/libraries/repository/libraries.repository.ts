@@ -10,7 +10,14 @@ import type {
   Transaction,
 } from "../../db/database.types"
 import { toContainsPattern } from "../../db/database.utils"
-import { libraries, organizations, storages, videos } from "../../db/schema"
+import {
+  libraries,
+  organizationDeletionRequests,
+  organizations,
+  storages,
+  videos,
+} from "../../db/schema"
+import { organizationStatusColumn } from "../../organizations/utils/organization-query.utils"
 import type {
   LibraryListFilter,
   LibraryPlaybackSecurity,
@@ -67,10 +74,14 @@ export class LibrariesRepository {
     const [library] = await this.db
       .select({
         ...libraryProfileColumns,
-        organizationStatus: organizations.status,
+        organizationStatus: organizationStatusColumn,
       })
       .from(libraries)
       .innerJoin(organizations, eq(organizations.id, libraries.organizationId))
+      .leftJoin(
+        organizationDeletionRequests,
+        eq(organizationDeletionRequests.organizationId, organizations.id)
+      )
       .leftJoin(storages, eq(storages.id, libraries.storageId))
       .where(eq(libraries.id, libraryId))
 

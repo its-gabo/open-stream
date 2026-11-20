@@ -22,7 +22,6 @@ import type {
   OrganizationAccess,
   OrganizationInvitationStatus,
   OrganizationRole,
-  OrganizationStatus,
 } from "../types/organizations.types"
 import {
   membershipWithUserColumns,
@@ -211,7 +210,7 @@ export class OrganizationsRepository {
 
   async updateOrganization(
     organizationId: string,
-    changes: { name?: string; slug?: string; status?: OrganizationStatus },
+    changes: { name?: string; slug?: string },
     executor: DatabaseExecutor
   ) {
     const [organization] = await executor

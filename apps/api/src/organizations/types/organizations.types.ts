@@ -12,6 +12,7 @@ import type { AuthenticatedEnv } from "../../auth/types/auth.types"
 import type { ValueOf } from "../../common/types/common.types"
 import type { AppConfig } from "../../config/app.config"
 import type { Database, Transaction } from "../../db/database.types"
+import type { OrganizationRecord } from "../../db/schema"
 import type { OutboxService } from "../../outbox/services/outbox.service"
 import type { ORGANIZATION_DELETION_ACTIONS } from "../constants/organizations.constants"
 
@@ -23,6 +24,10 @@ export type OrganizationInvitationStatus = ValueOf<
 export type OrganizationDeletionAction = ValueOf<
   typeof ORGANIZATION_DELETION_ACTIONS
 >
+
+export type OrganizationWithStatus = OrganizationRecord & {
+  status: OrganizationStatus
+}
 
 export type OrganizationSummary = {
   id: string

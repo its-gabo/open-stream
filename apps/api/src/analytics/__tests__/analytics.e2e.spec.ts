@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test"
-import { eq } from "drizzle-orm"
+import { eq, sql } from "drizzle-orm"
 
 import { createLibraryFactory } from "../../../test/factory/library.factory"
 import { createOrganizationFactory } from "../../../test/factory/organization.factory"
@@ -117,11 +117,17 @@ describe("Analytics (e2e)", () => {
   ) => (await (await startView(videoId, options)).json()).data.view.id as string
 
   /** Makes the view look `seconds` older, as if its last report was that long ago. */
-  const letTimePass = (viewId: string, seconds: number) =>
-    testApp.appModule.db
+  const letTimePass = (viewId: string, seconds: number) => {
+    const lastReportedAt = new Date(Date.now() - seconds * 1000)
+
+    return testApp.appModule.db
       .update(videoViews)
-      .set({ lastReportedAt: new Date(Date.now() - seconds * 1000) })
+      .set({
+        startedAt: sql`least(${videoViews.startedAt}, ${lastReportedAt.toISOString()}::timestamptz)`,
+        lastReportedAt,
+      })
       .where(eq(videoViews.id, viewId))
+  }
 
   const reportProgress = (videoId: string, viewId: string, body: unknown) =>
     viewer.post(`${viewsPath(videoId)}/${viewId}/progress`, body)

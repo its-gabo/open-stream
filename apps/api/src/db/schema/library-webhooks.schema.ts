@@ -4,7 +4,9 @@ import {
   type WebhookDeliveryStatus,
   type WebhookEventType,
 } from "@workspace/shared"
+import { sql } from "drizzle-orm"
 import {
+  check,
   index,
   integer,
   jsonb,
@@ -15,6 +17,7 @@ import {
 } from "drizzle-orm/pg-core"
 import type { EncryptedSecret } from "../../storage/types/storage.types"
 import type { WebhookEventPayload } from "../../webhooks/types/webhooks.types"
+import { checkOneOf } from "../database.utils"
 import { libraries } from "./libraries.schema"
 
 /** The endpoint a library's events are sent to; at most one per library. */
@@ -47,12 +50,9 @@ export const webhookDeliveries = pgTable(
       .notNull()
       .references(() => libraryWebhooks.id, { onDelete: "cascade" }),
     eventType: text("event_type", {
-      enum: [
-        WEBHOOK_EVENT_TYPES.VIDEO_PROCESSING_QUEUED,
-        WEBHOOK_EVENT_TYPES.VIDEO_PROCESSING_STARTED,
-        WEBHOOK_EVENT_TYPES.VIDEO_PROCESSING_READY,
-        WEBHOOK_EVENT_TYPES.VIDEO_PROCESSING_FAILED,
-        WEBHOOK_EVENT_TYPES.WEBHOOK_TEST,
+      enum: Object.values(WEBHOOK_EVENT_TYPES) as [
+        WebhookEventType,
+        ...WebhookEventType[],
       ],
     })
       .$type<WebhookEventType>()
@@ -80,6 +80,17 @@ export const webhookDeliveries = pgTable(
       .defaultNow(),
   },
   (table) => [
+    checkOneOf(
+      "webhook_deliveries_event_type_check",
+      table.eventType,
+      Object.values(WEBHOOK_EVENT_TYPES)
+    ),
+    checkOneOf(
+      "webhook_deliveries_status_check",
+      table.status,
+      Object.values(WEBHOOK_DELIVERY_STATUSES)
+    ),
+    check("webhook_deliveries_attempts_check", sql`${table.attempts} >= 0`),
     index("webhook_deliveries_webhook_id_created_at_idx").on(
       table.webhookId,
       table.createdAt

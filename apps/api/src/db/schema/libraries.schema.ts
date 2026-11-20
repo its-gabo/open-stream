@@ -5,8 +5,10 @@ import {
   type LibraryPlayerSettings,
   type VideoQuality,
 } from "@workspace/shared"
+import { sql } from "drizzle-orm"
 import {
   boolean,
+  check,
   foreignKey,
   index,
   jsonb,
@@ -16,6 +18,7 @@ import {
   unique,
   uuid,
 } from "drizzle-orm/pg-core"
+import { checkNonEmptySubsetOf } from "../database.utils"
 import { organizations } from "./organizations.schema"
 import { storages } from "./storages.schema"
 
@@ -65,6 +68,12 @@ export const libraries = pgTable(
       .$onUpdate(() => new Date()),
   },
   (table) => [
+    check("libraries_name_check", sql`btrim(${table.name}) <> ''`),
+    checkNonEmptySubsetOf(
+      "libraries_transcode_qualities_check",
+      table.transcodeQualities,
+      Object.values(VIDEO_QUALITIES)
+    ),
     // Target of the videos foreign key that keeps a video in its library's organization.
     unique("libraries_id_organization_unique").on(
       table.id,

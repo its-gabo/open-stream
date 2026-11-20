@@ -8,6 +8,7 @@ import {
   uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core"
+import { checkOneOf } from "../database.utils"
 import { organizations } from "./organizations.schema"
 import { users } from "./users.schema"
 
@@ -30,6 +31,11 @@ export const organizationMemberships = pgTable(
       .defaultNow(),
   },
   (table) => [
+    checkOneOf(
+      "organization_memberships_role_check",
+      table.role,
+      Object.values(ORGANIZATION_ROLES)
+    ),
     uniqueIndex("organization_memberships_organization_user_unique").on(
       table.organizationId,
       table.userId

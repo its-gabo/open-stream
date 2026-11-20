@@ -1,12 +1,16 @@
+import { sql } from "drizzle-orm"
 import {
   boolean,
+  check,
   index,
+  jsonb,
   pgTable,
   text,
   timestamp,
   unique,
   uuid,
 } from "drizzle-orm/pg-core"
+import type { EncryptedSecret } from "../../storage/types/storage.types"
 import { organizations } from "./organizations.schema"
 
 /** An S3-compatible bucket of an organization that its libraries can store videos in. */
@@ -25,12 +29,7 @@ export const storages = pgTable(
     pathTemplate: text("path_template").notNull(),
     /** Last characters of the access key id, so owners can recognize the key without it being readable. */
     accessKeyIdHint: text("access_key_id_hint").notNull(),
-    credentialsCiphertext: text("credentials_ciphertext").notNull(),
-    credentialsIv: text("credentials_iv").notNull(),
-    credentialsTag: text("credentials_tag").notNull(),
-    credentialsEncryptedKey: text("credentials_encrypted_key").notNull(),
-    credentialsKeyIv: text("credentials_key_iv").notNull(),
-    credentialsKeyTag: text("credentials_key_tag").notNull(),
+    credentials: jsonb("credentials").$type<EncryptedSecret>().notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -40,6 +39,7 @@ export const storages = pgTable(
       .$onUpdate(() => new Date()),
   },
   (table) => [
+    check("storages_name_check", sql`btrim(${table.name}) <> ''`),
     // Target of the libraries foreign key that keeps a library's storage in its organization.
     unique("storages_id_organization_unique").on(
       table.id,

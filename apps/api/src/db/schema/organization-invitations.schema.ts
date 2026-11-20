@@ -1,6 +1,7 @@
 import { ORGANIZATION_INVITATION_STATUSES } from "@workspace/shared"
 import { sql } from "drizzle-orm"
 import {
+  check,
   index,
   pgTable,
   text,
@@ -8,6 +9,7 @@ import {
   uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core"
+import { checkOneOf } from "../database.utils"
 import { organizations } from "./organizations.schema"
 import { users } from "./users.schema"
 
@@ -43,6 +45,15 @@ export const organizationInvitations = pgTable(
       .$onUpdate(() => new Date()),
   },
   (table) => [
+    checkOneOf(
+      "organization_invitations_status_check",
+      table.status,
+      Object.values(ORGANIZATION_INVITATION_STATUSES)
+    ),
+    check(
+      "organization_invitations_email_check",
+      sql`${table.email} = lower(${table.email})`
+    ),
     uniqueIndex("organization_invitations_pending_email_unique")
       .on(table.organizationId, table.email)
       .where(sql`${table.status} = 'pending'`),

@@ -37,9 +37,14 @@ export const LOCAL_UPLOAD_STATUSES = {
   FAILED: "failed",
 } as const
 
-/** Pages of a library, by path below the library; storage, encoding, player, API and webhook settings are owner-only. */
+/** Pages of a library, by path below the library; storage, encoding, player, security, API and webhook settings are owner-only. */
 export const LIBRARY_TABS = [
   { suffix: "", labelKey: "libraries.tabs.videos", isOwnerOnly: false },
+  {
+    suffix: "playlists",
+    labelKey: "libraries.tabs.playlists",
+    isOwnerOnly: false,
+  },
   {
     suffix: "analytics",
     labelKey: "libraries.tabs.analytics",
@@ -59,6 +64,11 @@ export const LIBRARY_TABS = [
   {
     suffix: "player",
     labelKey: "libraries.tabs.player",
+    isOwnerOnly: true,
+  },
+  {
+    suffix: "security",
+    labelKey: "libraries.tabs.security",
     isOwnerOnly: true,
   },
   { suffix: "api", labelKey: "libraries.tabs.api", isOwnerOnly: true },
@@ -187,6 +197,19 @@ export const VIDEO_PLAYER_PATHS = {
   STORYBOARD: "thumbnails/storyboard.vtt",
 } as const
 
+/** Whether a playlist's video plays for viewers: ready, still on its way, or failed and skipped until fixed. */
+export const PLAYLIST_VIDEO_STATES = {
+  READY: "ready",
+  WAITING: "waiting",
+  FAILED: "failed",
+} as const
+
+/** Tabs of a playlist's sheet. */
+export const PLAYLIST_DETAILS_TABS = {
+  VIDEOS: "videos",
+  EMBED: "embed",
+} as const
+
 /** Tabs below the player in a video's details sheet. */
 export const VIDEO_DETAILS_TABS = {
   DETAILS: "details",
@@ -211,6 +234,9 @@ export const PLAYER_SEEK_STEP_SECONDS = 5
 
 /** Volume the arrow keys change it by. */
 export const PLAYER_VOLUME_STEP = 0.1
+
+/** Seconds the player counts down at the end of a playlist video before the next one starts. */
+export const PLAYER_UP_NEXT_COUNTDOWN_SECONDS = 5
 
 /** The controls hide after this long without the pointer moving while the video plays. */
 export const PLAYER_CONTROLS_HIDE_DELAY_MS = 2500
@@ -250,8 +276,9 @@ export const PLAYER_SETTINGS_VIEWS = {
   SPEED: "speed",
 } as const
 
-/** `<video>` events after which the controls read its state again. */
+/** `<video>` events after which the controls read its state again; `emptied` when a new source starts loading. */
 export const PLAYER_MEDIA_EVENTS = [
+  "emptied",
   "play",
   "pause",
   "playing",

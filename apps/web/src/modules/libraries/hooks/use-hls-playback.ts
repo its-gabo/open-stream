@@ -9,7 +9,9 @@ import type { VideoPlayerQuality } from "../libraries.types"
 /**
  * Attaches an HLS stream to the `<video>` with hls.js, which also offers the
  * qualities to choose from; where hls.js cannot run, the browser plays the
- * stream itself.
+ * stream itself. A new `src` plays in the same `<video>`, e.g. the next video
+ * of a playlist, so fullscreen and volume carry over; with `autoPlay` it
+ * starts as soon as it loads.
  */
 export function useHlsPlayback(
   videoRef: RefObject<HTMLVideoElement | null>,
@@ -17,7 +19,12 @@ export function useHlsPlayback(
   {
     startSeconds,
     sendsCredentials = true,
-  }: { startSeconds?: number; sendsCredentials?: boolean } = {}
+    autoPlay = false,
+  }: {
+    startSeconds?: number
+    sendsCredentials?: boolean
+    autoPlay?: boolean
+  } = {}
 ) {
   const hlsRef = useRef<Hls | null>(null)
   const [qualities, setQualities] = useState<VideoPlayerQuality[]>([])
@@ -29,6 +36,9 @@ export function useHlsPlayback(
     const video = videoRef.current
 
     if (!video) return
+
+    setHasFailed(false)
+    setQualities([])
 
     if (!Hls.isSupported()) {
       const seekToStart = () => {
@@ -48,13 +58,15 @@ export function useHlsPlayback(
       },
     })
 
-    hls.on(Hls.Events.MANIFEST_PARSED, (_, data) =>
+    hls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
       setQualities(
         data.levels
           .map((level, index) => ({ level: index, height: level.height }))
           .sort((left, right) => right.height - left.height)
       )
-    )
+
+      if (autoPlay) video.play().catch(() => {})
+    })
     hls.on(Hls.Events.LEVEL_SWITCHED, (_, data) => setPlayingLevel(data.level))
     hls.on(Hls.Events.ERROR, (_, data) => {
       if (data.fatal) setHasFailed(true)
@@ -67,7 +79,7 @@ export function useHlsPlayback(
       hls.destroy()
       hlsRef.current = null
     }
-  }, [videoRef, src, startSeconds, sendsCredentials])
+  }, [videoRef, src, startSeconds, sendsCredentials, autoPlay])
 
   const selectLevel = useCallback((level: number) => {
     setSelectedLevel(level)

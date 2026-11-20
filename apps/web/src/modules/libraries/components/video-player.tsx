@@ -35,13 +35,16 @@ import {
 } from "../libraries.utils"
 import { PlayerButton } from "./player-button"
 import { PlayerChaptersMenu } from "./player-chapters-menu"
+import { PlayerEpisodesMenu } from "./player-episodes-menu"
+import { PlayerNextEpisodeButton } from "./player-next-episode-button"
 import { PlayerSettingsMenu } from "./player-settings-menu"
 import { PlayerSlider } from "./player-slider"
+import { PlayerUpNext } from "./player-up-next"
 import { StoryboardTile } from "./storyboard-tile"
 
 import type { VideoChapter } from "@workspace/shared"
 import type { CSSProperties } from "react"
-import type { PlayerControlsSettings } from "../libraries.types"
+import type { PlayerControlsSettings, PlayerPlaylist } from "../libraries.types"
 
 type VideoPlayerProps = {
   /** The HLS master playlist. */
@@ -70,6 +73,8 @@ type VideoPlayerProps = {
   controls?: PlayerControlsSettings
   /** Told where playback is whenever it moves, e.g. to pick the frame shown. */
   onTimeUpdate?: (seconds: number) => void
+  /** The playlist this video is part of, for the episodes menu and playing the next one. */
+  playlist?: PlayerPlaylist
 }
 
 /**
@@ -94,6 +99,7 @@ export function VideoPlayer({
   chapters = [],
   controls = DEFAULT_LIBRARY_PLAYER_SETTINGS,
   onTimeUpdate,
+  playlist,
 }: VideoPlayerProps) {
   const { t } = useTranslation()
   const containerRef = useRef<HTMLDivElement>(null)
@@ -101,6 +107,7 @@ export function VideoPlayer({
   const playback = useHlsPlayback(videoRef, src, {
     startSeconds,
     sendsCredentials,
+    autoPlay,
   })
   const media = useMediaState(videoRef)
   useViewReporting(videoRef, viewsUrl)
@@ -113,12 +120,23 @@ export function VideoPlayer({
   const [isIdle, setIsIdle] = useState(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [isChaptersOpen, setIsChaptersOpen] = useState(false)
+  const [isEpisodesOpen, setIsEpisodesOpen] = useState(false)
+  /** The source whose offer of the next episode the viewer dismissed. */
+  const [upNextDismissedSrc, setUpNextDismissedSrc] = useState<string | null>(
+    null
+  )
   const [previewSeconds, setPreviewSeconds] = useState<number | null>(null)
   const isPlaying = media?.isPlaying ?? false
   const duration = media?.duration ?? 0
   const areControlsVisible =
-    !isPlaying || !isIdle || isSettingsOpen || isChaptersOpen
+    !isPlaying || !isIdle || isSettingsOpen || isChaptersOpen || isEpisodesOpen
   const shownChapters = controls.showChapters ? chapters : []
+  const nextEpisodeIndex =
+    playlist && playlist.currentIndex + 1 < playlist.episodes.length
+      ? playlist.currentIndex + 1
+      : null
+  const nextEpisode =
+    nextEpisodeIndex !== null ? playlist?.episodes[nextEpisodeIndex] : undefined
   const currentTime = media?.currentTime ?? 0
 
   useEffect(() => {
@@ -206,6 +224,14 @@ export function VideoPlayer({
     (isOpen: boolean) => setIsChaptersOpen(isOpen),
     []
   )
+  const handleEpisodesOpenChange = useCallback(
+    (isOpen: boolean) => setIsEpisodesOpen(isOpen),
+    []
+  )
+  const onSelectEpisode = playlist?.onSelectEpisode
+  const playNextEpisode = useCallback(() => {
+    if (nextEpisodeIndex !== null) onSelectEpisode?.(nextEpisodeIndex)
+  }, [nextEpisodeIndex, onSelectEpisode])
 
   useHotkeys(
     [
@@ -291,7 +317,7 @@ export function VideoPlayer({
       tabIndex={0}
       aria-label={t("videos.player.label")}
       className={cn(
-        "group/player relative w-full overflow-hidden bg-black outline-none",
+        "group/player [container-type:size] relative w-full overflow-hidden bg-black outline-none",
         fill ? "h-full" : "aspect-video rounded-lg",
         isFullscreen && "rounded-none",
         !areControlsVisible && "cursor-none"
@@ -344,6 +370,16 @@ export function VideoPlayer({
         >
           <PlayIcon className="ml-1 size-7 fill-current" />
         </button>
+      )}
+
+      {nextEpisode && media?.isEnded && upNextDismissedSrc !== src && (
+        <PlayerUpNext
+          key={src}
+          episode={nextEpisode}
+          autoplay={playlist?.autoplayNext ?? false}
+          onPlay={playNextEpisode}
+          onDismiss={() => setUpNextDismissedSrc(src)}
+        />
       )}
 
       <div
@@ -444,6 +480,18 @@ export function VideoPlayer({
             />
           )}
           <div className="ml-auto flex shrink-0 items-center gap-1">
+            {nextEpisode && (
+              <PlayerNextEpisodeButton
+                episode={nextEpisode}
+                onClick={playNextEpisode}
+              />
+            )}
+            {playlist && playlist.episodes.length > 1 && (
+              <PlayerEpisodesMenu
+                playlist={playlist}
+                onOpenChange={handleEpisodesOpenChange}
+              />
+            )}
             {controls.showSettingsMenu && (
               <PlayerSettingsMenu
                 qualities={playback.qualities}

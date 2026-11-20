@@ -1,4 +1,4 @@
-import { VIDEO_EMBED_QUERY_KEYS, videoEmbedPath } from "@workspace/shared"
+import { VIDEO_EMBED_QUERY_KEYS } from "@workspace/shared"
 import { match } from "ts-pattern"
 
 import {
@@ -26,12 +26,11 @@ export const toEmbedUnavailableReason = (error: unknown) =>
  */
 export function buildEmbedUrl(
   origin: string,
-  libraryId: string,
-  videoId: string,
+  embedPath: string,
   { autoplay, muted, loop, startSeconds, showTitle }: EmbedCodeOptions,
   libraryShowsTitle: boolean | undefined
 ) {
-  const url = new URL(videoEmbedPath(libraryId, videoId), origin)
+  const url = new URL(embedPath, origin)
   const flags = [
     [VIDEO_EMBED_QUERY_KEYS.AUTOPLAY, autoplay],
     [VIDEO_EMBED_QUERY_KEYS.MUTED, muted],

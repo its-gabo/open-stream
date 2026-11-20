@@ -28,6 +28,13 @@ export const videoEmbedSearchSchema = z.object({
   token: signaturePartSchema,
 })
 
+/** A playlist plays its videos one after another, so it has no `loop`; `t` applies to the first video played. */
+export const playlistEmbedSearchSchema = videoEmbedSearchSchema
+  .omit({ [VIDEO_EMBED_QUERY_KEYS.LOOP]: true })
+  .extend({
+    [VIDEO_EMBED_QUERY_KEYS.VIDEO]: z.string().optional().catch(undefined),
+  })
+
 export const videoEmbedRequestSchema = z.object({
   libraryId: z.string(),
   videoId: z.string(),
@@ -36,5 +43,10 @@ export const videoEmbedRequestSchema = z.object({
   token: z.string().optional(),
 })
 
+export const playlistEmbedRequestSchema = videoEmbedRequestSchema
+  .omit({ videoId: true })
+  .extend({ playlistId: z.string() })
+
 export type VideoEmbedSearch = z.infer<typeof videoEmbedSearchSchema>
+export type PlaylistEmbedSearch = z.infer<typeof playlistEmbedSearchSchema>
 export type VideoEmbedRequest = z.infer<typeof videoEmbedRequestSchema>

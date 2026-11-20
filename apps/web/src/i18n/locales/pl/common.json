@@ -38,7 +38,8 @@
       "max_length": "Użyj maksymalnie {{max}} znaków."
     },
     "video_title": {
-      "max_length": "Użyj maksymalnie {{max}} znaków."
+      "max_length": "Użyj maksymalnie {{max}} znaków.",
+      "required": "Wpisz tytuł."
     },
     "storage": {
       "endpoint": "Podaj pełny adres URL endpointu S3, zaczynający się od https://.",
@@ -88,6 +89,13 @@
       "too_close_to_end_few": "Rozdział musi zaczynać się co najmniej {{count}} sekundy przed końcem filmu ({{time}}).",
       "too_close_to_end_many": "Rozdział musi zaczynać się co najmniej {{count}} sekund przed końcem filmu ({{time}}).",
       "too_close_to_end_other": "Rozdział musi zaczynać się co najmniej {{count}} sekundy przed końcem filmu ({{time}})."
+    },
+    "playlist_title": {
+      "required": "Wpisz tytuł.",
+      "max_length": "Użyj maksymalnie {{max}} znaków."
+    },
+    "description": {
+      "max_length": "Użyj maksymalnie {{max}} znaków."
     }
   },
   "pages": {
@@ -208,7 +216,15 @@
       "video.status.get.success": "Pobrano status filmu.",
       "activity.list.success": "Pobrano aktywność.",
       "video.poster.update.success": "Zapisano miniaturę.",
-      "video.chapters.update.success": "Zapisano rozdziały."
+      "video.chapters.update.success": "Zapisano rozdziały.",
+      "playlist.list.success": "Wczytano playlisty.",
+      "playlist.create.success": "Utworzono playlistę.",
+      "playlist.get.success": "Wczytano playlistę.",
+      "playlist.update.success": "Zapisano playlistę.",
+      "playlist.videos.update.success": "Zapisano filmy playlisty.",
+      "playlist.delete.success": "Usunięto playlistę.",
+      "playlist.playback_url.create.success": "Utworzono adres odtwarzania playlisty.",
+      "playlist.embed.get.success": "Wczytano osadzenie playlisty."
     },
     "error": {
       "fallback": "Ups, coś poszło nie tak..",
@@ -275,7 +291,9 @@
       "video.poster.frame_out_of_range": "Ta klatka wypada po końcu filmu.",
       "video.poster.image_too_large": "Ten obraz przekracza limit 5 MB.",
       "video.poster.unsupported_image": "Miniaturą może być tylko prawdziwy obraz JPEG, PNG lub WebP.",
-      "video.chapters.out_of_range": "Rozdział zaczyna się mniej niż sekundę przed końcem filmu."
+      "video.chapters.out_of_range": "Rozdział zaczyna się mniej niż sekundę przed końcem filmu.",
+      "playlist.not_found": "Ta playlista nie istnieje lub została usunięta.",
+      "playlist.video_not_in_library": "Playlista może zawierać tylko filmy z własnej biblioteki."
     }
   },
   "errors": {
@@ -505,10 +523,12 @@
       "videos": "Filmy",
       "analytics": "Statystyki",
       "storage": "Magazyn",
+      "security": "Bezpieczeństwo",
       "api": "API",
       "encoding": "Kodowanie",
       "player": "Odtwarzacz",
-      "webhooks": "Webhooki"
+      "webhooks": "Webhooki",
+      "playlists": "Playlisty"
     },
     "storage": {
       "current_title": "Gdzie przechowywane są filmy",
@@ -541,19 +561,6 @@
     "api": {
       "owner_only_title": "Tylko właściciel może zarządzać dostępem do API",
       "owner_only_description": "Poproś właściciela organizacji o klucz API biblioteki.",
-      "security": {
-        "title": "Bezpieczeństwo odtwarzania",
-        "description": "Zdecyduj, które strony mogą odtwarzać filmy z tej biblioteki. Przesyłanie zawsze wymaga klucza API.",
-        "hosts_label": "Dozwolone strony",
-        "hosts_hint": "Strona to host, np. example.com, albo *.example.com dla wszystkich subdomen. Bez stron każda strona może odtwarzać filmy; po dodaniu pierwszej odtwarzacze ukrywające stronę, na której działają, są blokowane.",
-        "signed_label": "Wymagaj podpisanych adresów",
-        "signed_hint": "Filmy odtwarzają się tylko przez wygasające adresy tworzone przez Twój serwer kluczem API.",
-        "save": "Zapisz ustawienia bezpieczeństwa",
-        "add_host": "Dodaj stronę",
-        "remove_host": "Usuń {{host}}",
-        "no_hosts": "Każda strona może odtwarzać filmy z tej biblioteki.",
-        "host_placeholder": "example.com"
-      },
       "usage": {
         "title": "Korzystanie z API",
         "description": "Wywołuj API ze swojego serwera, nigdy ze strony internetowej: klucz daje dostęp do biblioteki.",
@@ -699,6 +706,10 @@
         "showChapters": {
           "label": "Rozdziały",
           "hint": "Dzieli pasek przewijania na rozdziały i pozwala widzom przechodzić między nimi, w filmach, które je mają."
+        },
+        "autoplayNext": {
+          "label": "Automatycznie odtwarzaj następny film",
+          "hint": "W playlistach następny film startuje sam po krótkim odliczaniu."
         }
       },
       "hint": "Zmiany obejmą każde osadzenie tej biblioteki przy jego następnym wczytaniu.",
@@ -708,6 +719,21 @@
       "owner_only_title": "Tylko właściciel może zmienić odtwarzacz",
       "owner_only_description": "Poproś właściciela organizacji o zmianę wyglądu odtwarzacza tej biblioteki.",
       "preview_chapter": "Pierwsze kroki"
+    },
+    "security": {
+      "title": "Bezpieczeństwo odtwarzania",
+      "description": "Zdecyduj, które strony mogą odtwarzać filmy z tej biblioteki i czy potrzebują podpisanych adresów URL.",
+      "hosts_label": "Dozwolone strony",
+      "hosts_hint": "Strona to host, np. example.com, albo *.example.com dla wszystkich subdomen. Bez stron każda strona może odtwarzać filmy; po dodaniu pierwszej odtwarzacze ukrywające stronę, na której działają, są blokowane.",
+      "signed_label": "Wymagaj podpisanych adresów",
+      "signed_hint": "Filmy odtwarzają się tylko przez wygasające adresy tworzone przez Twój serwer kluczem API.",
+      "save": "Zapisz ustawienia bezpieczeństwa",
+      "add_host": "Dodaj stronę",
+      "remove_host": "Usuń {{host}}",
+      "no_hosts": "Każda strona może odtwarzać filmy z tej biblioteki.",
+      "host_placeholder": "example.com",
+      "owner_only_title": "Tylko właściciel może zmienić bezpieczeństwo odtwarzania",
+      "owner_only_description": "Poproś właściciela organizacji o zmianę stron, które mogą odtwarzać filmy z tej biblioteki."
     },
     "webhooks": {
       "owner_only_title": "Webhookami zarządza tylko właściciel",
@@ -793,7 +819,9 @@
       "title_placeholder": "Zostaw puste, aby użyć nazwy pliku",
       "file": "Plik wideo",
       "import_url": "Adres pliku",
-      "import_url_placeholder": "https://example.com/film.mp4"
+      "import_url_placeholder": "https://example.com/film.mp4",
+      "description": "Opis",
+      "description_placeholder": "Wyświetlany przy filmie w playlistach"
     },
     "create": {
       "trigger": "Dodaj film",
@@ -897,7 +925,8 @@
       "use_frame": "Użyj klatki z {{time}}",
       "upload_image": "Prześlij obraz",
       "reset": "Wybierz automatycznie",
-      "image_too_large": "Wybierz obraz do {{size}}."
+      "image_too_large": "Wybierz obraz do {{size}}.",
+      "source_label": "Źródło"
     },
     "player": {
       "failed": "Nie udało się odtworzyć filmu. Spróbuj ponownie za chwilę.",
@@ -918,7 +947,17 @@
       "picture_in_picture": "Obraz w obrazie",
       "fullscreen": "Pełny ekran",
       "exit_fullscreen": "Zamknij pełny ekran",
-      "chapters": "Rozdziały"
+      "chapters": "Rozdziały",
+      "episodes": "Odcinki",
+      "watched": "Obejrzano",
+      "now_playing": "Oglądasz",
+      "next_episode": "Następny odcinek",
+      "next_episode_named": "Następny odcinek: {{title}}",
+      "next_episode_in_one": "Następny odcinek za {{count}} sekundę",
+      "next_episode_in_few": "Następny odcinek za {{count}} sekundy",
+      "next_episode_in_many": "Następny odcinek za {{count}} sekund",
+      "next_episode_in_other": "Następny odcinek za {{count}} sekundy",
+      "dismiss_next_episode": "Zostań przy tym filmie"
     },
     "chapters": {
       "title": "Rozdziały",
@@ -951,6 +990,12 @@
         "skipped_many": "{{count}} rozdziałów zaczyna się mniej niż sekundę przed końcem filmu ({{duration}}) i zostanie pominiętych.",
         "skipped_other": "{{count}} rozdziału zaczyna się mniej niż sekundę przed końcem filmu ({{duration}}) i zostanie pominięte."
       }
+    },
+    "edit": {
+      "trigger": "Edytuj tytuł i opis",
+      "title": "Edytuj film",
+      "description": "Widzowie widzą tytuł i opis, na przykład w menu odcinków playlisty.",
+      "submit": "Zapisz zmiany"
     }
   },
   "embed": {
@@ -958,7 +1003,8 @@
       "title": "Osadzanie",
       "description": "Wklej ten kod na dowolnej stronie, aby pokazać wideo w odtwarzaczu OpenStream.",
       "autoplay_muted": "Przeglądarki odtwarzają automatycznie tylko wyciszone wideo, więc odtwarzacz startuje bez dźwięku.",
-      "restrictions": "Zasady odtwarzania biblioteki nadal obowiązują: odtwarzacz pokażą tylko dozwolone hosty, a biblioteka wymagająca podpisanego odtwarzania potrzebuje adresu osadzenia podpisanego przez API (embedUrl z adresów odtwarzania)."
+      "restrictions": "Zasady odtwarzania biblioteki nadal obowiązują: odtwarzacz pokażą tylko dozwolone hosty, a biblioteka wymagająca podpisanego odtwarzania potrzebuje adresu osadzenia podpisanego przez API (embedUrl z adresów odtwarzania).",
+      "playlist_description": "Wklej ten kod na dowolną stronę, aby pokazać playlistę w odtwarzaczu OpenStream. Widzowie przechodzą między filmami w menu odcinków."
     },
     "options": {
       "autoplay": "Autoodtwarzanie",
@@ -970,7 +1016,8 @@
     "unavailable": {
       "not_ready": "To wideo jest jeszcze przetwarzane. Spróbuj ponownie za chwilę.",
       "not_allowed": "Tego wideo nie można odtworzyć na tej stronie.",
-      "not_found": "To wideo jest niedostępne."
+      "not_found": "To wideo jest niedostępne.",
+      "playlist_empty": "Ta playlista nie ma jeszcze filmów do odtworzenia."
     }
   },
   "analytics": {
@@ -1138,7 +1185,8 @@
       "api_key": "Klucz API",
       "webhook": "Webhook",
       "video": "Film",
-      "account": "Konto"
+      "account": "Konto",
+      "playlist": "Playlista"
     },
     "columns": {
       "action": "Co się stało",
@@ -1208,12 +1256,90 @@
       "account_signed_out": "Wylogowano",
       "account_password_reset_requested": "Poproszono o reset hasła",
       "account_password_reset": "Zresetowano hasło",
-      "organization_deleted": "Usunięto organizację"
+      "organization_deleted": "Usunięto organizację",
+      "playlist_created": "Utworzono playlistę",
+      "playlist_updated": "Zmieniono playlistę",
+      "playlist_videos_updated": "Zmieniono filmy playlisty",
+      "playlist_deleted": "Usunięto playlistę"
     }
   },
   "account_activity": {
     "title": "Aktywność konta",
     "description": "Logowania na Twoje konto, nieudane próby, resety hasła i usunięte organizacje, których byłeś właścicielem. Rozwiń wpis, aby zobaczyć, skąd pochodził.",
     "search_placeholder": "Szukaj akcji i adresów e-mail"
+  },
+  "playlists": {
+    "description": "Grupuj filmy w playlisty, które odtwarzają się jeden po drugim w jednym osadzeniu.",
+    "fields": {
+      "title": "Tytuł",
+      "title_placeholder": "np. Pierwsze kroki",
+      "description": "Opis",
+      "description_placeholder": "Wyświetlany na górze menu odcinków"
+    },
+    "create": {
+      "trigger": "Nowa playlista",
+      "title": "Nowa playlista",
+      "description": "Nazwij playlistę; filmy dodasz w następnym kroku.",
+      "submit": "Utwórz playlistę"
+    },
+    "columns": {
+      "title": "Tytuł",
+      "videos": "Filmy",
+      "updated": "Zmieniono"
+    },
+    "video_count_one": "{{count}} film",
+    "video_count_few": "{{count}} filmy",
+    "video_count_many": "{{count}} filmów",
+    "video_count_other": "{{count}} filmu",
+    "actions": {
+      "delete": "Usuń playlistę"
+    },
+    "delete": {
+      "title": "Usunąć playlistę?",
+      "description": "„{{title}}” zostanie usunięta, a jej osadzenia przestaną działać. Filmy zostaną w bibliotece.",
+      "confirm": "Usuń playlistę"
+    },
+    "empty": {
+      "title": "Nie ma jeszcze playlist",
+      "description": "Utwórz playlistę, aby osadzić kilka filmów w jednym odtwarzaczu, np. kurs albo serię."
+    },
+    "tabs": {
+      "videos": "Filmy"
+    },
+    "videos": {
+      "add": "Dodaj film",
+      "search_placeholder": "Szukaj filmów",
+      "none_to_add": "Nie ma więcej filmów do dodania.",
+      "not_ready": "Jeszcze niegotowy",
+      "drag_handle": "Przeciągnij, aby zmienić kolejność: {{title}}",
+      "remove": "Usuń z playlisty",
+      "empty": {
+        "title": "Ta playlista nie ma filmów",
+        "description": "Dodaj filmy z biblioteki; ich kolejność możesz zmienić w każdej chwili."
+      },
+      "failed": "Błąd",
+      "failed_title_one": "{{count}} film nie może zostać odtworzony",
+      "failed_title_few": "{{count}} filmy nie mogą zostać odtworzone",
+      "failed_title_many": "{{count}} filmów nie może zostać odtworzonych",
+      "failed_title_other": "{{count}} filmu nie może zostać odtworzone",
+      "failed_hint_one": "Wgrywanie lub przetwarzanie nie powiodło się, więc widzowie go pomijają. Otwórz go w zakładce Filmy, aby wgrać plik ponownie lub przetworzyć go jeszcze raz, albo usuń go tutaj.",
+      "failed_hint_few": "Wgrywanie lub przetwarzanie nie powiodło się, więc widzowie je pomijają. Otwórz je w zakładce Filmy, aby wgrać pliki ponownie lub przetworzyć je jeszcze raz, albo usuń je tutaj.",
+      "failed_hint_many": "Wgrywanie lub przetwarzanie nie powiodło się, więc widzowie je pomijają. Otwórz je w zakładce Filmy, aby wgrać pliki ponownie lub przetworzyć je jeszcze raz, albo usuń je tutaj.",
+      "failed_hint_other": "Wgrywanie lub przetwarzanie nie powiodło się, więc widzowie je pomijają. Otwórz je w zakładce Filmy, aby wgrać pliki ponownie lub przetworzyć je jeszcze raz, albo usuń je tutaj.",
+      "waiting_title_one": "{{count}} film nie jest jeszcze gotowy",
+      "waiting_title_few": "{{count}} filmy nie są jeszcze gotowe",
+      "waiting_title_many": "{{count}} filmów nie jest jeszcze gotowych",
+      "waiting_title_other": "{{count}} filmu nie jest jeszcze gotowe",
+      "waiting_hint_one": "Widzowie zobaczą go w playliście, gdy jego plik zostanie wgrany i przetworzony.",
+      "waiting_hint_few": "Widzowie zobaczą je w playliście, gdy ich pliki zostaną wgrane i przetworzone.",
+      "waiting_hint_many": "Widzowie zobaczą je w playliście, gdy ich pliki zostaną wgrane i przetworzone.",
+      "waiting_hint_other": "Widzowie zobaczą je w playliście, gdy ich pliki zostaną wgrane i przetworzone."
+    },
+    "edit": {
+      "trigger": "Edytuj tytuł i opis",
+      "title": "Edytuj playlistę",
+      "description": "Widzowie widzą tytuł i opis na górze menu odcinków.",
+      "submit": "Zapisz zmiany"
+    }
   }
 }

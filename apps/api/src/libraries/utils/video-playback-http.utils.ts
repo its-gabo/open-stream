@@ -1,6 +1,7 @@
 import type { HonoRequest } from "hono"
 import { PLAYBACK_HEADERS } from "../constants/library-api.constants"
 import type {
+  LibraryPlaybackRequest,
   PlaybackFile,
   PlaybackRequest,
   VideoStream,
@@ -32,8 +33,16 @@ export const toPlaybackRequest = (
   request: HonoRequest,
   { libraryId, videoId }: { libraryId: string; videoId: string }
 ): PlaybackRequest => ({
-  libraryId,
+  ...toLibraryPlaybackRequest(request, libraryId),
   videoId,
+})
+
+/** Who asks to play something of the library and with which signature, read from the request. */
+export const toLibraryPlaybackRequest = (
+  request: HonoRequest,
+  libraryId: string
+): LibraryPlaybackRequest => ({
+  libraryId,
   keyId: request.query("key"),
   expires: request.query("expires"),
   token: request.query("token"),

@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test"
+import { VIDEO_FIELD_LIMITS } from "@workspace/shared"
 
 import { createLibraryFactory } from "../../../test/factory/library.factory"
 import { createOrganizationFactory } from "../../../test/factory/organization.factory"
@@ -88,6 +89,7 @@ describe("Videos (e2e)", () => {
         id: expect.any(String),
         libraryId: library.id,
         title: "Quarterly review",
+        description: null,
         status: "draft",
         failureReason: null,
         fileName: null,
@@ -151,6 +153,58 @@ describe("Videos (e2e)", () => {
 
       expect(response.status).toBe(200)
       expect((await readVideo(video.id)).title).toBe("Final cut")
+    })
+
+    it("describes a video and keeps its title", async () => {
+      const video = await createVideo({ title: "Draft" })
+
+      const response = await memberClient.patch(
+        `${libraryPath}/videos/${video.id}`,
+        { description: "  What changed this quarter. " }
+      )
+
+      expect(response.status).toBe(200)
+      expect(await readVideo(video.id)).toMatchObject({
+        title: "Draft",
+        description: "What changed this quarter.",
+      })
+    })
+
+    it.each([
+      { description: "an empty description", value: "  " },
+      { description: "null", value: null },
+    ])("removes the description given $description", async ({ value }) => {
+      const video = await createVideo({ title: "Draft" })
+      await memberClient.patch(`${libraryPath}/videos/${video.id}`, {
+        description: "Old",
+      })
+
+      await memberClient.patch(`${libraryPath}/videos/${video.id}`, {
+        description: value,
+      })
+
+      expect((await readVideo(video.id)).description).toBeNull()
+    })
+
+    it.each([
+      { description: "nothing to change", body: {} },
+      {
+        description: "a description over the limit",
+        body: {
+          description: "x".repeat(
+            VIDEO_FIELD_LIMITS.DESCRIPTION_MAX_LENGTH + 1
+          ),
+        },
+      },
+    ])("refuses $description", async ({ body }) => {
+      const video = await createVideo({ title: "Draft" })
+
+      const response = await memberClient.patch(
+        `${libraryPath}/videos/${video.id}`,
+        body
+      )
+
+      expect(response.status).toBe(422)
     })
   })
 

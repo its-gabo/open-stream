@@ -38,6 +38,8 @@ export const videos = pgTable(
       .references(() => organizations.id, { onDelete: "cascade" }),
     libraryId: uuid("library_id").notNull(),
     title: text("title").notNull(),
+    /** Shown with the video, e.g. in a playlist; null when it has none. */
+    description: text("description"),
     status: text("status", {
       enum: [
         VIDEO_STATUSES.DRAFT,
@@ -197,6 +199,7 @@ export const videos = pgTable(
       "videos_poster_frame_seconds_check",
       sql`(${table.posterSource} = 'frame') = (${table.posterFrameSeconds} is not null) and ${table.posterFrameSeconds} >= 0`
     ),
+    check("videos_description_check", sql`${table.description} <> ''`),
     check(
       "videos_chapters_check",
       sql`jsonb_typeof(${table.chapters}) = 'array' and jsonb_array_length(${table.chapters}) <= ${VIDEO_CHAPTER_LIMITS.MAX_PER_VIDEO}`.inlineParams()

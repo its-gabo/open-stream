@@ -17,6 +17,7 @@ import {
   libraryPlayerSettingsSchema,
   playbackHostSchema,
   videoChaptersSchema,
+  videoDescriptionSchema,
   videoImportUrlSchema,
   videoQualitiesSchema,
   videoTitleSchema,
@@ -174,8 +175,13 @@ export const videoImportBodySchema = z
   .object({ url: videoImportUrlSchema })
   .meta({ id: "VideoImportBody" })
 
+/** Only the fields sent change; an empty or null description removes it. */
 export const videoUpdateBodySchema = z
-  .object({ title: videoTitleSchema })
+  .object({
+    title: videoTitleSchema.optional(),
+    description: videoDescriptionSchema.nullable().optional(),
+  })
+  .refine((body) => body.title !== undefined || body.description !== undefined)
   .meta({ id: "VideoUpdateBody" })
 
 /** A frame of the video, in seconds from its start, or the poster picked automatically. */
@@ -284,6 +290,8 @@ export const videoDtoSchema = z
     id: z.uuid(),
     libraryId: z.uuid(),
     title: z.string(),
+    /** Null when the video has none. */
+    description: z.string().nullable(),
     status: videoStatusSchema,
     failureReason: videoFailureReasonSchema.nullable(),
     fileName: z.string().nullable(),
@@ -385,6 +393,7 @@ export const videoEmbedDtoSchema = z
   .object({
     videoId: z.uuid(),
     title: z.string(),
+    description: z.string().nullable(),
     durationSeconds: z.number().nonnegative(),
     width: z.int().positive(),
     height: z.int().positive(),

@@ -161,6 +161,7 @@ The API describes itself at `https://app.openstream.localhost/api/v1/openapi.jso
 - **Allowed sites.** Each library lists the sites that may play it. The player sends them as `frame-ancestors`, so no other page can frame it.
 - **Signed playback.** Optionally accept only expiring URLs signed by your server. Revoking the signing key revokes its URLs.
 - **Chapters.** Type chapters, add them at the player's position or paste a list like `0:00 Intro`. The player splits its seek bar at each one and lists them with storyboard thumbnails; other players can read them as a WebVTT chapters track.
+- **Playlists.** Group a library's videos into a playlist and embed it as one player. Viewers open an episodes menu with each video's description and how much of it they watched, skip to the next video, or let it start by itself after a countdown. Their progress stays in their own browser, and one signed URL covers every video in the playlist.
 
 </td>
   </tr>

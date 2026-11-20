@@ -21,6 +21,7 @@ const BRANDED_PLAYER = {
   showPictureInPicture: false,
   showFullscreen: true,
   showChapters: false,
+  autoplayNext: false,
 }
 
 describe("Library player settings (e2e)", () => {
@@ -94,12 +95,14 @@ describe("Library player settings (e2e)", () => {
           showTitle: true,
           showPictureInPicture: true,
           showChapters: true,
+          autoplayNext: true,
         },
         after: {
           accentColor: "#e11d48",
           showTitle: false,
           showPictureInPicture: false,
           showChapters: false,
+          autoplayNext: false,
         },
       })
     )

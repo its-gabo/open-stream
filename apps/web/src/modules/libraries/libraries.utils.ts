@@ -1,10 +1,13 @@
 import {
   LIBRARY_API_KEY_SCOPES,
+  VIDEO_PROCESSING_STATUSES,
+  VIDEO_STATUSES,
   VIDEO_UPLOAD_LIMITS,
   videoFileFormatFromName,
   videoImportUrlSchema,
   type VideoChapter,
 } from "@workspace/shared"
+import { match } from "ts-pattern"
 import { DetailedError } from "tus-js-client"
 
 import {
@@ -12,6 +15,7 @@ import {
   CHAPTER_LINE_TIME_LAST_PATTERN,
   CHAPTER_TIME_PATTERN,
   HLS_MIME_TYPE,
+  PLAYLIST_VIDEO_STATES,
   VIDEO_PLAYER_PATHS,
 } from "./libraries.constants"
 import { z } from "zod"
@@ -19,10 +23,11 @@ import { z } from "zod"
 import { API_URL } from "@/api/api-client"
 import type { TranslationFunction } from "@/i18n/i18n.types"
 import { buildOrganizationPath } from "@/modules/organizations/organizations.utils"
-import type { LibrarySecuritySettings } from "@/api/generated-api"
+import type { LibrarySecuritySettings, Video } from "@/api/generated-api"
 import type {
   LibrarySecurityFormInput,
   PlayerMediaState,
+  PlaylistVideoState,
   StoryboardCue,
 } from "./libraries.types"
 
@@ -322,6 +327,7 @@ export const readMediaState = (video: HTMLVideoElement): PlayerMediaState => ({
   volume: video.volume,
   isMuted: video.muted || video.volume === 0,
   playbackRate: video.playbackRate,
+  isEnded: video.ended,
 })
 
 /** The chapter playing at `seconds`: the last one to start at or before it. */
@@ -342,11 +348,11 @@ export function formatChapterTime(seconds: number) {
 
 /** Seconds of a typed chapter start such as `5`, `1:05`, `1:02:03` or `1:05.5`; null when it is not one. */
 export function parseChapterTime(value: string) {
-  const match = CHAPTER_TIME_PATTERN.exec(value.trim())
+  const parsed = CHAPTER_TIME_PATTERN.exec(value.trim())
 
-  if (!match) return null
+  if (!parsed) return null
 
-  const [, clock, fraction = ""] = match
+  const [, clock, fraction = ""] = parsed
   const parts = clock.split(":").map(Number)
 
   if (parts.slice(1).some((part) => part >= 60)) return null
@@ -390,3 +396,19 @@ export const toSliderSegments = (breaks: number[]) => {
 /** How much of the segment from `start` to `end` lies before `value`, as a CSS width. */
 export const segmentFill = (value: number, start: number, end: number) =>
   `${Math.min(1, Math.max(0, (value - start) / (end - start))) * 100}%`
+
+/** A failed upload or processing never plays until it is fixed; anything else not ready yet is on its way. */
+export const toPlaylistVideoState = (
+  video: Pick<Video, "status" | "processingStatus">
+): PlaylistVideoState =>
+  match(video)
+    .with(
+      { processingStatus: VIDEO_PROCESSING_STATUSES.READY },
+      () => PLAYLIST_VIDEO_STATES.READY
+    )
+    .with(
+      { status: VIDEO_STATUSES.FAILED },
+      { processingStatus: VIDEO_PROCESSING_STATUSES.FAILED },
+      () => PLAYLIST_VIDEO_STATES.FAILED
+    )
+    .otherwise(() => PLAYLIST_VIDEO_STATES.WAITING)

@@ -3,6 +3,7 @@ import { requireSession } from "../../auth/middleware/session.middleware"
 import type { AuthenticatedEnv } from "../../auth/types/auth.types"
 import { createLibraryAnalyticsRouter } from "../../analytics/routers/library-analytics.router"
 import { createLibraryWebhooksRouter } from "../../webhooks/routers/library-webhooks.router"
+import { createPlaylistsRouter } from "../../playlists/routers/playlists.router"
 import { createLibrariesCoreRouter } from "./libraries-core.router"
 import { createLibraryApiAccessRouter } from "./library-api-access.router"
 import { createLibraryEncodingRouter } from "./library-encoding.router"
@@ -86,6 +87,14 @@ export function createLibrariesRouter(module: LibrariesRouterDependencies) {
           module.videoPlaybackService,
           module.videoPostersService,
           module.videoImportsService
+        )
+      )
+      .route(
+        "/",
+        createPlaylistsRouter(
+          module.organizationsService,
+          module.librariesService,
+          module.playlistsService
         )
       )
       .route(

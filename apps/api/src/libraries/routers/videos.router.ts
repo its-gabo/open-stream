@@ -150,7 +150,7 @@ export function createVideosRouter(
       describeRoute({
         tags: [OPENAPI_TAGS.LIBRARIES],
         operationId: "updateVideo",
-        summary: "Rename a video",
+        summary: "Change a video's title or description",
         responses: {
           200: describeJsonResponse(
             "Video updated",
@@ -165,7 +165,7 @@ export function createVideosRouter(
       validateRequest("json", videoUpdateBodySchema),
       ...requireMemberOfLibrary,
       async (c) => {
-        const updated = await videosService.renameVideo(
+        const updated = await videosService.updateVideoDetails(
           c.get("library"),
           c.get("activityActor"),
           c.req.valid("param").videoId,

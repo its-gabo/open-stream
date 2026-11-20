@@ -31,11 +31,14 @@ import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdRouteImport } f
 import { Route as AuthenticatedOrganizationSlugSettingsIndexRouteImport } from './routes/_authenticated/$organizationSlug/settings/index'
 import { Route as AuthenticatedOrganizationSlugSettingsOrganizationRouteImport } from './routes/_authenticated/$organizationSlug/settings/organization'
 import { Route as AuthenticatedOrganizationSlugSettingsTeamRouteImport } from './routes/_authenticated/$organizationSlug/settings/team'
+import { Route as EmbedLibraryIdPlaylistsPlaylistIdRouteImport } from './routes/embed.$libraryId.playlists.$playlistId'
 import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdIndexRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/index'
 import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdAnalyticsRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/analytics'
 import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdApiRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/api'
 import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/encoding'
 import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdPlayerRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/player'
+import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdPlaylistsRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/playlists'
+import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdSecurityRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/security'
 import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/storage'
 import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdWebhooksRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/webhooks'
 
@@ -159,6 +162,12 @@ const AuthenticatedOrganizationSlugSettingsTeamRoute =
     path: '/settings/team',
     getParentRoute: () => AuthenticatedOrganizationSlugRoute,
   } as any)
+const EmbedLibraryIdPlaylistsPlaylistIdRoute =
+  EmbedLibraryIdPlaylistsPlaylistIdRouteImport.update({
+    id: '/embed/$libraryId/playlists/$playlistId',
+    path: '/embed/$libraryId/playlists/$playlistId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedOrganizationSlugLibrariesLibraryIdIndexRoute =
   AuthenticatedOrganizationSlugLibrariesLibraryIdIndexRouteImport.update({
     id: '/',
@@ -187,6 +196,18 @@ const AuthenticatedOrganizationSlugLibrariesLibraryIdPlayerRoute =
   AuthenticatedOrganizationSlugLibrariesLibraryIdPlayerRouteImport.update({
     id: '/player',
     path: '/player',
+    getParentRoute: () => AuthenticatedOrganizationSlugLibrariesLibraryIdRoute,
+  } as any)
+const AuthenticatedOrganizationSlugLibrariesLibraryIdPlaylistsRoute =
+  AuthenticatedOrganizationSlugLibrariesLibraryIdPlaylistsRouteImport.update({
+    id: '/playlists',
+    path: '/playlists',
+    getParentRoute: () => AuthenticatedOrganizationSlugLibrariesLibraryIdRoute,
+  } as any)
+const AuthenticatedOrganizationSlugLibrariesLibraryIdSecurityRoute =
+  AuthenticatedOrganizationSlugLibrariesLibraryIdSecurityRouteImport.update({
+    id: '/security',
+    path: '/security',
     getParentRoute: () => AuthenticatedOrganizationSlugLibrariesLibraryIdRoute,
   } as any)
 const AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRoute =
@@ -221,12 +242,15 @@ export interface FileRoutesByFullPath {
   '/$organizationSlug/libraries/$libraryId': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdRouteWithChildren
   '/$organizationSlug/settings/organization': typeof AuthenticatedOrganizationSlugSettingsOrganizationRoute
   '/$organizationSlug/settings/team': typeof AuthenticatedOrganizationSlugSettingsTeamRoute
+  '/embed/$libraryId/playlists/$playlistId': typeof EmbedLibraryIdPlaylistsPlaylistIdRoute
   '/$organizationSlug/libraries/': typeof AuthenticatedOrganizationSlugLibrariesIndexRoute
   '/$organizationSlug/settings/': typeof AuthenticatedOrganizationSlugSettingsIndexRoute
   '/$organizationSlug/libraries/$libraryId/analytics': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdAnalyticsRoute
   '/$organizationSlug/libraries/$libraryId/api': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute
   '/$organizationSlug/libraries/$libraryId/encoding': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute
   '/$organizationSlug/libraries/$libraryId/player': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdPlayerRoute
+  '/$organizationSlug/libraries/$libraryId/playlists': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdPlaylistsRoute
+  '/$organizationSlug/libraries/$libraryId/security': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdSecurityRoute
   '/$organizationSlug/libraries/$libraryId/storage': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRoute
   '/$organizationSlug/libraries/$libraryId/webhooks': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdWebhooksRoute
   '/$organizationSlug/libraries/$libraryId/': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdIndexRoute
@@ -248,12 +272,15 @@ export interface FileRoutesByTo {
   '/$organizationSlug': typeof AuthenticatedOrganizationSlugIndexRoute
   '/$organizationSlug/settings/organization': typeof AuthenticatedOrganizationSlugSettingsOrganizationRoute
   '/$organizationSlug/settings/team': typeof AuthenticatedOrganizationSlugSettingsTeamRoute
+  '/embed/$libraryId/playlists/$playlistId': typeof EmbedLibraryIdPlaylistsPlaylistIdRoute
   '/$organizationSlug/libraries': typeof AuthenticatedOrganizationSlugLibrariesIndexRoute
   '/$organizationSlug/settings': typeof AuthenticatedOrganizationSlugSettingsIndexRoute
   '/$organizationSlug/libraries/$libraryId/analytics': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdAnalyticsRoute
   '/$organizationSlug/libraries/$libraryId/api': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute
   '/$organizationSlug/libraries/$libraryId/encoding': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute
   '/$organizationSlug/libraries/$libraryId/player': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdPlayerRoute
+  '/$organizationSlug/libraries/$libraryId/playlists': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdPlaylistsRoute
+  '/$organizationSlug/libraries/$libraryId/security': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdSecurityRoute
   '/$organizationSlug/libraries/$libraryId/storage': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRoute
   '/$organizationSlug/libraries/$libraryId/webhooks': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdWebhooksRoute
   '/$organizationSlug/libraries/$libraryId': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdIndexRoute
@@ -280,12 +307,15 @@ export interface FileRoutesById {
   '/_authenticated/$organizationSlug/libraries/$libraryId': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdRouteWithChildren
   '/_authenticated/$organizationSlug/settings/organization': typeof AuthenticatedOrganizationSlugSettingsOrganizationRoute
   '/_authenticated/$organizationSlug/settings/team': typeof AuthenticatedOrganizationSlugSettingsTeamRoute
+  '/embed/$libraryId/playlists/$playlistId': typeof EmbedLibraryIdPlaylistsPlaylistIdRoute
   '/_authenticated/$organizationSlug/libraries/': typeof AuthenticatedOrganizationSlugLibrariesIndexRoute
   '/_authenticated/$organizationSlug/settings/': typeof AuthenticatedOrganizationSlugSettingsIndexRoute
   '/_authenticated/$organizationSlug/libraries/$libraryId/analytics': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdAnalyticsRoute
   '/_authenticated/$organizationSlug/libraries/$libraryId/api': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute
   '/_authenticated/$organizationSlug/libraries/$libraryId/encoding': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute
   '/_authenticated/$organizationSlug/libraries/$libraryId/player': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdPlayerRoute
+  '/_authenticated/$organizationSlug/libraries/$libraryId/playlists': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdPlaylistsRoute
+  '/_authenticated/$organizationSlug/libraries/$libraryId/security': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdSecurityRoute
   '/_authenticated/$organizationSlug/libraries/$libraryId/storage': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRoute
   '/_authenticated/$organizationSlug/libraries/$libraryId/webhooks': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdWebhooksRoute
   '/_authenticated/$organizationSlug/libraries/$libraryId/': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdIndexRoute
@@ -311,12 +341,15 @@ export interface FileRouteTypes {
     | '/$organizationSlug/libraries/$libraryId'
     | '/$organizationSlug/settings/organization'
     | '/$organizationSlug/settings/team'
+    | '/embed/$libraryId/playlists/$playlistId'
     | '/$organizationSlug/libraries/'
     | '/$organizationSlug/settings/'
     | '/$organizationSlug/libraries/$libraryId/analytics'
     | '/$organizationSlug/libraries/$libraryId/api'
     | '/$organizationSlug/libraries/$libraryId/encoding'
     | '/$organizationSlug/libraries/$libraryId/player'
+    | '/$organizationSlug/libraries/$libraryId/playlists'
+    | '/$organizationSlug/libraries/$libraryId/security'
     | '/$organizationSlug/libraries/$libraryId/storage'
     | '/$organizationSlug/libraries/$libraryId/webhooks'
     | '/$organizationSlug/libraries/$libraryId/'
@@ -338,12 +371,15 @@ export interface FileRouteTypes {
     | '/$organizationSlug'
     | '/$organizationSlug/settings/organization'
     | '/$organizationSlug/settings/team'
+    | '/embed/$libraryId/playlists/$playlistId'
     | '/$organizationSlug/libraries'
     | '/$organizationSlug/settings'
     | '/$organizationSlug/libraries/$libraryId/analytics'
     | '/$organizationSlug/libraries/$libraryId/api'
     | '/$organizationSlug/libraries/$libraryId/encoding'
     | '/$organizationSlug/libraries/$libraryId/player'
+    | '/$organizationSlug/libraries/$libraryId/playlists'
+    | '/$organizationSlug/libraries/$libraryId/security'
     | '/$organizationSlug/libraries/$libraryId/storage'
     | '/$organizationSlug/libraries/$libraryId/webhooks'
     | '/$organizationSlug/libraries/$libraryId'
@@ -369,12 +405,15 @@ export interface FileRouteTypes {
     | '/_authenticated/$organizationSlug/libraries/$libraryId'
     | '/_authenticated/$organizationSlug/settings/organization'
     | '/_authenticated/$organizationSlug/settings/team'
+    | '/embed/$libraryId/playlists/$playlistId'
     | '/_authenticated/$organizationSlug/libraries/'
     | '/_authenticated/$organizationSlug/settings/'
     | '/_authenticated/$organizationSlug/libraries/$libraryId/analytics'
     | '/_authenticated/$organizationSlug/libraries/$libraryId/api'
     | '/_authenticated/$organizationSlug/libraries/$libraryId/encoding'
     | '/_authenticated/$organizationSlug/libraries/$libraryId/player'
+    | '/_authenticated/$organizationSlug/libraries/$libraryId/playlists'
+    | '/_authenticated/$organizationSlug/libraries/$libraryId/security'
     | '/_authenticated/$organizationSlug/libraries/$libraryId/storage'
     | '/_authenticated/$organizationSlug/libraries/$libraryId/webhooks'
     | '/_authenticated/$organizationSlug/libraries/$libraryId/'
@@ -384,6 +423,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   GuestRoute: typeof GuestRouteWithChildren
   EmbedLibraryIdVideoIdRoute: typeof EmbedLibraryIdVideoIdRoute
+  EmbedLibraryIdPlaylistsPlaylistIdRoute: typeof EmbedLibraryIdPlaylistsPlaylistIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -542,6 +582,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOrganizationSlugSettingsTeamRouteImport
       parentRoute: typeof AuthenticatedOrganizationSlugRoute
     }
+    '/embed/$libraryId/playlists/$playlistId': {
+      id: '/embed/$libraryId/playlists/$playlistId'
+      path: '/embed/$libraryId/playlists/$playlistId'
+      fullPath: '/embed/$libraryId/playlists/$playlistId'
+      preLoaderRoute: typeof EmbedLibraryIdPlaylistsPlaylistIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/$organizationSlug/libraries/$libraryId/': {
       id: '/_authenticated/$organizationSlug/libraries/$libraryId/'
       path: '/'
@@ -577,6 +624,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdPlayerRouteImport
       parentRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdRoute
     }
+    '/_authenticated/$organizationSlug/libraries/$libraryId/playlists': {
+      id: '/_authenticated/$organizationSlug/libraries/$libraryId/playlists'
+      path: '/playlists'
+      fullPath: '/$organizationSlug/libraries/$libraryId/playlists'
+      preLoaderRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdPlaylistsRouteImport
+      parentRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdRoute
+    }
+    '/_authenticated/$organizationSlug/libraries/$libraryId/security': {
+      id: '/_authenticated/$organizationSlug/libraries/$libraryId/security'
+      path: '/security'
+      fullPath: '/$organizationSlug/libraries/$libraryId/security'
+      preLoaderRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdSecurityRouteImport
+      parentRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdRoute
+    }
     '/_authenticated/$organizationSlug/libraries/$libraryId/storage': {
       id: '/_authenticated/$organizationSlug/libraries/$libraryId/storage'
       path: '/storage'
@@ -599,6 +660,8 @@ interface AuthenticatedOrganizationSlugLibrariesLibraryIdRouteChildren {
   AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute
   AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute
   AuthenticatedOrganizationSlugLibrariesLibraryIdPlayerRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdPlayerRoute
+  AuthenticatedOrganizationSlugLibrariesLibraryIdPlaylistsRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdPlaylistsRoute
+  AuthenticatedOrganizationSlugLibrariesLibraryIdSecurityRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdSecurityRoute
   AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRoute
   AuthenticatedOrganizationSlugLibrariesLibraryIdWebhooksRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdWebhooksRoute
   AuthenticatedOrganizationSlugLibrariesLibraryIdIndexRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdIndexRoute
@@ -614,6 +677,10 @@ const AuthenticatedOrganizationSlugLibrariesLibraryIdRouteChildren: Authenticate
       AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute,
     AuthenticatedOrganizationSlugLibrariesLibraryIdPlayerRoute:
       AuthenticatedOrganizationSlugLibrariesLibraryIdPlayerRoute,
+    AuthenticatedOrganizationSlugLibrariesLibraryIdPlaylistsRoute:
+      AuthenticatedOrganizationSlugLibrariesLibraryIdPlaylistsRoute,
+    AuthenticatedOrganizationSlugLibrariesLibraryIdSecurityRoute:
+      AuthenticatedOrganizationSlugLibrariesLibraryIdSecurityRoute,
     AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRoute:
       AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRoute,
     AuthenticatedOrganizationSlugLibrariesLibraryIdWebhooksRoute:
@@ -709,6 +776,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   GuestRoute: GuestRouteWithChildren,
   EmbedLibraryIdVideoIdRoute: EmbedLibraryIdVideoIdRoute,
+  EmbedLibraryIdPlaylistsPlaylistIdRoute:
+    EmbedLibraryIdPlaylistsPlaylistIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

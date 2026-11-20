@@ -6,6 +6,7 @@ import {
   LIBRARY_SECURITY_LIMITS,
   PLAYBACK_HOST_PATTERN,
   PLAYER_ACCENT_COLOR_PATTERN,
+  PLAYLIST_LIMITS,
   VIDEO_CHAPTER_LIMITS,
   VIDEO_FIELD_LIMITS,
   latestChapterStartSeconds,
@@ -35,6 +36,76 @@ export const libraryFormSchema = (t: TranslationFunction) =>
         placeholder: t("libraries.fields.name_placeholder"),
         type: "text",
         autoComplete: "off",
+      }),
+  })
+
+/** A video's own title and description; an empty description removes it. */
+export const videoDetailsFormSchema = (t: TranslationFunction) =>
+  z.object({
+    title: z
+      .string()
+      .trim()
+      .min(1, t("validation.video_title.required"))
+      .max(
+        VIDEO_FIELD_LIMITS.TITLE_MAX_LENGTH,
+        t("validation.video_title.max_length", {
+          max: VIDEO_FIELD_LIMITS.TITLE_MAX_LENGTH,
+        })
+      )
+      .meta({
+        label: t("videos.fields.title"),
+        placeholder: t("videos.fields.title_placeholder"),
+        type: "text",
+        autoComplete: "off",
+      }),
+    description: z
+      .string()
+      .trim()
+      .max(
+        VIDEO_FIELD_LIMITS.DESCRIPTION_MAX_LENGTH,
+        t("validation.description.max_length", {
+          max: VIDEO_FIELD_LIMITS.DESCRIPTION_MAX_LENGTH,
+        })
+      )
+      .meta({
+        label: t("videos.fields.description"),
+        placeholder: t("videos.fields.description_placeholder"),
+        type: "textarea",
+      }),
+  })
+
+/** A playlist's title and description; an empty description removes it. */
+export const playlistFormSchema = (t: TranslationFunction) =>
+  z.object({
+    title: z
+      .string()
+      .trim()
+      .min(1, t("validation.playlist_title.required"))
+      .max(
+        PLAYLIST_LIMITS.TITLE_MAX_LENGTH,
+        t("validation.playlist_title.max_length", {
+          max: PLAYLIST_LIMITS.TITLE_MAX_LENGTH,
+        })
+      )
+      .meta({
+        label: t("playlists.fields.title"),
+        placeholder: t("playlists.fields.title_placeholder"),
+        type: "text",
+        autoComplete: "off",
+      }),
+    description: z
+      .string()
+      .trim()
+      .max(
+        PLAYLIST_LIMITS.DESCRIPTION_MAX_LENGTH,
+        t("validation.description.max_length", {
+          max: PLAYLIST_LIMITS.DESCRIPTION_MAX_LENGTH,
+        })
+      )
+      .meta({
+        label: t("playlists.fields.description"),
+        placeholder: t("playlists.fields.description_placeholder"),
+        type: "textarea",
       }),
   })
 
@@ -144,6 +215,10 @@ export const libraryWebhookFormSchema = (t: TranslationFunction) =>
 /** The video whose details sheet is open, kept in the URL so it can be linked and closed with Back. */
 export const libraryVideosSearchSchema = z.object({
   video: z.uuid().optional().catch(undefined),
+})
+
+export const libraryPlaylistsSearchSchema = z.object({
+  playlist: z.uuid().optional().catch(undefined),
 })
 
 /**

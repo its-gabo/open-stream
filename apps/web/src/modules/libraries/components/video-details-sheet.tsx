@@ -6,6 +6,7 @@ import { Label } from "@workspace/ui/components/label"
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
 } from "@workspace/ui/components/sheet"
@@ -22,13 +23,10 @@ import { Suspense, lazy, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { VIDEO_DETAILS_TABS, VIDEO_PLAYER_PATHS } from "../libraries.constants"
-import {
-  buildVideoFileUrl,
-  buildVideoPosterUrl,
-  formatDuration,
-  formatFileSize,
-} from "../libraries.utils"
+import { buildVideoFileUrl, buildVideoPosterUrl } from "../libraries.utils"
 import { VideoChaptersSection } from "./video-chapters-section"
+import { VideoEditDialog } from "./video-edit-dialog"
+import { VideoFacts } from "./video-facts"
 import { VideoPosterSection } from "./video-poster-section"
 
 import type { Video } from "@/api/generated-api"
@@ -80,7 +78,7 @@ function VideoDetails({
   libraryId,
   video,
 }: Omit<VideoDetailsSheetProps, "video" | "onClose"> & { video: Video }) {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const [playerSeconds, setPlayerSeconds] = useState(0)
   const [showsDefaultPlayer, setShowsDefaultPlayer] = useState(false)
   const isPlayable = video.processingStatus === VIDEO_PROCESSING_STATUSES.READY
@@ -96,51 +94,25 @@ function VideoDetails({
     isPlayable && video.width !== null && video.height !== null
       ? { width: video.width, height: video.height }
       : null
-  const formatDate = (value: string | null) =>
-    value
-      ? new Intl.DateTimeFormat(i18n.language, {
-          dateStyle: "medium",
-          timeStyle: "short",
-        }).format(new Date(value))
-      : null
-  const details = [
-    {
-      key: "duration",
-      value:
-        video.durationSeconds !== null
-          ? formatDuration(video.durationSeconds)
-          : null,
-    },
-    {
-      key: "resolution",
-      value:
-        video.width !== null && video.height !== null
-          ? `${video.width}×${video.height}`
-          : null,
-    },
-    {
-      key: "qualities",
-      value: video.renditions.map(({ quality }) => quality).join(", ") || null,
-    },
-    { key: "file_name", value: video.fileName },
-    { key: "format", value: video.fileFormat?.toUpperCase() ?? null },
-    {
-      key: "size",
-      value:
-        video.sizeBytes !== null
-          ? formatFileSize(video.sizeBytes, i18n.language)
-          : null,
-    },
-    { key: "created", value: formatDate(video.createdAt) },
-    { key: "uploaded", value: formatDate(video.uploadedAt) },
-    { key: "processed", value: formatDate(video.processedAt) },
-  ].filter(({ value }) => value)
 
   return (
     <>
-      <SheetHeader className="pr-12">
+      <SheetHeader className="pr-20">
         <SheetTitle className="truncate">{video.title}</SheetTitle>
+        {video.description && (
+          <SheetDescription className="line-clamp-2">
+            {video.description}
+          </SheetDescription>
+        )}
       </SheetHeader>
+      {/* Beside the sheet's close button, which sits at top-3 right-3. */}
+      <div className="absolute top-3 right-12">
+        <VideoEditDialog
+          organizationSlug={organizationSlug}
+          libraryId={libraryId}
+          video={video}
+        />
+      </div>
       <div className="flex flex-col gap-4 px-4 pb-6">
         {isPlayable && libraryPlayer.isPending && (
           <Skeleton className="aspect-video w-full rounded-lg" />
@@ -236,17 +208,11 @@ function VideoDetails({
               </TabsTrigger>
             )}
           </TabsList>
-          <TabsContent value={VIDEO_DETAILS_TABS.DETAILS}>
-            <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-sm">
-              {details.map(({ key, value }) => (
-                <div key={key} className="contents">
-                  <dt className="text-muted-foreground">
-                    {t(`videos.details.fields.${key}`)}
-                  </dt>
-                  <dd className="min-w-0 break-words">{value}</dd>
-                </div>
-              ))}
-            </dl>
+          <TabsContent
+            value={VIDEO_DETAILS_TABS.DETAILS}
+            className="flex flex-col gap-4"
+          >
+            <VideoFacts video={video} />
           </TabsContent>
           {isPlayable && (
             <TabsContent value={VIDEO_DETAILS_TABS.THUMBNAIL}>

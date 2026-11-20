@@ -3,6 +3,7 @@ import type { z } from "zod"
 
 import type {
   LOCAL_UPLOAD_STATUSES,
+  PLAYLIST_VIDEO_STATES,
   PLAYER_SETTINGS_VIEWS,
   VIDEO_SOURCES,
 } from "./libraries.constants"
@@ -13,8 +14,10 @@ import type {
   libraryPlayerFormSchema,
   librarySecurityFormSchema,
   libraryWebhookFormSchema,
+  playlistFormSchema,
   videoChaptersFormSchema,
   videoCreateFormSchema,
+  videoDetailsFormSchema,
 } from "./libraries.schemas"
 
 export type LibraryFormValues = z.infer<ReturnType<typeof libraryFormSchema>>
@@ -36,6 +39,10 @@ export type LibrarySecurityFormValues = z.output<
 export type VideoCreateFormValues = z.infer<
   ReturnType<typeof videoCreateFormSchema>
 >
+export type VideoDetailsFormValues = z.infer<
+  ReturnType<typeof videoDetailsFormSchema>
+>
+export type PlaylistFormValues = z.infer<ReturnType<typeof playlistFormSchema>>
 
 export type VideoChaptersFormInput = z.input<
   ReturnType<typeof videoChaptersFormSchema>
@@ -91,6 +98,28 @@ export type PlayerMediaState = {
   volume: number
   isMuted: boolean
   playbackRate: number
+  isEnded: boolean
+}
+
+/** A video of a playlist, as the player lists it. */
+export type PlayerEpisode = {
+  id: string
+  title: string
+  description: string | null
+  durationSeconds: number
+  posterUrl: string
+}
+
+/** The playlist a player plays one video of, and how to move to another. */
+export type PlayerPlaylist = {
+  title: string
+  episodes: PlayerEpisode[]
+  currentIndex: number
+  /** How much of each episode the viewer has watched, from 0 to 1, by id. */
+  watchedShares: Record<string, number>
+  /** Starts the next episode by itself after a countdown at the end. */
+  autoplayNext: boolean
+  onSelectEpisode: (index: number) => void
 }
 
 /** One tile of the storyboard sprite and the stretch of the video it shows. */
@@ -109,3 +138,6 @@ export type PlayerSettingsView =
 
 /** The library's accent color and the controls its player offers; whether to show the title is decided by whoever renders the player. */
 export type PlayerControlsSettings = Omit<LibraryPlayerSettings, "showTitle">
+
+export type PlaylistVideoState =
+  (typeof PLAYLIST_VIDEO_STATES)[keyof typeof PLAYLIST_VIDEO_STATES]

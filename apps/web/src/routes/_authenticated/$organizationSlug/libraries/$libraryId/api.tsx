@@ -16,7 +16,6 @@ import { useOrganizationQuery } from "@/api/queries/organizations/useOrganizatio
 import { createPageMeta } from "@/lib/page-meta"
 import { LibraryApiKeysSection } from "@/modules/libraries/components/library-api-keys-section"
 import { LibraryApiUsage } from "@/modules/libraries/components/library-api-usage"
-import { LibrarySecurityForm } from "@/modules/libraries/components/library-security-form"
 
 export const Route = createFileRoute(
   "/_authenticated/$organizationSlug/libraries/$libraryId/api"
@@ -59,13 +58,6 @@ function LibraryApiRoute() {
         <LibraryApiKeysSection
           organizationSlug={organizationSlug}
           apiAccess={loadedAccess}
-        />
-        <Separator />
-        <LibrarySecurityForm
-          key={loadedAccess.security.allowedPlaybackHosts.join(",")}
-          organizationSlug={organizationSlug}
-          libraryId={libraryId}
-          security={loadedAccess.security}
         />
         <Separator />
         <LibraryApiUsage apiUrl={loadedAccess.apiUrl} />

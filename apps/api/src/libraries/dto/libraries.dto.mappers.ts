@@ -39,6 +39,7 @@ export const toVideoDto = (
   id: video.id,
   libraryId: video.libraryId,
   title: video.title,
+  description: video.description,
   status: video.status,
   failureReason: video.failureReason,
   fileName: video.fileName,

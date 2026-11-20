@@ -27,19 +27,34 @@ export type SeedVideoFile = {
 
 export type SeedVideo = {
   title: string
+  description?: string
   file: SeedVideoFile | null
   /** Views spread over the last `SEED_VIEW_DAYS` days, if it plays. */
   viewCount: number
   chapters?: VideoChapter[]
 }
 
+/**
+ * A custom storage in its own bucket on the local S3 server, with a path
+ * template other than the default one, so seeded videos show where a
+ * custom layout puts them.
+ */
+export const SEED_STORAGE = {
+  name: "Acme Media bucket",
+  bucket: "acme-media-videos",
+  pathTemplate: "videos/{year}/{month}/{libraryId}/{videoId}",
+}
+
 export type SeedLibrary = {
   name: string
+  /** Stores its videos in `SEED_STORAGE` instead of the default storage. */
+  usesSeedStorage?: boolean
   security?: { allowedPlaybackHosts: string[]; requireSignedPlayback: boolean }
   player?: LibraryPlayerSettings
   /** Hosts the seeded views were embedded on; `null` is a view without one. */
   embeddingHosts: (string | null)[]
   videos: SeedVideo[]
+  playlist?: { title: string; description: string; videoTitles: string[] }
 }
 
 export const SEED_LIBRARIES: SeedLibrary[] = [
@@ -101,6 +116,7 @@ export const SEED_LIBRARIES: SeedLibrary[] = [
   },
   {
     name: "Online courses",
+    usesSeedStorage: true,
     security: {
       allowedPlaybackHosts: ["courses.example.com", "*.example.com"],
       requireSignedPlayback: true,
@@ -112,11 +128,14 @@ export const SEED_LIBRARIES: SeedLibrary[] = [
       showPictureInPicture: false,
       showFullscreen: true,
       showChapters: true,
+      autoplayNext: true,
     },
     embeddingHosts: ["courses.example.com", "learn.example.com"],
     videos: [
       {
         title: "Lesson 1: Getting started",
+        description:
+          "Create your first library, upload a video and watch it play in the embeddable player.",
         file: {
           pattern: "rgbtestsrc",
           width: 1280,
@@ -134,6 +153,8 @@ export const SEED_LIBRARIES: SeedLibrary[] = [
       },
       {
         title: "Lesson 2: Uploading videos",
+        description:
+          "Upload large files that resume after a dropped connection, or import a video from a URL.",
         file: {
           pattern: "testsrc2",
           width: 854,
@@ -144,6 +165,11 @@ export const SEED_LIBRARIES: SeedLibrary[] = [
         viewCount: 80,
       },
     ],
+    playlist: {
+      title: "OpenStream basics",
+      description: "Everything you need to publish your first video.",
+      videoTitles: ["Lesson 1: Getting started", "Lesson 2: Uploading videos"],
+    },
   },
 ]
 

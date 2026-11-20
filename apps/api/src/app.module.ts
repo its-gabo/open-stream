@@ -11,6 +11,7 @@ import { createMediaModule } from "./media/media.module"
 import type { MediaToolkit } from "./media/types/media.types"
 import { createOrganizationsModule } from "./organizations/organizations.module"
 import { createOutboxModule } from "./outbox/outbox.module"
+import { createPlaylistsModule } from "./playlists/playlists.module"
 import { createStorageModule } from "./storage/storage.module"
 import type { ObjectStorage } from "./storage/types/storage.types"
 import { createWebhooksModule } from "./webhooks/webhooks.module"
@@ -75,6 +76,12 @@ export function createAppModule(
     db: database.db,
     videoPlaybackService: libraries.videoPlaybackService,
   })
+  const playlists = createPlaylistsModule({
+    db: database.db,
+    config,
+    activityLogService: activity.activityLogService,
+    videoPlaybackService: libraries.videoPlaybackService,
+  })
   const organizations = createOrganizationsModule({
     db: database.db,
     config,
@@ -99,6 +106,7 @@ export function createAppModule(
     ...webhooks,
     ...libraries,
     ...analytics,
+    ...playlists,
     async close() {
       email.emailSenderService.close()
       await database.close()

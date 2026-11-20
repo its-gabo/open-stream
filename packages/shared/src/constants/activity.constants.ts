@@ -21,6 +21,7 @@ export const ACTIVITY_RESOURCE_TYPES = {
   API_KEY: "api_key",
   WEBHOOK: "webhook",
   VIDEO: "video",
+  PLAYLIST: "playlist",
 } as const
 
 /** Everything recorded in an organization's activity log, as `<resource>.<what happened>`. */
@@ -73,6 +74,10 @@ export const ACTIVITY_ACTIONS = {
   VIDEO_UPLOAD_CANCELED: "video.upload_canceled",
   VIDEO_IMPORT_STARTED: "video.import_started",
   VIDEO_REPROCESS_REQUESTED: "video.reprocess_requested",
+  PLAYLIST_CREATED: "playlist.created",
+  PLAYLIST_UPDATED: "playlist.updated",
+  PLAYLIST_VIDEOS_UPDATED: "playlist.videos_updated",
+  PLAYLIST_DELETED: "playlist.deleted",
 } as const
 
 export const ACTIVITY_LIMITS = {

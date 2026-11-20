@@ -73,6 +73,17 @@
     "webhook_url": {
       "required": "Enter the URL to send events to",
       "invalid": "Enter a full http:// or https:// URL without a username or password"
+    },
+    "chapters": {
+      "time_invalid": "Enter a time like 1:05 or 1:02:03.",
+      "title_required": "Enter a title.",
+      "title_max_length": "Use at most {{max}} characters.",
+      "too_many": "Use at most {{max}} chapters.",
+      "first_at_start": "The first chapter starts at 0:00.",
+      "too_close_one": "Start at least {{count}} second after the chapter before.",
+      "too_close_other": "Start at least {{count}} seconds after the chapter before.",
+      "too_close_to_end_one": "Start at least {{count}} second before the video ends at {{time}}.",
+      "too_close_to_end_other": "Start at least {{count}} seconds before the video ends at {{time}}."
     }
   },
   "pages": {
@@ -192,7 +203,8 @@
       "library.webhook.delivery_resend.success": "Delivery queued again.",
       "video.status.get.success": "Video status fetched.",
       "activity.list.success": "Activity fetched.",
-      "video.poster.update.success": "Poster saved."
+      "video.poster.update.success": "Poster saved.",
+      "video.chapters.update.success": "Chapters saved."
     },
     "error": {
       "fallback": "Oops something went wrong..",
@@ -258,7 +270,8 @@
       "library.webhook.delivery_pending": "This delivery is still being sent.",
       "video.poster.frame_out_of_range": "That frame is past the end of the video.",
       "video.poster.image_too_large": "This image is larger than the 5 MB limit.",
-      "video.poster.unsupported_image": "Only real JPEG, PNG and WebP images can be posters."
+      "video.poster.unsupported_image": "Only real JPEG, PNG and WebP images can be posters.",
+      "video.chapters.out_of_range": "A chapter starts less than a second before the end of the video."
     }
   },
   "errors": {
@@ -676,6 +689,10 @@
         "showFullscreen": {
           "label": "Fullscreen",
           "hint": "The fullscreen button, double-click and the F shortcut."
+        },
+        "showChapters": {
+          "label": "Chapters",
+          "hint": "Splits the seek bar at each chapter and lets viewers jump between them, for videos that have chapters."
         }
       },
       "hint": "Changes apply to every embed of this library the next time it loads.",
@@ -683,7 +700,8 @@
       "preview_title": "Product launch",
       "save": "Save player",
       "owner_only_title": "Only the owner can change the player",
-      "owner_only_description": "Ask the organization owner to change how this library's player looks."
+      "owner_only_description": "Ask the organization owner to change how this library's player looks.",
+      "preview_chapter": "Getting started"
     },
     "webhooks": {
       "owner_only_title": "Only the owner can manage webhooks",
@@ -700,7 +718,7 @@
       "events_title": "Events",
       "events": {
         "video_created": "A video was created, from the dashboard or the API.",
-        "video_updated": "A video was renamed.",
+        "video_updated": "A video was renamed, or its thumbnail or chapters changed.",
         "video_deleted": "A video was deleted. Its files are removed from storage shortly after.",
         "video_uploaded": "The whole file arrived and passed the checks.",
         "video_upload_failed": "The file was rejected, e.g. it is not really an MP4 or MOV, or an import could not download it.",
@@ -856,7 +874,8 @@
         "created": "Created",
         "uploaded": "Uploaded",
         "processed": "Processed"
-      }
+      },
+      "default_player": "Show the default player"
     },
     "poster": {
       "title": "Thumbnail",
@@ -870,7 +889,6 @@
       "use_frame": "Use frame at {{time}}",
       "upload_image": "Upload image",
       "reset": "Pick automatically",
-      "image_hint": "Pause the player on the frame you want, or upload a JPEG, PNG or WebP image up to {{size}}. Images are scaled down to 1280 pixels on the long side.",
       "image_too_large": "Choose an image up to {{size}}."
     },
     "player": {
@@ -891,7 +909,34 @@
       "speed_normal": "Normal",
       "picture_in_picture": "Picture in picture",
       "fullscreen": "Fullscreen",
-      "exit_fullscreen": "Exit fullscreen"
+      "exit_fullscreen": "Exit fullscreen",
+      "chapters": "Chapters"
+    },
+    "chapters": {
+      "title": "Chapters",
+      "description": "Chapters split the seek bar and let viewers jump to a part of the video. Each one runs until the next starts.",
+      "empty": "No chapters yet. Pause the player where a part begins and add a chapter, or paste a list.",
+      "time_label": "Start of chapter {{number}}",
+      "title_label": "Title of chapter {{number}}",
+      "title_placeholder": "Chapter title",
+      "remove": "Remove chapter {{title}}",
+      "remove_all": "Remove all",
+      "add_at": "Add chapter at {{time}}",
+      "paste": "Paste list",
+      "save": "Save chapters",
+      "paste_dialog": {
+        "title": "Paste chapters",
+        "description": "One chapter per line with its start time, as in a video description: 0:00 Intro. The time can also come last, like Setup (1:23).",
+        "label": "Chapters",
+        "found_one": "{{count}} chapter found",
+        "found_other": "{{count}} chapters found",
+        "replaces": "These replace the chapters listed now. Nothing is saved until you save the chapters.",
+        "apply_one": "Use {{count}} chapter",
+        "apply_other": "Use {{count}} chapters",
+        "after_end": "too close to the end",
+        "skipped_one": "{{count}} chapter starts less than a second before the video ends at {{duration}} and is left out.",
+        "skipped_other": "{{count}} chapters start less than a second before the video ends at {{duration}} and are left out."
+      }
     }
   },
   "embed": {
@@ -970,6 +1015,11 @@
     },
     "top_libraries": {
       "title": "Top libraries"
+    },
+    "chapters": {
+      "title": "Chapters",
+      "reached": "reached",
+      "finished": "finished"
     }
   },
   "pagination": {
@@ -1124,6 +1174,8 @@
       "webhook_delivery_resent": "Resent a webhook delivery",
       "video_created": "Created a video",
       "video_updated": "Renamed a video",
+      "video_poster_updated": "Changed a video's thumbnail",
+      "video_chapters_updated": "Changed a video's chapters",
       "video_deleted": "Deleted a video",
       "video_uploaded": "Uploaded a video's file",
       "video_upload_canceled": "Canceled an upload",

@@ -50,6 +50,7 @@ import {
   libraryActivityContext,
   videoActivityResource,
 } from "../utils/library-activity.utils"
+import { keepChaptersWithin } from "../utils/video-chapters.utils"
 import { toVideoWebhookEvent } from "../utils/video-events.utils"
 import {
   derivedFileContentType,
@@ -468,6 +469,7 @@ export class VideoProcessingService {
         height,
         bandwidth: bandwidths.get(quality) ?? 0,
       })),
+      chapters: keepChaptersWithin(video.chapters, probe.durationSeconds),
     }
 
     // A run that lost the video must not touch the files of the run holding it.

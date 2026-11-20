@@ -2,6 +2,7 @@ import {
   LIBRARY_API_KEY_SCOPES,
   VIEWER_DEVICE_TYPES,
   type LibraryPlayerSettings,
+  type VideoChapter,
 } from "@workspace/shared"
 
 /** Every seeded account signs in with this password. */
@@ -29,6 +30,7 @@ export type SeedVideo = {
   file: SeedVideoFile | null
   /** Views spread over the last `SEED_VIEW_DAYS` days, if it plays. */
   viewCount: number
+  chapters?: VideoChapter[]
 }
 
 export type SeedLibrary = {
@@ -55,6 +57,11 @@ export const SEED_LIBRARIES: SeedLibrary[] = [
           toneHz: 440,
         },
         viewCount: 120,
+        chapters: [
+          { title: "Introduction", startSeconds: 0 },
+          { title: "Your libraries", startSeconds: 5 },
+          { title: "Analytics", startSeconds: 12 },
+        ],
       },
       {
         title: "Mobile app preview",
@@ -104,6 +111,7 @@ export const SEED_LIBRARIES: SeedLibrary[] = [
       showSettingsMenu: true,
       showPictureInPicture: false,
       showFullscreen: true,
+      showChapters: true,
     },
     embeddingHosts: ["courses.example.com", "learn.example.com"],
     videos: [
@@ -117,6 +125,12 @@ export const SEED_LIBRARIES: SeedLibrary[] = [
           toneHz: 392,
         },
         viewCount: 150,
+        chapters: [
+          { title: "Welcome", startSeconds: 0 },
+          { title: "Creating a library", startSeconds: 8 },
+          { title: "Your first upload", startSeconds: 18 },
+          { title: "Wrap-up", startSeconds: 25 },
+        ],
       },
       {
         title: "Lesson 2: Uploading videos",

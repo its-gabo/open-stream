@@ -327,7 +327,7 @@ describe("Video posters (e2e)", () => {
 
       expect(activity).toEqual(
         expect.objectContaining({
-          action: "video.updated",
+          action: "video.poster_updated",
           before: { posterSource: "automatic", posterFrameSeconds: null },
           after: { posterSource: "frame", posterFrameSeconds: 2 },
         })

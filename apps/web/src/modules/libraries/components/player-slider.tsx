@@ -3,6 +3,7 @@ import { useHotkeys } from "@tanstack/react-hotkeys"
 import { useRef, useState } from "react"
 
 import { PLAYER_SLIDER_KEY_DIRECTIONS } from "../libraries.constants"
+import { segmentFill, toSliderSegments } from "../libraries.utils"
 
 import type { PointerEvent, ReactNode } from "react"
 
@@ -22,6 +23,8 @@ type PlayerSliderProps = {
   hoverContentHalfWidth?: number
   /** How far the arrow keys move the value. */
   keyboardStep: number
+  /** Where the track splits into segments with a gap between them, from 0 to 1, e.g. where chapters start. */
+  breaks?: number[]
   className?: string
 }
 
@@ -36,6 +39,7 @@ export function PlayerSlider({
   hoverContent,
   hoverContentHalfWidth = 0,
   keyboardStep,
+  breaks = [],
   className,
 }: PlayerSliderProps) {
   const trackRef = useRef<HTMLDivElement>(null)
@@ -98,17 +102,25 @@ export function PlayerSlider({
         if (!isDragging) updateHover(null)
       }}
     >
-      <div className="relative h-1 w-full overflow-hidden rounded-full bg-white/25 transition-[height] group-hover/slider:h-1.5 group-focus-visible/slider:h-1.5">
-        {secondaryValue !== undefined && (
+      <div className="flex h-1 w-full gap-0.5 transition-[height] group-hover/slider:h-1.5 group-focus-visible/slider:h-1.5">
+        {toSliderSegments(breaks).map(({ start, end }) => (
           <div
-            className="absolute inset-y-0 left-0 bg-white/35"
-            style={{ width: `${secondaryValue * 100}%` }}
-          />
-        )}
-        <div
-          className="absolute inset-y-0 left-0 bg-[var(--player-accent,white)]"
-          style={{ width: `${value * 100}%` }}
-        />
+            key={start}
+            className="relative h-full overflow-hidden rounded-full bg-white/25"
+            style={{ flexGrow: end - start, flexBasis: 0 }}
+          >
+            {secondaryValue !== undefined && (
+              <div
+                className="absolute inset-y-0 left-0 bg-white/35"
+                style={{ width: segmentFill(secondaryValue, start, end) }}
+              />
+            )}
+            <div
+              className="absolute inset-y-0 left-0 bg-[var(--player-accent,white)]"
+              style={{ width: segmentFill(value, start, end) }}
+            />
+          </div>
+        ))}
       </div>
       <div
         className={cn(

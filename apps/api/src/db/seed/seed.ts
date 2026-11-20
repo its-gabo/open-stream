@@ -9,7 +9,7 @@ import type { AuthUserSession } from "../../auth/types/auth.types"
 import { readConfig } from "../../config/app.config"
 import type { LibraryProfile } from "../../libraries/types/libraries.types"
 import type { OrganizationAccess } from "../../organizations/types/organizations.types"
-import { users, videoViews, type NewVideoViewRecord } from "../schema"
+import { users, videoViews, videos, type NewVideoViewRecord } from "../schema"
 import {
   SEED_API_KEY,
   SEED_DEVICE_TYPES,
@@ -205,6 +205,14 @@ async function createSeedVideo(
   })
 
   if (!seedVideo.file) return video
+
+  if (seedVideo.chapters) {
+    // Chapters are saved through the API once a video is processed; the worker processes these later.
+    await appModule.db
+      .update(videos)
+      .set({ chapters: seedVideo.chapters })
+      .where(eq(videos.id, video.id))
+  }
 
   const bytes = await createSeedVideoFile(
     appModule.config.FFMPEG_PATH,

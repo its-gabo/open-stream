@@ -1,4 +1,8 @@
-import { VIDEO_PROCESSING_STATUSES } from "@workspace/shared"
+import {
+  DEFAULT_LIBRARY_PLAYER_SETTINGS,
+  VIDEO_PROCESSING_STATUSES,
+} from "@workspace/shared"
+import { Label } from "@workspace/ui/components/label"
 import {
   Sheet,
   SheetContent,
@@ -6,6 +10,7 @@ import {
   SheetTitle,
 } from "@workspace/ui/components/sheet"
 import { Skeleton } from "@workspace/ui/components/skeleton"
+import { Switch } from "@workspace/ui/components/switch"
 import {
   Tabs,
   TabsContent,
@@ -23,9 +28,11 @@ import {
   formatDuration,
   formatFileSize,
 } from "../libraries.utils"
+import { VideoChaptersSection } from "./video-chapters-section"
 import { VideoPosterSection } from "./video-poster-section"
 
 import type { Video } from "@/api/generated-api"
+import { useLibraryPlayerQuery } from "@/api/queries/libraries/useLibraryPlayerQuery"
 import { VideoAnalyticsSection } from "@/modules/analytics/components/video-analytics-section"
 import { VideoEmbedSection } from "@/modules/embed/components/video-embed-section"
 
@@ -75,7 +82,16 @@ function VideoDetails({
 }: Omit<VideoDetailsSheetProps, "video" | "onClose"> & { video: Video }) {
   const { t, i18n } = useTranslation()
   const [playerSeconds, setPlayerSeconds] = useState(0)
+  const [showsDefaultPlayer, setShowsDefaultPlayer] = useState(false)
   const isPlayable = video.processingStatus === VIDEO_PROCESSING_STATUSES.READY
+  const libraryPlayer = useLibraryPlayerQuery(organizationSlug, libraryId, {
+    enabled: isPlayable,
+  })
+  // The library's player as its embeds show it; the stock one if its settings cannot be read.
+  const playerSettings =
+    showsDefaultPlayer || !libraryPlayer.data
+      ? DEFAULT_LIBRARY_PLAYER_SETTINGS
+      : libraryPlayer.data
   const embedSize =
     isPlayable && video.width !== null && video.height !== null
       ? { width: video.width, height: video.height }
@@ -125,57 +141,88 @@ function VideoDetails({
       <SheetHeader className="pr-12">
         <SheetTitle className="truncate">{video.title}</SheetTitle>
       </SheetHeader>
-      <div className="flex flex-col gap-6 px-4 pb-6">
-        {isPlayable ? (
-          <Suspense
-            fallback={<Skeleton className="aspect-video w-full rounded-lg" />}
-          >
-            <VideoPlayer
-              src={buildVideoFileUrl(
-                organizationSlug,
-                libraryId,
-                video,
-                VIDEO_PLAYER_PATHS.MASTER_PLAYLIST
-              )}
-              poster={buildVideoPosterUrl(organizationSlug, libraryId, video)}
-              storyboardUrl={buildVideoFileUrl(
-                organizationSlug,
-                libraryId,
-                video,
-                VIDEO_PLAYER_PATHS.STORYBOARD
-              )}
-              onTimeUpdate={setPlayerSeconds}
-            />
-          </Suspense>
-        ) : (
+      <div className="flex flex-col gap-4 px-4 pb-6">
+        {isPlayable && libraryPlayer.isPending && (
+          <Skeleton className="aspect-video w-full rounded-lg" />
+        )}
+        {isPlayable && !libraryPlayer.isPending && (
+          <div className="flex flex-col gap-2">
+            <Suspense
+              fallback={<Skeleton className="aspect-video w-full rounded-lg" />}
+            >
+              <VideoPlayer
+                src={buildVideoFileUrl(
+                  organizationSlug,
+                  libraryId,
+                  video,
+                  VIDEO_PLAYER_PATHS.MASTER_PLAYLIST
+                )}
+                poster={buildVideoPosterUrl(organizationSlug, libraryId, video)}
+                storyboardUrl={buildVideoFileUrl(
+                  organizationSlug,
+                  libraryId,
+                  video,
+                  VIDEO_PLAYER_PATHS.STORYBOARD
+                )}
+                title={playerSettings.showTitle ? video.title : undefined}
+                chapters={video.chapters}
+                controls={playerSettings}
+                onTimeUpdate={setPlayerSeconds}
+              />
+            </Suspense>
+            <div className="flex items-center gap-2">
+              <Switch
+                id="video-default-player"
+                checked={showsDefaultPlayer}
+                onCheckedChange={setShowsDefaultPlayer}
+              />
+              <Label
+                htmlFor="video-default-player"
+                className="text-xs font-normal text-muted-foreground"
+              >
+                {t("videos.details.default_player")}
+              </Label>
+            </div>
+          </div>
+        )}
+        {!isPlayable && (
           <div className="flex aspect-video w-full flex-col items-center justify-center gap-2 rounded-lg bg-muted p-6 text-center text-sm text-muted-foreground">
             <FilmIcon className="size-5" />
             {t("videos.details.not_playable")}
           </div>
         )}
         <Tabs defaultValue={VIDEO_DETAILS_TABS.DETAILS} className="gap-4">
+          {/* Wraps on narrow screens; each row keeps its own line, drawn by the background. */}
           <TabsList
             variant="line"
-            className="h-11 w-full justify-start gap-5 rounded-none border-b"
+            className="w-full flex-wrap justify-start gap-x-5 gap-y-0 rounded-none bg-[linear-gradient(to_bottom,transparent_calc(2rem-1px),var(--color-border)_calc(2rem-1px))] bg-[length:100%_2rem] p-0 group-data-horizontal/tabs:h-auto"
           >
             <TabsTrigger
               value={VIDEO_DETAILS_TABS.DETAILS}
-              className="h-full flex-none px-0"
+              className="h-8 flex-none px-0 group-data-horizontal/tabs:after:bottom-0"
             >
               {t("videos.details.title")}
             </TabsTrigger>
             {isPlayable && (
               <TabsTrigger
                 value={VIDEO_DETAILS_TABS.THUMBNAIL}
-                className="h-full flex-none px-0"
+                className="h-8 flex-none px-0 group-data-horizontal/tabs:after:bottom-0"
               >
                 {t("videos.poster.title")}
               </TabsTrigger>
             )}
             {isPlayable && (
               <TabsTrigger
+                value={VIDEO_DETAILS_TABS.CHAPTERS}
+                className="h-8 flex-none px-0 group-data-horizontal/tabs:after:bottom-0"
+              >
+                {t("videos.chapters.title")}
+              </TabsTrigger>
+            )}
+            {isPlayable && (
+              <TabsTrigger
                 value={VIDEO_DETAILS_TABS.ANALYTICS}
-                className="h-full flex-none px-0"
+                className="h-8 flex-none px-0 group-data-horizontal/tabs:after:bottom-0"
               >
                 {t("analytics.video.title")}
               </TabsTrigger>
@@ -183,7 +230,7 @@ function VideoDetails({
             {embedSize && (
               <TabsTrigger
                 value={VIDEO_DETAILS_TABS.EMBED}
-                className="h-full flex-none px-0"
+                className="h-8 flex-none px-0 group-data-horizontal/tabs:after:bottom-0"
               >
                 {t("embed.section.title")}
               </TabsTrigger>
@@ -204,6 +251,16 @@ function VideoDetails({
           {isPlayable && (
             <TabsContent value={VIDEO_DETAILS_TABS.THUMBNAIL}>
               <VideoPosterSection
+                organizationSlug={organizationSlug}
+                libraryId={libraryId}
+                video={video}
+                currentSeconds={playerSeconds}
+              />
+            </TabsContent>
+          )}
+          {isPlayable && (
+            <TabsContent value={VIDEO_DETAILS_TABS.CHAPTERS}>
+              <VideoChaptersSection
                 organizationSlug={organizationSlug}
                 libraryId={libraryId}
                 video={video}

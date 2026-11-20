@@ -282,7 +282,7 @@ export class VideoPostersService {
             actor,
             {
               organizationId: library.organizationId,
-              action: ACTIVITY_ACTIONS.VIDEO_UPDATED,
+              action: ACTIVITY_ACTIONS.VIDEO_POSTER_UPDATED,
               resource: videoActivityResource(updated),
               context: libraryActivityContext(library),
               ...diffActivityValues(

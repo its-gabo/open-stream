@@ -136,14 +136,6 @@ export function VideoPosterSection({
               </Button>
             )}
           </div>
-          <p className="text-xs text-muted-foreground">
-            {t("videos.poster.image_hint", {
-              size: formatFileSize(
-                VIDEO_POSTER_IMAGE_LIMITS.MAX_FILE_SIZE_BYTES,
-                i18n.language
-              ),
-            })}
-          </p>
           <input
             ref={fileInputRef}
             type="file"

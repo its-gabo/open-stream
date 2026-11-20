@@ -60,6 +60,7 @@ export const toVideoDto = (
     frameSeconds: video.posterFrameSeconds,
     updatedAt: video.posterUpdatedAt?.toISOString() ?? null,
   },
+  chapters: video.chapters,
 })
 
 export const toVideoStatusDetailsDto = (

@@ -128,6 +128,19 @@ export const retentionPointDtoSchema = z
   })
   .meta({ id: "RetentionPoint" })
 
+export const chapterAnalyticsDtoSchema = z
+  .object({
+    title: z.string(),
+    startSeconds: z.number().nonnegative(),
+    /** Where the next chapter starts, or the end of the video. */
+    endSeconds: z.number().nonnegative(),
+    /** Views that reached the chapter's start. */
+    views: z.int().nonnegative(),
+    /** Views that played on to the chapter's end. */
+    completedViews: z.int().nonnegative(),
+  })
+  .meta({ id: "ChapterAnalytics" })
+
 export const libraryAnalyticsDtoSchema = z
   .object({
     period: analyticsPeriodDtoSchema,
@@ -153,6 +166,8 @@ export const videoAnalyticsDtoSchema = z
     daily: z.array(analyticsDayDtoSchema),
     /** How many views reached each tenth of the video. */
     retention: z.array(retentionPointDtoSchema),
+    /** How far views got through each chapter, in playback order; empty when the video has none. */
+    chapters: z.array(chapterAnalyticsDtoSchema),
     devices: z.array(analyticsDeviceDtoSchema),
     embeddingHosts: z.array(analyticsEmbeddingHostDtoSchema),
   })

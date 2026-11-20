@@ -71,6 +71,20 @@
       "when": 1795132528853,
       "tag": "0009_finish_video_view_and_storage_credential_changes",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1795202852453,
+      "tag": "0010_add_video_chapters",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1795207642712,
+      "tag": "0011_add_chapter_and_poster_activity_actions",
+      "breakpoints": true
     }
   ]
 }

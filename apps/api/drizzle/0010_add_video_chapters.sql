@@ -1,0 +1,3 @@
+ALTER TABLE "libraries" ALTER COLUMN "player_settings" SET DEFAULT '{"accentColor":"#ffffff","showTitle":true,"showSettingsMenu":true,"showPictureInPicture":true,"showFullscreen":true,"showChapters":true}'::jsonb;--> statement-breakpoint
+ALTER TABLE "videos" ADD COLUMN "chapters" jsonb DEFAULT '[]'::jsonb NOT NULL;--> statement-breakpoint
+ALTER TABLE "videos" ADD CONSTRAINT "videos_chapters_check" CHECK (jsonb_typeof("videos"."chapters") = 'array' and jsonb_array_length("videos"."chapters") <= 50);

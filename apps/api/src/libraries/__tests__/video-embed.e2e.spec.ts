@@ -97,6 +97,7 @@ describe("Video embeds (e2e)", () => {
       posterUrl: `${filesUrl}/thumbnails/poster.jpg`,
       storyboardUrl: `${filesUrl}/thumbnails/storyboard.vtt`,
       viewsUrl: `${filesUrl}/views`,
+      chapters: [],
       allowedPlaybackHosts: [],
       player: DEFAULT_LIBRARY_PLAYER_SETTINGS,
     })
@@ -110,6 +111,7 @@ describe("Video embeds (e2e)", () => {
       showSettingsMenu: false,
       showPictureInPicture: false,
       showFullscreen: false,
+      showChapters: false,
     }
 
     await ownerClient.put(`${libraryPath}/player`, player)

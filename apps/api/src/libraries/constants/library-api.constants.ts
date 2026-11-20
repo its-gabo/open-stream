@@ -20,6 +20,9 @@ export const PLAYBACK_QUERY_KEYS = {
   TOKEN: "token",
 } as const
 
+/** Below a video's library API URL: its chapters as WebVTT, made from the video's chapters rather than stored. */
+export const CHAPTERS_TRACK_PATH = "chapters.vtt"
+
 /** Browsers may keep streamed bytes briefly; playback rules are checked again after that. */
 export const VIDEO_STREAM_CACHE_CONTROL = "private, max-age=300"
 

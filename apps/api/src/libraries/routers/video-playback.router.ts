@@ -153,4 +153,27 @@ export function createVideoPlaybackRouter(
         )
       }
     )
+    .get(
+      "/:libraryId/videos/:videoId/chapters.vtt",
+      describeRoute({
+        tags: [OPENAPI_TAGS.LIBRARY_API],
+        operationId: "readLibraryApiVideoChapters",
+        summary:
+          "Read a processed video's chapters as a WebVTT chapters track, for players of your own",
+        responses: {
+          200: describeBinaryResponse("The WebVTT", "text/vtt"),
+          ...describeApiErrorResponses(
+            LIBRARY_ROUTE_ERROR_DESCRIPTIONS.VIDEO_PLAYBACK_FILE
+          ),
+        },
+      }),
+      validateRequest("param", publicVideoParamSchema),
+      validateRequest("query", playbackQuerySchema),
+      async (c) =>
+        toFileResponse(
+          await videoPlaybackService.readChaptersTrack(
+            toPlaybackRequest(c.req, c.req.valid("param"))
+          )
+        )
+    )
 }

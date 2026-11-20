@@ -45,6 +45,14 @@ export const VIDEO_UPLOAD_LIMITS = {
   CHUNK_SIZE_BYTES: 16 * MIB,
 } as const
 
+/** A video's chapters: the first starts at 0:00, and each runs until the next one starts. */
+export const VIDEO_CHAPTER_LIMITS = {
+  MAX_PER_VIDEO: 50,
+  TITLE_MAX_LENGTH: 100,
+  /** Each chapter, the last one included, lasts at least this long. */
+  MIN_LENGTH_SECONDS: 1,
+} as const
+
 export const VIDEO_IMPORT_LIMITS = {
   URL_MAX_LENGTH: 2048,
 } as const
@@ -102,6 +110,7 @@ export const DEFAULT_LIBRARY_PLAYER_SETTINGS = {
   showSettingsMenu: true,
   showPictureInPicture: true,
   showFullscreen: true,
+  showChapters: true,
 } as const satisfies LibraryPlayerSettings
 
 /** How long a signed playback URL stays valid. */
@@ -117,7 +126,7 @@ export const LIBRARY_API_KEY_SCOPES = {
   VIDEOS_READ: "videos:read",
   /** Create videos and upload their files with tus. */
   VIDEOS_UPLOAD: "videos:upload",
-  /** Rename and delete videos. */
+  /** Rename and delete videos, and change their posters and chapters. */
   VIDEOS_MANAGE: "videos:manage",
   /** Sign playback URLs. */
   PLAYBACK_SIGN: "playback:sign",

@@ -60,6 +60,8 @@ export type ActivityAction =
   | "webhook.delivery_resent"
   | "video.created"
   | "video.updated"
+  | "video.poster_updated"
+  | "video.chapters_updated"
   | "video.deleted"
   | "video.uploaded"
   | "video.upload_canceled"
@@ -326,6 +328,24 @@ export interface CancelOrganizationInvitationParams {
    */
   invitationId: string
   organizationSlug: string
+}
+
+export interface ChapterAnalytics {
+  /**
+   * @min 0
+   * @max 9007199254740991
+   */
+  completedViews: number
+  /** @min 0 */
+  endSeconds: number
+  /** @min 0 */
+  startSeconds: number
+  title: string
+  /**
+   * @min 0
+   * @max 9007199254740991
+   */
+  views: number
 }
 
 export interface CreateLibraryApiKeyParams {
@@ -888,6 +908,7 @@ export interface LibraryListSuccessResponse {
 export interface LibraryPlayerSettings {
   /** @pattern ^#[0-9a-f]{6}$ */
   accentColor: string
+  showChapters: boolean
   showFullscreen: boolean
   showPictureInPicture: boolean
   showSettingsMenu: boolean
@@ -905,6 +926,7 @@ export interface LibraryPlayerSuccessResponse {
 export interface LibraryPlayerUpdateBody {
   /** @pattern ^#[0-9a-f]{6}$ */
   accentColor: string
+  showChapters: boolean
   showFullscreen: boolean
   showPictureInPicture: boolean
   showSettingsMenu: boolean
@@ -1412,6 +1434,8 @@ export interface Pagination {
 
 export interface PlaybackUrl {
   /** @format uri */
+  chaptersUrl: string
+  /** @format uri */
   embedUrl: string
   /**
    * @format date-time
@@ -1443,6 +1467,22 @@ export interface PlaybackUrlSuccessResponse {
     playback: PlaybackUrl
   }
   message: string
+}
+
+export interface ReadLibraryApiVideoChaptersParams {
+  expires?: string
+  key?: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  token?: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
 }
 
 export interface ReadLibraryApiVideoHlsFileParams {
@@ -1838,6 +1878,19 @@ export interface UpdateLibraryApiKeyParams {
   organizationSlug: string
 }
 
+export interface UpdateLibraryApiVideoChaptersParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+}
+
 export interface UpdateLibraryApiVideoParams {
   /**
    * @format uuid
@@ -1922,6 +1975,20 @@ export interface UpdateStorageParams {
   storageId: string
 }
 
+export interface UpdateVideoChaptersParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  organizationSlug: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+}
+
 export interface UpdateVideoParams {
   /**
    * @format uuid
@@ -1983,6 +2050,7 @@ export interface VerifyEmailParams {
 }
 
 export interface Video {
+  chapters: VideoChapter[]
   /**
    * @format date-time
    * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
@@ -2022,6 +2090,7 @@ export interface Video {
 }
 
 export interface VideoAnalytics {
+  chapters: ChapterAnalytics[]
   daily: AnalyticsDay[]
   devices: AnalyticsDevice[]
   embeddingHosts: AnalyticsEmbeddingHost[]
@@ -2043,6 +2112,25 @@ export interface VideoAnalyticsSuccessResponse {
   message: string
 }
 
+export interface VideoChapter {
+  /** @min 0 */
+  startSeconds: number
+  title: string
+}
+
+export interface VideoChaptersUpdateBody {
+  /** @maxItems 50 */
+  chapters: {
+    /** @min 0 */
+    startSeconds: number
+    /**
+     * @minLength 1
+     * @maxLength 100
+     */
+    title: string
+  }[]
+}
+
 export interface VideoCreateBody {
   /**
    * @minLength 1
@@ -2058,6 +2146,7 @@ export interface VideoCreateBody {
 
 export interface VideoEmbed {
   allowedPlaybackHosts: string[]
+  chapters: VideoChapter[]
   /** @min 0 */
   durationSeconds: number
   /**
@@ -3941,6 +4030,28 @@ export class OpenStreamApi<
      * No description
      *
      * @tags Libraries
+     * @name UpdateVideoChapters
+     * @summary Replace a processed video's chapters; the first starts at 0:00 and an empty list removes them
+     * @request PUT:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/videos/{videoId}/chapters
+     */
+    updateVideoChapters: (
+      { organizationSlug, libraryId, videoId }: UpdateVideoChaptersParams,
+      data: VideoChaptersUpdateBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<VideoSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/videos/${videoId}/chapters`,
+        method: "PUT",
+        body: data,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Libraries
      * @name GetVideoPoster
      * @summary Read a processed video's poster, for previews in the web app
      * @request GET:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/videos/{videoId}/poster.jpg
@@ -4190,6 +4301,25 @@ export class OpenStreamApi<
         method: "GET",
         query: query,
         format: "blob",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Library API
+     * @name ReadLibraryApiVideoChapters
+     * @summary Read a processed video's chapters as a WebVTT chapters track, for players of your own
+     * @request GET:/api/v1/libraries/{libraryId}/videos/{videoId}/chapters.vtt
+     */
+    readLibraryApiVideoChapters: (
+      { libraryId, videoId, ...query }: ReadLibraryApiVideoChaptersParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<File, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/videos/${videoId}/chapters.vtt`,
+        method: "GET",
+        query: query,
         ...params,
       }),
 
@@ -4483,6 +4613,30 @@ export class OpenStreamApi<
         body: data,
         secure: true,
         type: "multipart/form-data",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Needs the `videos:manage` scope.
+     *
+     * @tags Library API
+     * @name UpdateLibraryApiVideoChapters
+     * @summary Replace a processed video's chapters; the first starts at 0:00 and an empty list removes them
+     * @request PUT:/api/v1/libraries/{libraryId}/videos/{videoId}/chapters
+     * @secure
+     */
+    updateLibraryApiVideoChapters: (
+      { libraryId, videoId }: UpdateLibraryApiVideoChaptersParams,
+      data: VideoChaptersUpdateBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<VideoSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/videos/${videoId}/chapters`,
+        method: "PUT",
+        body: data,
+        secure: true,
+        type: "application/json",
         format: "json",
         ...params,
       }),

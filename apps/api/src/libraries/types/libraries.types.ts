@@ -7,6 +7,7 @@ import type { StorageCleanupService } from "../../storage/services/storage-clean
 import type {
   LibraryPlayerSettings,
   LibraryStorageKind,
+  VideoChapter,
   VideoFileFormat,
   VideoQuality,
 } from "@workspace/shared"
@@ -252,6 +253,8 @@ export type VideoProcessingResult = {
   videoCodec: string
   audioCodec: string | null
   renditions: VideoRendition[]
+  /** The video's chapters that still start before its end. */
+  chapters: VideoChapter[]
 }
 
 /** Identifies a video only together with the library and organization it must belong to. */

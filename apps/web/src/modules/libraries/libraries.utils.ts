@@ -3,10 +3,17 @@ import {
   VIDEO_UPLOAD_LIMITS,
   videoFileFormatFromName,
   videoImportUrlSchema,
+  type VideoChapter,
 } from "@workspace/shared"
 import { DetailedError } from "tus-js-client"
 
-import { HLS_MIME_TYPE, VIDEO_PLAYER_PATHS } from "./libraries.constants"
+import {
+  CHAPTER_LINE_TIME_FIRST_PATTERN,
+  CHAPTER_LINE_TIME_LAST_PATTERN,
+  CHAPTER_TIME_PATTERN,
+  HLS_MIME_TYPE,
+  VIDEO_PLAYER_PATHS,
+} from "./libraries.constants"
 import { z } from "zod"
 
 import { API_URL } from "@/api/api-client"
@@ -316,3 +323,70 @@ export const readMediaState = (video: HTMLVideoElement): PlayerMediaState => ({
   isMuted: video.muted || video.volume === 0,
   playbackRate: video.playbackRate,
 })
+
+/** The chapter playing at `seconds`: the last one to start at or before it. */
+export const findChapterAt = <TChapter extends VideoChapter>(
+  chapters: TChapter[],
+  seconds: number
+) => chapters.filter(({ startSeconds }) => startSeconds <= seconds).at(-1)
+
+/** A chapter's start as owners type it: `1:05`, `1:02:03`, with milliseconds only when it has them. */
+export function formatChapterTime(seconds: number) {
+  const milliseconds = Math.round(seconds * 1000) % 1000
+  const whole = formatDuration(Math.floor(seconds))
+
+  return milliseconds > 0
+    ? `${whole}.${String(milliseconds).padStart(3, "0").replace(/0+$/, "")}`
+    : whole
+}
+
+/** Seconds of a typed chapter start such as `5`, `1:05`, `1:02:03` or `1:05.5`; null when it is not one. */
+export function parseChapterTime(value: string) {
+  const match = CHAPTER_TIME_PATTERN.exec(value.trim())
+
+  if (!match) return null
+
+  const [, clock, fraction = ""] = match
+  const parts = clock.split(":").map(Number)
+
+  if (parts.slice(1).some((part) => part >= 60)) return null
+
+  const seconds = parts.reduce((total, part) => total * 60 + part, 0)
+
+  return seconds + Number(`0${fraction}`)
+}
+
+/**
+ * Chapters from a pasted list, one per line, as video descriptions write
+ * them: `0:00 Intro`, `1:23 - Setup`, or the time last as in `Setup (1:23)`.
+ * Lines without a time are skipped; the chapters come back in time order.
+ */
+export function parseChapterList(text: string): VideoChapter[] {
+  return text
+    .split(/\r?\n/)
+    .flatMap((line) => {
+      const groups = (
+        CHAPTER_LINE_TIME_FIRST_PATTERN.exec(line) ??
+        CHAPTER_LINE_TIME_LAST_PATTERN.exec(line)
+      )?.groups
+
+      if (!groups) return []
+
+      const startSeconds = parseChapterTime(groups.time)
+      const title = groups.title.trim()
+
+      return startSeconds !== null && title ? [{ title, startSeconds }] : []
+    })
+    .sort((left, right) => left.startSeconds - right.startSeconds)
+}
+
+/** The stretches of the track between its breaks, from 0 to 1. */
+export const toSliderSegments = (breaks: number[]) => {
+  const edges = [0, ...breaks.filter((at) => at > 0 && at < 1), 1]
+
+  return edges.slice(1).map((end, index) => ({ start: edges[index], end }))
+}
+
+/** How much of the segment from `start` to `end` lies before `value`, as a CSS width. */
+export const segmentFill = (value: number, start: number, end: number) =>
+  `${Math.min(1, Math.max(0, (value - start) / (end - start))) * 100}%`

@@ -22,7 +22,10 @@ import type {
 } from "../constants/webhooks.constants"
 
 import type { z } from "zod"
-import type { libraryPlayerSettingsSchema } from "../schemas/libraries.schemas"
+import type {
+  libraryPlayerSettingsSchema,
+  videoChapterSchema,
+} from "../schemas/libraries.schemas"
 
 type ValueOf<T> = T[keyof T]
 
@@ -50,6 +53,8 @@ export type ActivityAction = ValueOf<typeof ACTIVITY_ACTIONS>
 export type SignInFailureReason = ValueOf<typeof SIGN_IN_FAILURE_REASONS>
 
 export type LibraryPlayerSettings = z.output<typeof libraryPlayerSettingsSchema>
+
+export type VideoChapter = z.output<typeof videoChapterSchema>
 
 /** The player's on/off settings, which the dashboard shows as switches. */
 export type LibraryPlayerSwitch = {

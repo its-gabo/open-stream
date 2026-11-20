@@ -17,12 +17,16 @@ import type {
   StorageByteRange,
 } from "../../storage/types/storage.types"
 import {
+  CHAPTERS_TRACK_PATH,
   LIBRARY_API_PATH,
   PLAYBACK_QUERY_KEYS,
   PLAYBACK_EXPIRES_PATTERN,
   TEXT_FILE_EXTENSIONS,
 } from "../constants/library-api.constants"
-import { VIDEO_DERIVED_FILES } from "../constants/video-processing.constants"
+import {
+  VIDEO_DERIVED_CONTENT_TYPES,
+  VIDEO_DERIVED_FILES,
+} from "../constants/video-processing.constants"
 import { toLibraryPlayerSettingsDto } from "../dto/libraries.dto.mappers"
 import type { PlaybackUrlCreateBody } from "../dto/libraries.schemas"
 import { LIBRARY_ERRORS } from "../errors/libraries.errors"
@@ -54,6 +58,7 @@ import {
   isThumbnailFileName,
   thumbnailsPrefixOf,
 } from "../utils/video-files.utils"
+import { buildChaptersVtt } from "../utils/video-chapters.utils"
 import type { LibraryStorageService } from "./library-storage.service"
 import { apiKeyIdSchema } from "../dto/libraries.schemas"
 
@@ -108,6 +113,7 @@ export class VideoPlaybackService {
         originalUrl: urls.originalUrl,
         posterUrl: urls.posterUrl,
         storyboardUrl: urls.storyboardUrl,
+        chaptersUrl: urls.chaptersUrl,
         embedUrl: `${this.config.WEB_ORIGIN}${videoEmbedPath(library.id, video.id)}?${query}`,
         expiresAt: new Date(expires * 1000).toISOString(),
       },
@@ -149,6 +155,7 @@ export class VideoPlaybackService {
         posterUrl: urls.posterUrl,
         storyboardUrl: urls.storyboardUrl,
         viewsUrl: urls.viewsUrl,
+        chapters: video.chapters,
         allowedPlaybackHosts: library.allowedPlaybackHosts,
         player: toLibraryPlayerSettingsDto(library),
       },
@@ -173,6 +180,7 @@ export class VideoPlaybackService {
         `${VIDEO_DERIVED_FILES.THUMBNAILS_FOLDER}/${VIDEO_DERIVED_FILES.STORYBOARD_VTT}`
       ),
       viewsUrl: withQuery("views"),
+      chaptersUrl: withQuery(CHAPTERS_TRACK_PATH),
     }
   }
 
@@ -234,6 +242,23 @@ export class VideoPlaybackService {
       fileName,
       toSignatureQuery(request)
     )
+  }
+
+  /** The chapters of a processed video as a WebVTT track, for players other than OpenStream's. */
+  async readChaptersTrack(request: PlaybackRequest): Promise<PlaybackFile> {
+    const { video } = await this.authorizePlayback(request)
+
+    if (
+      video.processingStatus !== VIDEO_PROCESSING_STATUSES.READY ||
+      video.durationSeconds === null
+    ) {
+      throw new DomainError(LIBRARY_ERRORS.VIDEO_NOT_READY)
+    }
+
+    return {
+      contentType: VIDEO_DERIVED_CONTENT_TYPES[".vtt"],
+      body: buildChaptersVtt(video.chapters, video.durationSeconds),
+    }
   }
 
   /**

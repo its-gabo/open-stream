@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next"
 
 import { formatCount } from "../analytics.utils"
+import { AnalyticsCard } from "./analytics-card"
 
 import type { ReactNode } from "react"
 
@@ -16,8 +17,7 @@ export function RankingList({ title, emptyText, rows }: RankingListProps) {
   const topViews = Math.max(1, ...rows.map(({ views }) => views))
 
   return (
-    <section className="flex flex-col gap-3 rounded-lg border p-4">
-      <h3 className="text-sm font-medium">{title}</h3>
+    <AnalyticsCard title={title}>
       {rows.length === 0 ? (
         <p className="text-sm text-muted-foreground">{emptyText}</p>
       ) : (
@@ -48,6 +48,6 @@ export function RankingList({ title, emptyText, rows }: RankingListProps) {
           ))}
         </ol>
       )}
-    </section>
+    </AnalyticsCard>
   )
 }

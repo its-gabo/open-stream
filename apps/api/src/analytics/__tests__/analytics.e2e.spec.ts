@@ -439,6 +439,53 @@ describe("Analytics (e2e)", () => {
       expect(retention[10]).toEqual({ percent: 100, views: 1 })
     })
 
+    it("shows how far views got through each chapter", async () => {
+      const videoId = await createVideo("Launch")
+      await memberClient.put(`${libraryPath}/videos/${videoId}/chapters`, {
+        chapters: [
+          { title: "Intro", startSeconds: 0 },
+          { title: "Demo", startSeconds: 1 },
+          { title: "Outro", startSeconds: 2 },
+        ],
+      })
+      await startView(videoId)
+      await recordView(videoId, 1.5, 1.5)
+      await recordView(videoId, 3, 3)
+
+      const { chapters } = await readVideoAnalytics(videoId)
+
+      expect(chapters).toEqual([
+        {
+          title: "Intro",
+          startSeconds: 0,
+          endSeconds: 1,
+          views: 3,
+          completedViews: 2,
+        },
+        {
+          title: "Demo",
+          startSeconds: 1,
+          endSeconds: 2,
+          views: 2,
+          completedViews: 1,
+        },
+        {
+          title: "Outro",
+          startSeconds: 2,
+          endSeconds: 3,
+          views: 1,
+          completedViews: 1,
+        },
+      ])
+    })
+
+    it("shows no chapter figures for a video without chapters", async () => {
+      const videoId = await createVideo("Launch")
+      await recordView(videoId, 3, 3)
+
+      expect((await readVideoAnalytics(videoId)).chapters).toEqual([])
+    })
+
     it("keeps each library's views apart", async () => {
       const videoId = await createVideo("Launch")
       const otherLibraryId = (

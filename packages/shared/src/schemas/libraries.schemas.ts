@@ -9,6 +9,7 @@ import {
   PLAYER_ACCENT_COLOR_PATTERN,
   STORAGE_BUCKET_PATTERN,
   STORAGE_FIELD_LIMITS,
+  VIDEO_CHAPTER_LIMITS,
   VIDEO_FIELD_LIMITS,
   VIDEO_IMPORT_LIMITS,
 } from "../constants/libraries.constants"
@@ -26,6 +27,53 @@ export const videoTitleSchema = z
   .trim()
   .min(1)
   .max(VIDEO_FIELD_LIMITS.TITLE_MAX_LENGTH)
+
+export const videoChapterSchema = z.object({
+  title: z.string().trim().min(1).max(VIDEO_CHAPTER_LIMITS.TITLE_MAX_LENGTH),
+  /** Seconds from the start of the video, kept to the millisecond. */
+  startSeconds: z
+    .number()
+    .nonnegative()
+    .transform((seconds) => Math.round(seconds * 1000) / 1000),
+})
+
+/**
+ * A video's chapters in playback order: the first starts at 0:00 and each
+ * later one at least `MIN_LENGTH_SECONDS` after the one before it, so they
+ * cover the whole video without overlapping. Whether the last one is long
+ * enough depends on the video's duration, which only the API knows.
+ */
+export const videoChaptersSchema = z
+  .array(videoChapterSchema)
+  .max(VIDEO_CHAPTER_LIMITS.MAX_PER_VIDEO)
+  .superRefine((chapters, context) => {
+    if (chapters.length > 0 && chapters[0]!.startSeconds !== 0) {
+      context.addIssue({
+        code: "custom",
+        path: [0, "startSeconds"],
+        message: "The first chapter must start at 0:00",
+      })
+    }
+
+    chapters.forEach((chapter, index) => {
+      if (index === 0) return
+
+      const previousStart = chapters[index - 1]!.startSeconds
+
+      if (
+        chapter.startSeconds - previousStart >=
+        VIDEO_CHAPTER_LIMITS.MIN_LENGTH_SECONDS
+      ) {
+        return
+      }
+
+      context.addIssue({
+        code: "custom",
+        path: [index, "startSeconds"],
+        message: `Each chapter must start at least ${VIDEO_CHAPTER_LIMITS.MIN_LENGTH_SECONDS} second after the one before it`,
+      })
+    })
+  })
 
 export const videoImportUrlSchema = z
   .string()
@@ -89,6 +137,8 @@ export const libraryPlayerSettingsSchema = z.object({
   showPictureInPicture: z.boolean(),
   /** The fullscreen button, double-click and the `F` shortcut. */
   showFullscreen: z.boolean(),
+  /** A video's chapters on the seek bar and in a chapter menu, when it has any. */
+  showChapters: z.boolean(),
 })
 
 export const libraryApiKeyNameSchema = z

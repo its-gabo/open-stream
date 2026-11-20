@@ -111,6 +111,22 @@ export const LIBRARY_ROUTE_ERROR_DESCRIPTIONS = {
     423: PENDING_DELETION,
     503: "The video storage is unavailable",
   },
+  VIDEO_CHAPTERS_UPDATE: {
+    401: SESSION_REQUIRED,
+    403: API_ERROR_RESPONSE_DESCRIPTIONS.ORIGIN_NOT_ALLOWED,
+    404: VIDEO_NOT_FOUND,
+    409: "The video is not processed yet, or is being processed",
+    422: "The chapters are invalid: the first must start at 0:00, and each must last at least a second, the last one before the video ends",
+    423: PENDING_DELETION,
+  },
+  API_VIDEO_CHAPTERS_UPDATE: {
+    401: API_KEY_INVALID,
+    403: API_KEY_SCOPE_MISSING,
+    404: VIDEO_NOT_FOUND_IN_LIBRARY,
+    409: "The video is not processed yet, or is being processed",
+    422: "The chapters are invalid: the first must start at 0:00, and each must last at least a second, the last one before the video ends",
+    423: PENDING_DELETION,
+  },
   SECURITY_UPDATE: {
     401: SESSION_REQUIRED,
     403: OWNER_REQUIRED,

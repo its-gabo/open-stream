@@ -28,6 +28,7 @@ export const LIBRARY_SUCCESS_CODES = {
   VIDEO_STATUS_GET: "video.status.get.success",
   VIDEO_EMBED_GET: "video.embed.get.success",
   VIDEO_POSTER_UPDATE: "video.poster.update.success",
+  VIDEO_CHAPTERS_UPDATE: "video.chapters.update.success",
 } as const
 
 export const LIBRARY_SUCCESS_RESULTS = {
@@ -138,5 +139,9 @@ export const LIBRARY_SUCCESS_RESULTS = {
   VIDEO_POSTER_UPDATE: {
     code: LIBRARY_SUCCESS_CODES.VIDEO_POSTER_UPDATE,
     message: "Video poster saved.",
+  },
+  VIDEO_CHAPTERS_UPDATE: {
+    code: LIBRARY_SUCCESS_CODES.VIDEO_CHAPTERS_UPDATE,
+    message: "Video chapters saved.",
   },
 } as const satisfies ApiResultCatalog<typeof LIBRARY_SUCCESS_CODES>

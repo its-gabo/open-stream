@@ -66,6 +66,8 @@ export const ACTIVITY_ACTIONS = {
   WEBHOOK_DELIVERY_RESENT: "webhook.delivery_resent",
   VIDEO_CREATED: "video.created",
   VIDEO_UPDATED: "video.updated",
+  VIDEO_POSTER_UPDATED: "video.poster_updated",
+  VIDEO_CHAPTERS_UPDATED: "video.chapters_updated",
   VIDEO_DELETED: "video.deleted",
   VIDEO_UPLOADED: "video.uploaded",
   VIDEO_UPLOAD_CANCELED: "video.upload_canceled",

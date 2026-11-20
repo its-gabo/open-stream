@@ -191,6 +191,7 @@ export const VIDEO_PLAYER_PATHS = {
 export const VIDEO_DETAILS_TABS = {
   DETAILS: "details",
   THUMBNAIL: "thumbnail",
+  CHAPTERS: "chapters",
   ANALYTICS: "analytics",
   EMBED: "embed",
 } as const
@@ -220,6 +221,26 @@ export const PLAYER_SLIDER_KEY_DIRECTIONS = {
   ArrowUp: 1,
   ArrowLeft: -1,
   ArrowDown: -1,
+} as const
+
+/** A typed chapter start: hours and minutes optional, then seconds, with an optional fraction. */
+export const CHAPTER_TIME_PATTERN = /^(\d{1,2}(?::\d{1,2}){0,2})(\.\d{1,3})?$/
+
+/** A pasted chapter line with the time first: `0:00 Intro`, `- 1:23 – Setup`, `[1:23] Setup`; the title is set apart from the time. */
+export const CHAPTER_LINE_TIME_FIRST_PATTERN =
+  /^\s*(?:[-*•]\s*)?[[(]?(?<time>\d{1,2}(?::\d{2}){1,2}(?:\.\d{1,3})?)(?:[\])]\s*|\s*[-–—:|]\s*|\s+)(?<title>.+)$/
+
+/** A pasted chapter line with the time last: `Setup 1:23`, `Setup - (1:23)`; the time is set apart from the title. */
+export const CHAPTER_LINE_TIME_LAST_PATTERN =
+  /^\s*(?:[-*•]\s*)?(?<title>.+?)(?:\s*[[(]|\s*[-–—|]\s*|\s+)(?<time>\d{1,2}(?::\d{2}){1,2}(?:\.\d{1,3})?)[\])]?\s*$/
+
+/** Where the player settings preview splits its seek bar into chapters, from 0 to 1. */
+export const LIBRARY_PLAYER_PREVIEW_CHAPTER_BREAKS = [0.25, 0.6]
+
+/** Width of chapter thumbnails cut from the storyboard, in pixels: as tall as an input in the editor, smaller in the player. */
+export const CHAPTER_THUMBNAIL_WIDTHS = {
+  EDITOR: 64,
+  PLAYER_MENU: 48,
 } as const
 
 /** Pages of the player's settings menu. */

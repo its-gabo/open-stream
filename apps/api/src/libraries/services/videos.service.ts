@@ -1,6 +1,8 @@
 import {
   ACTIVITY_ACTIONS,
+  VIDEO_PROCESSING_STATUSES,
   WEBHOOK_EVENT_TYPES,
+  latestChapterStartSeconds,
   videoTitleFromFileName,
   type WebhookEventType,
 } from "@workspace/shared"
@@ -20,7 +22,11 @@ import {
   toVideoDto,
   toVideoStatusDetailsDto,
 } from "../dto/libraries.dto.mappers"
-import type { VideoCreateBody, VideoUpdateBody } from "../dto/libraries.schemas"
+import type {
+  VideoChaptersUpdateBody,
+  VideoCreateBody,
+  VideoUpdateBody,
+} from "../dto/libraries.schemas"
 import { LIBRARY_ERRORS } from "../errors/libraries.errors"
 import type { VideosRepository } from "../repository/videos.repository"
 import type { LibraryProfile } from "../types/libraries.types"
@@ -162,6 +168,79 @@ export class VideosService {
     )
 
     return { video: await this.toVideoDtoWithImport(renamed) }
+  }
+
+  /**
+   * Replaces the chapters of a processed video. Only its duration, known once
+   * it is processed, tells whether the last chapter lasts the minimum length.
+   * Saving the same chapters again changes and records nothing.
+   */
+  async updateVideoChapters(
+    library: LibraryProfile,
+    actor: ActivityActor,
+    videoId: string,
+    input: VideoChaptersUpdateBody
+  ) {
+    const updated = await this.videosRepository.transaction(
+      async (transaction) => {
+        const video = await this.videosRepository.lockVideo(
+          {
+            organizationId: library.organizationId,
+            libraryId: library.id,
+            videoId,
+          },
+          transaction
+        )
+
+        if (!video) throw new DomainError(LIBRARY_ERRORS.VIDEO_NOT_FOUND)
+
+        if (
+          video.processingStatus !== VIDEO_PROCESSING_STATUSES.READY ||
+          video.durationSeconds === null
+        ) {
+          throw new DomainError(LIBRARY_ERRORS.VIDEO_NOT_READY)
+        }
+
+        const latestStart = latestChapterStartSeconds(video.durationSeconds)
+
+        if (
+          input.chapters.some(({ startSeconds }) => startSeconds > latestStart)
+        ) {
+          throw new DomainError(LIBRARY_ERRORS.CHAPTER_OUT_OF_RANGE)
+        }
+
+        const changes = diffActivityValues(
+          { chapters: video.chapters },
+          { chapters: input.chapters }
+        )
+
+        if (!changes) return video
+
+        const changed = await this.videosRepository.updateVideo(
+          video.id,
+          { chapters: input.chapters },
+          transaction
+        )
+
+        if (!changed) throw new DomainError(LIBRARY_ERRORS.VIDEO_NOT_FOUND)
+
+        await this.recordVideoChange(
+          library,
+          actor,
+          {
+            eventType: WEBHOOK_EVENT_TYPES.VIDEO_UPDATED,
+            action: ACTIVITY_ACTIONS.VIDEO_CHAPTERS_UPDATED,
+            video: changed,
+            ...changes,
+          },
+          transaction
+        )
+
+        return changed
+      }
+    )
+
+    return { video: await this.toVideoDtoWithImport(updated) }
   }
 
   /**

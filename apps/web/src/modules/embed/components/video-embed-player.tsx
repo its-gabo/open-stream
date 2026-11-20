@@ -56,6 +56,7 @@ export function VideoEmbedPlayer({ result, options }: VideoEmbedPlayerProps) {
         sendsCredentials={false}
         autoFocus={false}
         viewsUrl={embed.viewsUrl}
+        chapters={embed.chapters}
         controls={embed.player}
       />
     </Suspense>

@@ -1,4 +1,5 @@
 import {
+  VIDEO_CHAPTER_LIMITS,
   VIDEO_FIELD_LIMITS,
   VIDEO_FILE_FORMAT_DETAILS,
 } from "../constants/libraries.constants"
@@ -26,3 +27,7 @@ export const videoTitleFromFileName = (fileName: string): string => {
     VIDEO_FIELD_LIMITS.TITLE_MAX_LENGTH
   )
 }
+
+/** The latest a chapter can start in a video this long, so that it still lasts the minimum length. */
+export const latestChapterStartSeconds = (durationSeconds: number) =>
+  durationSeconds - VIDEO_CHAPTER_LIMITS.MIN_LENGTH_SECONDS

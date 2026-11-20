@@ -5,11 +5,11 @@ import {
   ChevronRightIcon,
   SettingsIcon,
 } from "lucide-react"
-import { useHotkey } from "@tanstack/react-hotkeys"
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { match } from "ts-pattern"
 
+import { usePlayerMenuDismiss } from "../hooks/use-player-menu-dismiss"
 import {
   AUTO_QUALITY_LEVEL,
   PLAYBACK_RATES,
@@ -61,27 +61,12 @@ export function PlayerSettingsMenu({
     onOpenChange(next !== null)
   }
 
-  useHotkey("Escape", () => changeView(null), {
-    target: menuRef,
-    enabled: view !== null,
-    capture: true,
-  })
+  const close = useCallback(() => {
+    setView(null)
+    onOpenChange(false)
+  }, [onOpenChange])
 
-  useEffect(() => {
-    if (!view) return
-
-    const closeOnOutsidePointer = (event: PointerEvent) => {
-      if (!menuRef.current?.contains(event.target as Node)) {
-        setView(null)
-        onOpenChange(false)
-      }
-    }
-
-    document.addEventListener("pointerdown", closeOnOutsidePointer)
-
-    return () =>
-      document.removeEventListener("pointerdown", closeOnOutsidePointer)
-  }, [view, onOpenChange])
+  usePlayerMenuDismiss(menuRef, view !== null, close)
 
   return (
     <div ref={menuRef} className="relative">
@@ -209,7 +194,8 @@ function SettingsOptions({
 
 type PlayerMenuItemProps = ComponentProps<"button">
 
-function PlayerMenuItem({ className, ...props }: PlayerMenuItemProps) {
+/** A row of a menu drawn inside the player. */
+export function PlayerMenuItem({ className, ...props }: PlayerMenuItemProps) {
   return (
     <button
       type="button"

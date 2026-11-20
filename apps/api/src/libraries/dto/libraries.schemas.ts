@@ -16,6 +16,7 @@ import {
   libraryNameSchema,
   libraryPlayerSettingsSchema,
   playbackHostSchema,
+  videoChaptersSchema,
   videoImportUrlSchema,
   videoQualitiesSchema,
   videoTitleSchema,
@@ -188,6 +189,11 @@ export const videoPosterUpdateBodySchema = z
   ])
   .meta({ id: "VideoPosterUpdateBody" })
 
+/** Replaces all of the video's chapters; an empty list removes them. */
+export const videoChaptersUpdateBodySchema = z
+  .object({ chapters: videoChaptersSchema })
+  .meta({ id: "VideoChaptersUpdateBody" })
+
 /** A JPEG, PNG or WebP image; it is scaled down to the poster's size. */
 export const videoPosterImageBodySchema = z
   .object({ image: z.file() })
@@ -233,6 +239,14 @@ export const videoPosterDtoSchema = z
     updatedAt: z.iso.datetime().nullable(),
   })
   .meta({ id: "VideoPoster" })
+
+export const videoChapterDtoSchema = z
+  .object({
+    title: z.string(),
+    /** Seconds from the start; the chapter runs until the next one starts, or the video ends. */
+    startSeconds: z.number().nonnegative(),
+  })
+  .meta({ id: "VideoChapter" })
 
 const videoFileFormatSchema = z
   .enum(VIDEO_FILE_FORMATS)
@@ -290,6 +304,8 @@ export const videoDtoSchema = z
     renditions: z.array(videoRenditionDtoSchema),
     processedAt: z.iso.datetime().nullable(),
     poster: videoPosterDtoSchema,
+    /** In playback order; the first starts at 0:00. Empty when the video has none. */
+    chapters: z.array(videoChapterDtoSchema),
   })
   .meta({ id: "Video" })
 
@@ -357,6 +373,8 @@ export const playbackUrlDtoSchema = z
     posterUrl: z.url(),
     /** WebVTT of seek preview tiles. */
     storyboardUrl: z.url(),
+    /** WebVTT chapters track, for players of your own; empty while the video has no chapters. */
+    chaptersUrl: z.url(),
     /** The embeddable player page, for an iframe; signed like the other URLs. */
     embedUrl: z.url(),
     expiresAt: z.iso.datetime(),
@@ -377,6 +395,7 @@ export const videoEmbedDtoSchema = z
     storyboardUrl: z.url(),
     /** Where the player starts counting a view, carrying the same signature. */
     viewsUrl: z.url(),
+    chapters: z.array(videoChapterDtoSchema),
     /** Hosts allowed to frame the player; empty when any site may. */
     allowedPlaybackHosts: z.array(z.string()),
     /** How the library's player looks and which controls it offers. */
@@ -469,6 +488,9 @@ export type VideoCreateBody = z.infer<typeof videoCreateBodySchema>
 export type VideoUpdateBody = z.infer<typeof videoUpdateBodySchema>
 export type VideoImportBody = z.infer<typeof videoImportBodySchema>
 export type VideoPosterUpdateBody = z.infer<typeof videoPosterUpdateBodySchema>
+export type VideoChaptersUpdateBody = z.infer<
+  typeof videoChaptersUpdateBodySchema
+>
 export type LibraryEncodingUpdateBody = z.infer<
   typeof libraryEncodingUpdateBodySchema
 >

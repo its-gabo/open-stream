@@ -13,6 +13,7 @@ import type {
   libraryPlayerFormSchema,
   librarySecurityFormSchema,
   libraryWebhookFormSchema,
+  videoChaptersFormSchema,
   videoCreateFormSchema,
 } from "./libraries.schemas"
 
@@ -34,6 +35,13 @@ export type LibrarySecurityFormValues = z.output<
 >
 export type VideoCreateFormValues = z.infer<
   ReturnType<typeof videoCreateFormSchema>
+>
+
+export type VideoChaptersFormInput = z.input<
+  ReturnType<typeof videoChaptersFormSchema>
+>
+export type VideoChaptersFormValues = z.output<
+  ReturnType<typeof videoChaptersFormSchema>
 >
 
 export type VideoSource = (typeof VIDEO_SOURCES)[keyof typeof VIDEO_SOURCES]

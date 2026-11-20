@@ -105,6 +105,7 @@ describe("Videos (e2e)", () => {
         renditions: [],
         processedAt: null,
         poster: { source: "automatic", frameSeconds: null, updatedAt: null },
+        chapters: [],
       })
     })
 

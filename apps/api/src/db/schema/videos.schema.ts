@@ -1,10 +1,12 @@
 import {
+  VIDEO_CHAPTER_LIMITS,
   VIDEO_FAILURE_REASONS,
   VIDEO_FILE_FORMATS,
   VIDEO_PROCESSING_FAILURE_REASONS,
   VIDEO_PROCESSING_STATUSES,
   VIDEO_POSTER_SOURCES,
   VIDEO_STATUSES,
+  type VideoChapter,
 } from "@workspace/shared"
 import type { VideoRendition } from "../../libraries/types/libraries.types"
 import { sql } from "drizzle-orm"
@@ -116,6 +118,8 @@ export const videos = pgTable(
     posterFrameSeconds: doublePrecision("poster_frame_seconds"),
     /** When the poster file last changed, so its URL can change with it. */
     posterUpdatedAt: timestamp("poster_updated_at", { withTimezone: true }),
+    /** In playback order, the first at 0:00; each runs until the next one starts. */
+    chapters: jsonb("chapters").$type<VideoChapter[]>().notNull().default([]),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -192,6 +196,10 @@ export const videos = pgTable(
     check(
       "videos_poster_frame_seconds_check",
       sql`(${table.posterSource} = 'frame') = (${table.posterFrameSeconds} is not null) and ${table.posterFrameSeconds} >= 0`
+    ),
+    check(
+      "videos_chapters_check",
+      sql`jsonb_typeof(${table.chapters}) = 'array' and jsonb_array_length(${table.chapters}) <= ${VIDEO_CHAPTER_LIMITS.MAX_PER_VIDEO}`.inlineParams()
     ),
     index("videos_library_id_created_at_idx").on(
       table.libraryId,

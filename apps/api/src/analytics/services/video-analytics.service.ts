@@ -1,4 +1,4 @@
-import { ANALYTICS_RANKING_LIMIT } from "@workspace/shared"
+import { ANALYTICS_RANKING_LIMIT, type VideoChapter } from "@workspace/shared"
 import { DomainError } from "../../common/errors/domain-error"
 import { LIBRARY_ERRORS } from "../../libraries/errors/libraries.errors"
 import type { LibraryProfile } from "../../libraries/types/libraries.types"
@@ -70,7 +70,11 @@ export class VideoAnalyticsService {
       videoId: video.id,
     }
     const { durationSeconds } = video
-    const [shared, reached] = await Promise.all([
+    const chapterSpans =
+      durationSeconds === null
+        ? []
+        : toChapterSpans(video.chapters, durationSeconds)
+    const [shared, reached, chapterReach] = await Promise.all([
       this.readSharedFigures(filter, period),
       durationSeconds === null
         ? Promise.resolve(null)
@@ -79,6 +83,15 @@ export class VideoAnalyticsService {
             RETENTION_PERCENTS.map((percent) =>
               retentionThresholdSeconds(percent, durationSeconds)
             )
+          ),
+      chapterSpans.length === 0
+        ? Promise.resolve([])
+        : this.videoViewsRepository.countViewsReaching(
+            filter,
+            chapterSpans.flatMap(({ startSeconds, reachedEndSeconds }) => [
+              startSeconds,
+              reachedEndSeconds,
+            ])
           ),
     ])
 
@@ -92,6 +105,15 @@ export class VideoAnalyticsService {
               views: reached[index]!,
             }))
           : [],
+        chapters: chapterSpans.map(
+          ({ title, startSeconds, endSeconds }, index) => ({
+            title,
+            startSeconds,
+            endSeconds,
+            views: chapterReach[index * 2]!,
+            completedViews: chapterReach[index * 2 + 1]!,
+          })
+        ),
       },
     }
   }
@@ -124,6 +146,24 @@ export class VideoAnalyticsService {
     }
   }
 }
+
+/**
+ * Each chapter with where it ends, and the position a view must reach to
+ * have played it to the end; the last chapter ends with the video, which
+ * counts a second early as the retention curve's end does.
+ */
+const toChapterSpans = (chapters: VideoChapter[], durationSeconds: number) =>
+  chapters.map(({ title, startSeconds }, index) => {
+    const nextStart = chapters[index + 1]?.startSeconds
+
+    return {
+      title,
+      startSeconds,
+      endSeconds: nextStart ?? durationSeconds,
+      reachedEndSeconds:
+        nextStart ?? retentionThresholdSeconds(100, durationSeconds),
+    }
+  })
 
 const toFilter = (
   scope: AnalyticsScope,

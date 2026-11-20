@@ -28,6 +28,7 @@ export const LIBRARY_ERROR_CODES = {
   POSTER_FRAME_OUT_OF_RANGE: "video.poster.frame_out_of_range",
   POSTER_IMAGE_TOO_LARGE: "video.poster.image_too_large",
   UNSUPPORTED_POSTER_IMAGE: "video.poster.unsupported_image",
+  CHAPTER_OUT_OF_RANGE: "video.chapters.out_of_range",
 } as const
 
 export const LIBRARY_ERRORS = {
@@ -187,5 +188,11 @@ export const LIBRARY_ERRORS = {
     code: LIBRARY_ERROR_CODES.UNSUPPORTED_POSTER_IMAGE,
     message: "Only JPEG, PNG and WebP images can be posters",
     reason: "video.unsupported_poster_image",
+  },
+  CHAPTER_OUT_OF_RANGE: {
+    kind: DOMAIN_ERROR_KINDS.INVALID_INPUT,
+    code: LIBRARY_ERROR_CODES.CHAPTER_OUT_OF_RANGE,
+    message: "A chapter starts less than a second before the end of the video",
+    reason: "video.chapter_out_of_range",
   },
 } as const satisfies DomainErrorCatalog<typeof LIBRARY_ERROR_CODES>

@@ -29,13 +29,17 @@ import {
 } from "../libraries.constants"
 import {
   canPlayHlsNatively,
+  findChapterAt,
   findStoryboardCue,
   formatPlaybackTime,
 } from "../libraries.utils"
 import { PlayerButton } from "./player-button"
+import { PlayerChaptersMenu } from "./player-chapters-menu"
 import { PlayerSettingsMenu } from "./player-settings-menu"
 import { PlayerSlider } from "./player-slider"
+import { StoryboardTile } from "./storyboard-tile"
 
+import type { VideoChapter } from "@workspace/shared"
 import type { CSSProperties } from "react"
 import type { PlayerControlsSettings } from "../libraries.types"
 
@@ -60,6 +64,8 @@ type VideoPlayerProps = {
   autoFocus?: boolean
   /** Where to count views of this video; views are not counted without it. */
   viewsUrl?: string
+  /** Shown on the seek bar and in a chapter menu, unless the controls turn them off. */
+  chapters?: VideoChapter[]
   /** The library's accent color and controls; the stock player when left out. */
   controls?: PlayerControlsSettings
   /** Told where playback is whenever it moves, e.g. to pick the frame shown. */
@@ -68,7 +74,7 @@ type VideoPlayerProps = {
 
 /**
  * Plays an HLS video with hls.js and the app's own controls: seeking with
- * storyboard previews, volume, quality and speed, picture-in-picture,
+ * storyboard previews, chapters, volume, quality and speed, picture-in-picture,
  * fullscreen and keyboard shortcuts. Where hls.js cannot run, e.g. on older
  * iPhones, the browser plays the stream with its own controls.
  */
@@ -85,6 +91,7 @@ export function VideoPlayer({
   sendsCredentials = true,
   autoFocus = true,
   viewsUrl,
+  chapters = [],
   controls = DEFAULT_LIBRARY_PLAYER_SETTINGS,
   onTimeUpdate,
 }: VideoPlayerProps) {
@@ -105,10 +112,13 @@ export function VideoPlayer({
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isIdle, setIsIdle] = useState(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const [isChaptersOpen, setIsChaptersOpen] = useState(false)
   const [previewSeconds, setPreviewSeconds] = useState<number | null>(null)
   const isPlaying = media?.isPlaying ?? false
   const duration = media?.duration ?? 0
-  const areControlsVisible = !isPlaying || !isIdle || isSettingsOpen
+  const areControlsVisible =
+    !isPlaying || !isIdle || isSettingsOpen || isChaptersOpen
+  const shownChapters = controls.showChapters ? chapters : []
   const currentTime = media?.currentTime ?? 0
 
   useEffect(() => {
@@ -192,6 +202,10 @@ export function VideoPlayer({
     (isOpen: boolean) => setIsSettingsOpen(isOpen),
     []
   )
+  const handleChaptersOpenChange = useCallback(
+    (isOpen: boolean) => setIsChaptersOpen(isOpen),
+    []
+  )
 
   useHotkeys(
     [
@@ -261,6 +275,10 @@ export function VideoPlayer({
   const previewCue =
     previewSeconds !== null
       ? findStoryboardCue(storyboard, previewSeconds)
+      : undefined
+  const previewChapter =
+    previewSeconds !== null
+      ? findChapterAt(shownChapters, previewSeconds)
       : undefined
   const VolumeIcon = match(media)
     .with({ isMuted: true }, () => VolumeXIcon)
@@ -340,6 +358,13 @@ export function VideoPlayer({
           valueText={`${formatPlaybackTime(media?.currentTime ?? 0)} / ${formatPlaybackTime(duration)}`}
           secondaryValue={duration ? (media?.bufferedEnd ?? 0) / duration : 0}
           keyboardStep={duration ? PLAYER_SEEK_STEP_SECONDS / duration : 0}
+          breaks={
+            duration
+              ? shownChapters
+                  .slice(1)
+                  .map((chapter) => chapter.startSeconds / duration)
+              : []
+          }
           onChange={(fraction) => seekTo(fraction * duration)}
           onHoverChange={(fraction) =>
             setPreviewSeconds(fraction === null ? null : fraction * duration)
@@ -348,15 +373,18 @@ export function VideoPlayer({
           hoverContent={
             previewSeconds !== null && (
               <div className="flex flex-col items-center gap-1">
+                {previewChapter && (
+                  <span
+                    className="truncate rounded bg-black/80 px-1.5 py-0.5 text-xs font-medium text-white"
+                    style={{ maxWidth: previewCue?.width }}
+                  >
+                    {previewChapter.title}
+                  </span>
+                )}
                 {previewCue && (
-                  <div
-                    className="rounded-md border border-white/20 bg-black bg-no-repeat shadow-lg"
-                    style={{
-                      width: previewCue.width,
-                      height: previewCue.height,
-                      backgroundImage: `url("${previewCue.imageUrl}")`,
-                      backgroundPosition: `-${previewCue.x}px -${previewCue.y}px`,
-                    }}
+                  <StoryboardTile
+                    cue={previewCue}
+                    className="rounded-md border border-white/20 shadow-lg"
                   />
                 )}
                 <span className="rounded bg-black/80 px-1.5 py-0.5 text-xs font-medium text-white tabular-nums">
@@ -399,14 +427,23 @@ export function VideoPlayer({
               onChange={changeVolume}
             />
           </div>
-          <span className="ml-2 text-sm text-white/90 tabular-nums">
+          <span className="ml-2 shrink-0 text-sm text-white/90 tabular-nums">
             {formatPlaybackTime(media?.currentTime ?? 0)}
             <span className="text-white/60">
               {" / "}
               {formatPlaybackTime(duration)}
             </span>
           </span>
-          <div className="ml-auto flex items-center gap-1">
+          {shownChapters.length > 0 && (
+            <PlayerChaptersMenu
+              chapters={shownChapters}
+              currentSeconds={currentTime}
+              storyboard={storyboard}
+              onSeek={seekTo}
+              onOpenChange={handleChaptersOpenChange}
+            />
+          )}
+          <div className="ml-auto flex shrink-0 items-center gap-1">
             {controls.showSettingsMenu && (
               <PlayerSettingsMenu
                 qualities={playback.qualities}

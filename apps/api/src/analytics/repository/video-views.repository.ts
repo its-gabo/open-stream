@@ -35,6 +35,7 @@ export class VideoViewsRepository {
         id: videos.id,
         title: videos.title,
         durationSeconds: videos.durationSeconds,
+        chapters: videos.chapters,
       })
       .from(videos)
       .where(and(eq(videos.libraryId, libraryId), eq(videos.id, videoId)))

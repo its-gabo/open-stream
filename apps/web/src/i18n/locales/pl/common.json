@@ -73,6 +73,21 @@
     "webhook_url": {
       "required": "Podaj adres URL, na który mają trafiać zdarzenia",
       "invalid": "Podaj pełny adres http:// lub https:// bez nazwy użytkownika i hasła"
+    },
+    "chapters": {
+      "time_invalid": "Podaj czas, np. 1:05 lub 1:02:03.",
+      "title_required": "Podaj tytuł.",
+      "title_max_length": "Użyj maksymalnie {{max}} znaków.",
+      "too_many": "Użyj maksymalnie {{max}} rozdziałów.",
+      "first_at_start": "Pierwszy rozdział zaczyna się od 0:00.",
+      "too_close_one": "Rozdział musi zaczynać się co najmniej {{count}} sekundę po poprzednim.",
+      "too_close_few": "Rozdział musi zaczynać się co najmniej {{count}} sekundy po poprzednim.",
+      "too_close_many": "Rozdział musi zaczynać się co najmniej {{count}} sekund po poprzednim.",
+      "too_close_other": "Rozdział musi zaczynać się co najmniej {{count}} sekundy po poprzednim.",
+      "too_close_to_end_one": "Rozdział musi zaczynać się co najmniej {{count}} sekundę przed końcem filmu ({{time}}).",
+      "too_close_to_end_few": "Rozdział musi zaczynać się co najmniej {{count}} sekundy przed końcem filmu ({{time}}).",
+      "too_close_to_end_many": "Rozdział musi zaczynać się co najmniej {{count}} sekund przed końcem filmu ({{time}}).",
+      "too_close_to_end_other": "Rozdział musi zaczynać się co najmniej {{count}} sekundy przed końcem filmu ({{time}})."
     }
   },
   "pages": {
@@ -192,7 +207,8 @@
       "library.webhook.delivery_resend.success": "Dostarczenie zostanie wysłane ponownie.",
       "video.status.get.success": "Pobrano status filmu.",
       "activity.list.success": "Pobrano aktywność.",
-      "video.poster.update.success": "Zapisano miniaturę."
+      "video.poster.update.success": "Zapisano miniaturę.",
+      "video.chapters.update.success": "Zapisano rozdziały."
     },
     "error": {
       "fallback": "Ups, coś poszło nie tak..",
@@ -258,7 +274,8 @@
       "library.webhook.delivery_pending": "To dostarczenie jest jeszcze wysyłane.",
       "video.poster.frame_out_of_range": "Ta klatka wypada po końcu filmu.",
       "video.poster.image_too_large": "Ten obraz przekracza limit 5 MB.",
-      "video.poster.unsupported_image": "Miniaturą może być tylko prawdziwy obraz JPEG, PNG lub WebP."
+      "video.poster.unsupported_image": "Miniaturą może być tylko prawdziwy obraz JPEG, PNG lub WebP.",
+      "video.chapters.out_of_range": "Rozdział zaczyna się mniej niż sekundę przed końcem filmu."
     }
   },
   "errors": {
@@ -678,6 +695,10 @@
         "showFullscreen": {
           "label": "Pełny ekran",
           "hint": "Przycisk pełnego ekranu, podwójne kliknięcie i skrót F."
+        },
+        "showChapters": {
+          "label": "Rozdziały",
+          "hint": "Dzieli pasek przewijania na rozdziały i pozwala widzom przechodzić między nimi, w filmach, które je mają."
         }
       },
       "hint": "Zmiany obejmą każde osadzenie tej biblioteki przy jego następnym wczytaniu.",
@@ -685,7 +706,8 @@
       "preview_title": "Premiera produktu",
       "save": "Zapisz odtwarzacz",
       "owner_only_title": "Tylko właściciel może zmienić odtwarzacz",
-      "owner_only_description": "Poproś właściciela organizacji o zmianę wyglądu odtwarzacza tej biblioteki."
+      "owner_only_description": "Poproś właściciela organizacji o zmianę wyglądu odtwarzacza tej biblioteki.",
+      "preview_chapter": "Pierwsze kroki"
     },
     "webhooks": {
       "owner_only_title": "Webhookami zarządza tylko właściciel",
@@ -702,7 +724,7 @@
       "events_title": "Zdarzenia",
       "events": {
         "video_created": "Utworzono film, w panelu albo przez API.",
-        "video_updated": "Zmieniono nazwę filmu.",
+        "video_updated": "Zmieniono nazwę filmu, jego miniaturę albo rozdziały.",
         "video_deleted": "Usunięto film. Jego pliki zostaną wkrótce usunięte z magazynu.",
         "video_uploaded": "Cały plik dotarł i przeszedł sprawdzenie.",
         "video_upload_failed": "Plik odrzucono, np. nie jest naprawdę MP4 ani MOV, albo importu nie udało się pobrać.",
@@ -860,7 +882,8 @@
         "created": "Utworzono",
         "uploaded": "Przesłano",
         "processed": "Przetworzono"
-      }
+      },
+      "default_player": "Pokaż domyślny odtwarzacz"
     },
     "poster": {
       "title": "Miniatura",
@@ -874,7 +897,6 @@
       "use_frame": "Użyj klatki z {{time}}",
       "upload_image": "Prześlij obraz",
       "reset": "Wybierz automatycznie",
-      "image_hint": "Zatrzymaj odtwarzacz na wybranej klatce albo prześlij obraz JPEG, PNG lub WebP do {{size}}. Obrazy są zmniejszane do 1280 pikseli na dłuższym boku.",
       "image_too_large": "Wybierz obraz do {{size}}."
     },
     "player": {
@@ -895,7 +917,40 @@
       "speed_normal": "Normalna",
       "picture_in_picture": "Obraz w obrazie",
       "fullscreen": "Pełny ekran",
-      "exit_fullscreen": "Zamknij pełny ekran"
+      "exit_fullscreen": "Zamknij pełny ekran",
+      "chapters": "Rozdziały"
+    },
+    "chapters": {
+      "title": "Rozdziały",
+      "description": "Rozdziały dzielą pasek przewijania i pozwalają widzom przejść do wybranej części filmu. Każdy trwa do początku następnego.",
+      "empty": "Brak rozdziałów. Zatrzymaj odtwarzacz tam, gdzie zaczyna się część filmu, i dodaj rozdział albo wklej listę.",
+      "time_label": "Początek rozdziału {{number}}",
+      "title_label": "Tytuł rozdziału {{number}}",
+      "title_placeholder": "Tytuł rozdziału",
+      "remove": "Usuń rozdział {{title}}",
+      "remove_all": "Usuń wszystkie",
+      "add_at": "Dodaj rozdział od {{time}}",
+      "paste": "Wklej listę",
+      "save": "Zapisz rozdziały",
+      "paste_dialog": {
+        "title": "Wklej rozdziały",
+        "description": "Jeden rozdział w wierszu, z czasem początku, jak w opisie filmu: 0:00 Wstęp. Czas może też być na końcu, np. Konfiguracja (1:23).",
+        "label": "Rozdziały",
+        "found_one": "Znaleziono {{count}} rozdział",
+        "found_few": "Znaleziono {{count}} rozdziały",
+        "found_many": "Znaleziono {{count}} rozdziałów",
+        "found_other": "Znaleziono {{count}} rozdziału",
+        "replaces": "Zastąpią obecną listę rozdziałów. Nic nie zostanie zapisane, dopóki nie zapiszesz rozdziałów.",
+        "apply_one": "Użyj {{count}} rozdziału",
+        "apply_few": "Użyj {{count}} rozdziałów",
+        "apply_many": "Użyj {{count}} rozdziałów",
+        "apply_other": "Użyj {{count}} rozdziału",
+        "after_end": "za blisko końca",
+        "skipped_one": "{{count}} rozdział zaczyna się mniej niż sekundę przed końcem filmu ({{duration}}) i zostanie pominięty.",
+        "skipped_few": "{{count}} rozdziały zaczynają się mniej niż sekundę przed końcem filmu ({{duration}}) i zostaną pominięte.",
+        "skipped_many": "{{count}} rozdziałów zaczyna się mniej niż sekundę przed końcem filmu ({{duration}}) i zostanie pominiętych.",
+        "skipped_other": "{{count}} rozdziału zaczyna się mniej niż sekundę przed końcem filmu ({{duration}}) i zostanie pominięte."
+      }
     }
   },
   "embed": {
@@ -980,6 +1035,11 @@
     },
     "top_libraries": {
       "title": "Najpopularniejsze biblioteki"
+    },
+    "chapters": {
+      "title": "Rozdziały",
+      "reached": "dotarło",
+      "finished": "do końca"
     }
   },
   "pagination": {
@@ -1134,6 +1194,8 @@
       "webhook_delivery_resent": "Ponowiono dostarczenie webhooka",
       "video_created": "Utworzono film",
       "video_updated": "Zmieniono nazwę filmu",
+      "video_poster_updated": "Zmieniono miniaturę filmu",
+      "video_chapters_updated": "Zmieniono rozdziały filmu",
       "video_deleted": "Usunięto film",
       "video_uploaded": "Przesłano plik filmu",
       "video_upload_canceled": "Anulowano przesyłanie",

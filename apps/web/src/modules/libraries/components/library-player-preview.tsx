@@ -1,4 +1,5 @@
 import {
+  ChevronRightIcon,
   MaximizeIcon,
   PictureInPicture2Icon,
   PlayIcon,
@@ -7,7 +8,14 @@ import {
 } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
+import { LIBRARY_PLAYER_PREVIEW_CHAPTER_BREAKS } from "../libraries.constants"
+import { segmentFill, toSliderSegments } from "../libraries.utils"
+
 import type { LibraryPlayerFormValues } from "../libraries.types"
+
+/** Where the still's seek bar shows playback and buffering, from 0 to 1. */
+const PREVIEW_PROGRESS = 0.4
+const PREVIEW_BUFFERED = 0.6
 
 type LibraryPlayerPreviewProps = {
   settings: LibraryPlayerFormValues
@@ -30,15 +38,36 @@ export function LibraryPlayerPreview({ settings }: LibraryPlayerPreviewProps) {
         )}
       </div>
       <div className="flex flex-col gap-2 bg-gradient-to-t from-black/80 via-black/40 to-transparent px-3 pt-10 pb-3">
-        <div className="relative h-1 w-full rounded-full bg-white/25">
-          <div className="absolute inset-y-0 left-0 w-3/5 rounded-full bg-white/35" />
+        <div className="relative flex h-1 w-full gap-0.5">
+          {toSliderSegments(
+            settings.showChapters ? LIBRARY_PLAYER_PREVIEW_CHAPTER_BREAKS : []
+          ).map(({ start, end }) => (
+            <div
+              key={start}
+              className="relative h-full overflow-hidden rounded-full bg-white/25"
+              style={{ flexGrow: end - start, flexBasis: 0 }}
+            >
+              <div
+                className="absolute inset-y-0 left-0 bg-white/35"
+                style={{
+                  width: segmentFill(PREVIEW_BUFFERED, start, end),
+                }}
+              />
+              <div
+                className="absolute inset-y-0 left-0"
+                style={{
+                  width: segmentFill(PREVIEW_PROGRESS, start, end),
+                  backgroundColor: settings.accentColor,
+                }}
+              />
+            </div>
+          ))}
           <div
-            className="absolute inset-y-0 left-0 w-2/5 rounded-full"
-            style={{ backgroundColor: settings.accentColor }}
-          />
-          <div
-            className="absolute top-1/2 left-2/5 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full shadow"
-            style={{ backgroundColor: settings.accentColor }}
+            className="absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full shadow"
+            style={{
+              left: `${PREVIEW_PROGRESS * 100}%`,
+              backgroundColor: settings.accentColor,
+            }}
           />
         </div>
         <div className="flex items-center gap-3 [&_svg]:size-4">
@@ -48,6 +77,14 @@ export function LibraryPlayerPreview({ settings }: LibraryPlayerPreviewProps) {
             0:42
             <span className="text-white/60"> / 1:45</span>
           </span>
+          {settings.showChapters && (
+            <span className="flex min-w-0 items-center gap-0.5 text-xs text-white/90">
+              <span className="truncate">
+                {t("libraries.player.preview_chapter")}
+              </span>
+              <ChevronRightIcon />
+            </span>
+          )}
           <div className="ml-auto flex items-center gap-3">
             {settings.showSettingsMenu && <SettingsIcon />}
             {settings.showPictureInPicture && <PictureInPicture2Icon />}

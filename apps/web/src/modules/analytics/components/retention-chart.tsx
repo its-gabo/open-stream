@@ -2,14 +2,23 @@ import { useTranslation } from "react-i18next"
 
 import { formatShare } from "../analytics.utils"
 
-import type { RetentionPoint } from "@/api/generated-api"
+import type { ChapterAnalytics, RetentionPoint } from "@/api/generated-api"
+
+type RetentionChartProps = {
+  retention: RetentionPoint[]
+  /** Marked where each one after the first starts. */
+  chapters?: ChapterAnalytics[]
+}
 
 /**
  * The share of views still watching at each tenth of the video, as a line
  * over a light wash. Each tenth shows its figures on hover and keyboard
  * focus; a table carries them for screen readers.
  */
-export function RetentionChart({ retention }: { retention: RetentionPoint[] }) {
+export function RetentionChart({
+  retention,
+  chapters = [],
+}: RetentionChartProps) {
   const { t, i18n } = useTranslation()
   const started = retention[0]?.views ?? 0
   const points = retention.map(({ percent, views }) => ({
@@ -17,12 +26,19 @@ export function RetentionChart({ retention }: { retention: RetentionPoint[] }) {
     views,
     share: started > 0 ? views / started : 0,
   }))
+  const durationSeconds = chapters.at(-1)?.endSeconds ?? 0
+  const chapterBreaks =
+    durationSeconds > 0
+      ? chapters
+          .slice(1)
+          .map(({ startSeconds }) => startSeconds / durationSeconds)
+      : []
   const line = points
     .map(({ percent, share }) => `${percent},${100 - share * 100}`)
     .join(" ")
 
   return (
-    <figure className="flex flex-col gap-2 pt-4">
+    <figure className="flex flex-col gap-2 pt-2">
       <div className="flex gap-2" aria-hidden>
         <div className="flex h-36 flex-col justify-between text-right text-xs text-muted-foreground tabular-nums">
           {[1, 0.5, 0].map((share) => (
@@ -37,6 +53,13 @@ export function RetentionChart({ retention }: { retention: RetentionPoint[] }) {
               key={share}
               className="absolute inset-x-0 border-t border-border"
               style={{ bottom: `${share * 100}%` }}
+            />
+          ))}
+          {chapterBreaks.map((at) => (
+            <div
+              key={at}
+              className="absolute inset-y-0 border-l border-dashed border-muted-foreground/40"
+              style={{ left: `${at * 100}%` }}
             />
           ))}
           <svg

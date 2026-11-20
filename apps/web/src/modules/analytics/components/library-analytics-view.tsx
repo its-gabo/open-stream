@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next"
 
 import { formatWatchTime } from "../analytics.utils"
 import { AnalyticsBreakdowns } from "./analytics-breakdowns"
+import { AnalyticsCard } from "./analytics-card"
 import { AnalyticsPeriodTabs } from "./analytics-period-tabs"
 import { AnalyticsStatTiles } from "./analytics-stat-tiles"
 import { DailyViewsChart } from "./daily-views-chart"
@@ -45,12 +46,9 @@ export function LibraryAnalyticsView({
       ) : (
         <>
           <AnalyticsStatTiles totals={analytics.totals} />
-          <section className="flex flex-col gap-3 rounded-lg border p-4">
-            <h3 className="text-sm font-medium">
-              {t("analytics.daily.title")}
-            </h3>
+          <AnalyticsCard title={t("analytics.daily.title")}>
             <DailyViewsChart daily={analytics.daily} />
-          </section>
+          </AnalyticsCard>
           <div className="grid gap-4 lg:grid-cols-3">
             <RankingList
               title={t("analytics.top_videos.title")}

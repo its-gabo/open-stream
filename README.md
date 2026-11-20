@@ -160,6 +160,7 @@ The API describes itself at `https://app.openstream.localhost/api/v1/openapi.jso
 - **Embeddable player.** Copy an `<iframe>` from the video's **Embed** tab, with autoplay, mute, loop, start time and title options.
 - **Allowed sites.** Each library lists the sites that may play it. The player sends them as `frame-ancestors`, so no other page can frame it.
 - **Signed playback.** Optionally accept only expiring URLs signed by your server. Revoking the signing key revokes its URLs.
+- **Chapters.** Type chapters, add them at the player's position or paste a list like `0:00 Intro`. The player splits its seek bar at each one and lists them with storyboard thumbnails; other players can read them as a WebVTT chapters track.
 
 </td>
   </tr>
@@ -170,7 +171,7 @@ The API describes itself at `https://app.openstream.localhost/api/v1/openapi.jso
 
 - **Real viewing data.** Players report watched seconds and position every 15 seconds, and the server caps each report by the real time that passed.
 - **Three levels.** Views, watch time, average view, completion, daily views, devices and embedding sites for the organization, each library and each video, over 7, 30 or 90 days.
-- **Retention.** See the share of viewers still watching at each point of a video.
+- **Retention.** See the share of viewers still watching at each point of a video. Videos with chapters also show how many views reached and finished each chapter.
 
 </td>
     <td width="50%" valign="middle">

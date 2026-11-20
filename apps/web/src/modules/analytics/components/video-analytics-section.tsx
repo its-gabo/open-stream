@@ -3,8 +3,10 @@ import { Skeleton } from "@workspace/ui/components/skeleton"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 
+import { AnalyticsCard } from "./analytics-card"
 import { AnalyticsPeriodTabs } from "./analytics-period-tabs"
 import { AnalyticsStatTiles } from "./analytics-stat-tiles"
+import { ChapterBreakdown } from "./chapter-breakdown"
 import { RetentionChart } from "./retention-chart"
 
 import type { AnalyticsPeriodDays } from "@workspace/shared"
@@ -34,7 +36,7 @@ export function VideoAnalyticsSection({
   )
 
   return (
-    <section className="flex flex-col gap-3">
+    <section className="flex flex-col gap-4">
       <AnalyticsPeriodTabs days={days} onChange={setDays} />
       {isPending || !analytics ? (
         <Skeleton className="h-64 w-full" />
@@ -42,14 +44,25 @@ export function VideoAnalyticsSection({
         <>
           <AnalyticsStatTiles totals={analytics.totals} />
           {analytics.totals.views > 0 ? (
-            <div className="flex flex-col gap-2">
-              <p className="text-xs text-muted-foreground">
-                {t("analytics.retention.description")}
-              </p>
-              <RetentionChart retention={analytics.retention} />
-            </div>
+            <>
+              <AnalyticsCard
+                title={t("analytics.retention.title")}
+                description={t("analytics.retention.description")}
+              >
+                <RetentionChart
+                  retention={analytics.retention}
+                  chapters={analytics.chapters}
+                />
+              </AnalyticsCard>
+              {analytics.chapters.length > 0 && (
+                <ChapterBreakdown
+                  chapters={analytics.chapters}
+                  startedViews={analytics.retention[0]?.views ?? 0}
+                />
+              )}
+            </>
           ) : (
-            <p className="text-sm text-muted-foreground">
+            <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
               {t("analytics.empty_period")}
             </p>
           )}

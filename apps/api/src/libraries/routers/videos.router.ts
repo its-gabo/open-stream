@@ -22,6 +22,7 @@ import {
   videoCreateBodySchema,
   videoImportBodySchema,
   videoListSuccessResponseSchema,
+  videoChaptersUpdateBodySchema,
   videoParamSchema,
   videoPosterImageBodySchema,
   videoPosterUpdateBodySchema,
@@ -347,6 +348,43 @@ export function createVideosRouter(
         return c.json(
           createApiSuccessResponse(
             LIBRARY_SUCCESS_RESULTS.VIDEO_POSTER_UPDATE,
+            updated
+          ),
+          200
+        )
+      }
+    )
+    .put(
+      "/:organizationSlug/libraries/:libraryId/videos/:videoId/chapters",
+      describeRoute({
+        tags: [OPENAPI_TAGS.LIBRARIES],
+        operationId: "updateVideoChapters",
+        summary:
+          "Replace a processed video's chapters; the first starts at 0:00 and an empty list removes them",
+        responses: {
+          200: describeJsonResponse(
+            "Chapters saved",
+            videoSuccessResponseSchema
+          ),
+          ...describeApiErrorResponses(
+            LIBRARY_ROUTE_ERROR_DESCRIPTIONS.VIDEO_CHAPTERS_UPDATE
+          ),
+        },
+      }),
+      validateRequest("param", videoParamSchema),
+      validateRequest("json", videoChaptersUpdateBodySchema),
+      ...requireMemberOfLibrary,
+      async (c) => {
+        const updated = await videosService.updateVideoChapters(
+          c.get("library"),
+          c.get("activityActor"),
+          c.req.valid("param").videoId,
+          c.req.valid("json")
+        )
+
+        return c.json(
+          createApiSuccessResponse(
+            LIBRARY_SUCCESS_RESULTS.VIDEO_CHAPTERS_UPDATE,
             updated
           ),
           200

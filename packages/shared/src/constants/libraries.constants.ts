@@ -6,7 +6,15 @@ export const LIBRARY_FIELD_LIMITS = {
 
 export const VIDEO_FIELD_LIMITS = {
   TITLE_MAX_LENGTH: 200,
+  DESCRIPTION_MAX_LENGTH: 2000,
   FILE_NAME_MAX_LENGTH: 255,
+} as const
+
+/** A playlist plays some of a library's videos in the order its owner chose. */
+export const PLAYLIST_LIMITS = {
+  TITLE_MAX_LENGTH: 200,
+  DESCRIPTION_MAX_LENGTH: 2000,
+  MAX_VIDEOS: 50,
 } as const
 
 /** A video starts as a draft (no file yet) and moves to `uploaded` once its whole file is stored. */
@@ -111,6 +119,7 @@ export const DEFAULT_LIBRARY_PLAYER_SETTINGS = {
   showPictureInPicture: true,
   showFullscreen: true,
   showChapters: true,
+  autoplayNext: true,
 } as const satisfies LibraryPlayerSettings
 
 /** How long a signed playback URL stays valid. */
@@ -122,11 +131,11 @@ export const PLAYBACK_URL_TTL_SECONDS = {
 
 /** What a library API key may do; each key holds any combination. */
 export const LIBRARY_API_KEY_SCOPES = {
-  /** List and read videos. */
+  /** List and read videos and playlists. */
   VIDEOS_READ: "videos:read",
   /** Create videos and upload their files with tus. */
   VIDEOS_UPLOAD: "videos:upload",
-  /** Rename and delete videos, and change their posters and chapters. */
+  /** Rename and delete videos, change their posters and chapters, and manage playlists. */
   VIDEOS_MANAGE: "videos:manage",
   /** Sign playback URLs. */
   PLAYBACK_SIGN: "playback:sign",

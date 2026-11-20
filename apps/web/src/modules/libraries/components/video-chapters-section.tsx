@@ -144,7 +144,7 @@ export function VideoChaptersSection({
             {t("videos.chapters.empty")}
           </p>
         ) : (
-          <ol className="flex flex-col gap-2">
+          <ol className="flex flex-col divide-y rounded-lg border">
             {fields.map((field, index) => {
               const errors = chapterErrors?.[index]
               const start = parseChapterTime(rows[index]?.time ?? "")
@@ -156,7 +156,7 @@ export function VideoChaptersSection({
               return (
                 <li
                   key={field.id}
-                  className="flex flex-col gap-1"
+                  className="flex flex-col gap-1 px-3 py-2"
                   onBlur={(event) => {
                     // Only once focus leaves the row, not when moving from its time to its title.
                     if (!event.currentTarget.contains(event.relatedTarget)) {

@@ -6,6 +6,7 @@ import {
   LIBRARY_FIELD_LIMITS,
   LIBRARY_SECURITY_LIMITS,
   PLAYBACK_HOST_PATTERN,
+  PLAYLIST_LIMITS,
   PLAYER_ACCENT_COLOR_PATTERN,
   STORAGE_BUCKET_PATTERN,
   STORAGE_FIELD_LIMITS,
@@ -27,6 +28,34 @@ export const videoTitleSchema = z
   .trim()
   .min(1)
   .max(VIDEO_FIELD_LIMITS.TITLE_MAX_LENGTH)
+
+/** Free text shown with the video, e.g. in a playlist; an empty one is stored as none. */
+export const videoDescriptionSchema = z
+  .string()
+  .trim()
+  .max(VIDEO_FIELD_LIMITS.DESCRIPTION_MAX_LENGTH)
+  .transform((description) => description || null)
+
+export const playlistTitleSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .max(PLAYLIST_LIMITS.TITLE_MAX_LENGTH)
+
+/** An empty description is stored as none. */
+export const playlistDescriptionSchema = z
+  .string()
+  .trim()
+  .max(PLAYLIST_LIMITS.DESCRIPTION_MAX_LENGTH)
+  .transform((description) => description || null)
+
+/** A playlist's videos in playback order, each listed once. */
+export const playlistVideoIdsSchema = z
+  .array(z.uuid())
+  .max(PLAYLIST_LIMITS.MAX_VIDEOS)
+  .refine((videoIds) => new Set(videoIds).size === videoIds.length, {
+    message: "Each video can be in a playlist once",
+  })
 
 export const videoChapterSchema = z.object({
   title: z.string().trim().min(1).max(VIDEO_CHAPTER_LIMITS.TITLE_MAX_LENGTH),
@@ -139,6 +168,8 @@ export const libraryPlayerSettingsSchema = z.object({
   showFullscreen: z.boolean(),
   /** A video's chapters on the seek bar and in a chapter menu, when it has any. */
   showChapters: z.boolean(),
+  /** In a playlist, the next video starts by itself after a short countdown. */
+  autoplayNext: z.boolean(),
 })
 
 export const libraryApiKeyNameSchema = z

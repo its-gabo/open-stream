@@ -39,6 +39,7 @@ import type { OrganizationsService } from "../../organizations/services/organiza
 import type { AnalyticsModule } from "../../analytics/analytics.module"
 import type { WebhooksModule } from "../../webhooks/webhooks.module"
 import type { LibrariesModule } from "../libraries.module"
+import type { PlaylistsModule } from "../../playlists/playlists.module"
 
 /** A library's own settings, without figures that need its videos counted. */
 export type LibraryProfile = {
@@ -105,16 +106,24 @@ export type LibraryPlaybackSecurity = Pick<
   "allowedPlaybackHosts" | "requireSignedPlayback"
 >
 
-/** A playback request: the video, who asks, and the signature it carries. */
-export type PlaybackRequest = {
+/** A request to play something of a library: who asks, and the signature it carries. */
+export type LibraryPlaybackRequest = {
   libraryId: string
-  videoId: string
   /** Id of the API key that signed the URL. */
   keyId: string | undefined
   expires: string | undefined
   token: string | undefined
   /** Host of the page that embeds the video, from `Origin` or `Referer`. */
   requestingHost: string | null
+}
+
+/** A playback request for one video. */
+export type PlaybackRequest = LibraryPlaybackRequest & { videoId: string }
+
+/** The key and expiry a valid signature was made with, to sign what the signed thing plays. */
+export type PlaybackSignature = {
+  apiKey: LibraryApiKeyRecord
+  expires: number
 }
 
 /** A request for the uploaded file itself, possibly for part of it. */
@@ -297,6 +306,7 @@ export type VideoFiles = Pick<VideoRecord, "libraryId" | "sourceObjectKey"> & {
 export type LibrariesRouterDependencies = LibrariesModule &
   Pick<WebhooksModule, "libraryWebhooksService"> &
   Pick<AnalyticsModule, "videoAnalyticsService"> &
+  Pick<PlaylistsModule, "playlistsService"> &
   OrganizationRouterDependencies & {
     organizationsService: OrganizationsService
   }

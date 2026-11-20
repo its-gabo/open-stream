@@ -1,4 +1,4 @@
-import { VIDEO_PROCESSING_STATUSES, VIDEO_STATUSES } from "@workspace/shared"
+import { VIDEO_STATUSES } from "@workspace/shared"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,7 +19,6 @@ import {
   TableRow,
 } from "@workspace/ui/components/table"
 import {
-  FilmIcon,
   LoaderCircleIcon,
   RefreshCwIcon,
   RotateCwIcon,
@@ -37,12 +36,9 @@ import {
   VIDEO_FILE_ACCEPT,
   REPROCESSABLE_STATUSES,
 } from "../libraries.constants"
-import {
-  buildVideoPosterUrl,
-  formatDuration,
-  validateVideoFile,
-} from "../libraries.utils"
+import { validateVideoFile } from "../libraries.utils"
 import { useVideoUploadStore } from "../video-upload.store"
+import { VideoThumbnail } from "./video-thumbnail"
 import { VideoUploadState } from "./video-upload-state"
 
 import type { Video } from "@/api/generated-api"
@@ -117,10 +113,12 @@ export function VideoTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>{t("videos.columns.title")}</TableHead>
+            <TableHead className="pl-4 sm:pl-5">
+              {t("videos.columns.title")}
+            </TableHead>
             <TableHead>{t("videos.columns.state")}</TableHead>
             <TableHead>{t("videos.columns.created")}</TableHead>
-            <TableHead className="w-0" />
+            <TableHead className="w-0 pr-4 sm:pr-5" />
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -141,30 +139,13 @@ export function VideoTable({
                 className="cursor-pointer"
                 onClick={() => onOpenVideo(video.id)}
               >
-                <TableCell className="max-w-72">
+                <TableCell className="max-w-72 pl-4 sm:pl-5">
                   <div className="flex items-center gap-3">
-                    <span className="relative flex aspect-video w-16 shrink-0 items-center justify-center overflow-hidden rounded-md bg-muted text-muted-foreground">
-                      {video.processingStatus ===
-                      VIDEO_PROCESSING_STATUSES.READY ? (
-                        <img
-                          src={buildVideoPosterUrl(
-                            organizationSlug,
-                            libraryId,
-                            video
-                          )}
-                          alt=""
-                          loading="lazy"
-                          className="size-full object-cover"
-                        />
-                      ) : (
-                        <FilmIcon className="size-4" />
-                      )}
-                      {video.durationSeconds !== null && (
-                        <span className="absolute right-0.5 bottom-0.5 rounded bg-black/75 px-1 text-[10px] leading-4 font-medium text-white tabular-nums">
-                          {formatDuration(video.durationSeconds)}
-                        </span>
-                      )}
-                    </span>
+                    <VideoThumbnail
+                      organizationSlug={organizationSlug}
+                      libraryId={libraryId}
+                      video={video}
+                    />
                     <button
                       type="button"
                       className="truncate text-left font-medium hover:underline focus-visible:underline focus-visible:outline-none"
@@ -185,7 +166,10 @@ export function VideoTable({
                     dateStyle: "medium",
                   }).format(new Date(video.createdAt))}
                 </TableCell>
-                <TableCell onClick={(event) => event.stopPropagation()}>
+                <TableCell
+                  className="pr-4 sm:pr-5"
+                  onClick={(event) => event.stopPropagation()}
+                >
                   <div className="flex justify-end gap-1">
                     {isUploadingHere && (
                       <Button

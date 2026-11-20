@@ -7,7 +7,7 @@ export type FormFieldType = {
   name: string
   label?: string
   placeholder?: string
-  type?: "text" | "email" | "password" | "select"
+  type?: "text" | "email" | "password" | "select" | "textarea"
   autoComplete?: string
   /** For `select` fields. */
   options?: FormFieldSelectOption[]

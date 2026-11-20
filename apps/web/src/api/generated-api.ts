@@ -67,6 +67,10 @@ export type ActivityAction =
   | "video.upload_canceled"
   | "video.import_started"
   | "video.reprocess_requested"
+  | "playlist.created"
+  | "playlist.updated"
+  | "playlist.videos_updated"
+  | "playlist.deleted"
 
 export type ActivityActorKind = "user" | "api_key" | "anonymous" | "system"
 
@@ -119,6 +123,7 @@ export type ActivityResourceType =
   | "api_key"
   | "webhook"
   | "video"
+  | "playlist"
 
 export interface AnalyticsDay {
   /**
@@ -370,6 +375,27 @@ export interface CreateLibraryApiPlaybackUrlParams {
   videoId: string
 }
 
+export interface CreateLibraryApiPlaylistParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+}
+
+export interface CreateLibraryApiPlaylistPlaybackUrlParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  playlistId: string
+}
+
 export interface CreateLibraryApiVideoParams {
   /**
    * @format uuid
@@ -379,6 +405,15 @@ export interface CreateLibraryApiVideoParams {
 }
 
 export interface CreateLibraryParams {
+  organizationSlug: string
+}
+
+export interface CreatePlaylistParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
   organizationSlug: string
 }
 
@@ -417,6 +452,19 @@ export interface DeleteLibraryApiKeyParams {
   organizationSlug: string
 }
 
+export interface DeleteLibraryApiPlaylistParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  playlistId: string
+}
+
 export interface DeleteLibraryApiVideoParams {
   /**
    * @format uuid
@@ -437,6 +485,20 @@ export interface DeleteLibraryWebhookParams {
    */
   libraryId: string
   organizationSlug: string
+}
+
+export interface DeletePlaylistParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  organizationSlug: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  playlistId: string
 }
 
 export interface DeleteStorageParams {
@@ -490,6 +552,35 @@ export interface GetLibraryApiAnalyticsParams {
    * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
    */
   libraryId: string
+}
+
+export interface GetLibraryApiPlaylistEmbedParams {
+  expires?: string
+  key?: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  playlistId: string
+  token?: string
+}
+
+export interface GetLibraryApiPlaylistParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  playlistId: string
 }
 
 export interface GetLibraryApiVideoAnalyticsParams {
@@ -606,6 +697,20 @@ export interface GetOrganizationParams {
 
 export interface GetOrganizationTeamParams {
   organizationSlug: string
+}
+
+export interface GetPlaylistParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  organizationSlug: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  playlistId: string
 }
 
 export interface GetStorageParams {
@@ -908,6 +1013,7 @@ export interface LibraryListSuccessResponse {
 export interface LibraryPlayerSettings {
   /** @pattern ^#[0-9a-f]{6}$ */
   accentColor: string
+  autoplayNext: boolean
   showChapters: boolean
   showFullscreen: boolean
   showPictureInPicture: boolean
@@ -926,6 +1032,7 @@ export interface LibraryPlayerSuccessResponse {
 export interface LibraryPlayerUpdateBody {
   /** @pattern ^#[0-9a-f]{6}$ */
   accentColor: string
+  autoplayNext: boolean
   showChapters: boolean
   showFullscreen: boolean
   showPictureInPicture: boolean
@@ -1054,6 +1161,14 @@ export interface ListLibrariesParams {
   search?: string
 }
 
+export interface ListLibraryApiPlaylistsParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+}
+
 export interface ListLibraryApiVideosParams {
   /**
    * @format uuid
@@ -1122,6 +1237,15 @@ export interface ListOrganizationActivityParams {
   resourceType?: ActivityResourceType
   /** @maxLength 100 */
   search?: string
+}
+
+export interface ListPlaylistsParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  organizationSlug: string
 }
 
 export interface ListStoragesParams {
@@ -1467,6 +1591,182 @@ export interface PlaybackUrlSuccessResponse {
     playback: PlaybackUrl
   }
   message: string
+}
+
+export interface Playlist {
+  /**
+   * @format date-time
+   * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+   */
+  createdAt: string
+  description: string | null
+  /** @min 0 */
+  durationSeconds: number
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  id: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  title: string
+  /**
+   * @format date-time
+   * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+   */
+  updatedAt: string
+  /**
+   * @min 0
+   * @max 9007199254740991
+   */
+  videoCount: number
+  videos: Video[]
+}
+
+export interface PlaylistCreateBody {
+  description?: string | null
+  /**
+   * @minLength 1
+   * @maxLength 200
+   */
+  title: string
+  /** @maxItems 50 */
+  videoIds?: string[]
+}
+
+export interface PlaylistEmbed {
+  allowedPlaybackHosts: string[]
+  description: string | null
+  player: LibraryPlayerSettings
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  playlistId: string
+  title: string
+  videos: PlaylistEmbedVideo[]
+}
+
+export interface PlaylistEmbedSuccessResponse {
+  code: string
+  data: {
+    embed: PlaylistEmbed
+  }
+  message: string
+}
+
+export interface PlaylistEmbedVideo {
+  chapters: VideoChapter[]
+  description: string | null
+  /** @min 0 */
+  durationSeconds: number
+  /**
+   * @exclusiveMin 0
+   * @max 9007199254740991
+   */
+  height: number
+  /** @format uri */
+  hlsUrl: string
+  /** @format uri */
+  posterUrl: string
+  /** @format uri */
+  storyboardUrl: string
+  title: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+  /** @format uri */
+  viewsUrl: string
+  /**
+   * @exclusiveMin 0
+   * @max 9007199254740991
+   */
+  width: number
+}
+
+export interface PlaylistListSuccessResponse {
+  code: string
+  data: {
+    playlists: PlaylistSummary[]
+  }
+  message: string
+}
+
+export interface PlaylistPlaybackUrl {
+  /** @format uri */
+  embedUrl: string
+  /**
+   * @format date-time
+   * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+   */
+  expiresAt: string
+}
+
+export interface PlaylistPlaybackUrlSuccessResponse {
+  code: string
+  data: {
+    playback: PlaylistPlaybackUrl
+  }
+  message: string
+}
+
+export interface PlaylistSuccessResponse {
+  code: string
+  data: {
+    playlist: Playlist
+  }
+  message: string
+}
+
+export interface PlaylistSummary {
+  /**
+   * @format date-time
+   * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+   */
+  createdAt: string
+  description: string | null
+  /** @min 0 */
+  durationSeconds: number
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  id: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  title: string
+  /**
+   * @format date-time
+   * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+   */
+  updatedAt: string
+  /**
+   * @min 0
+   * @max 9007199254740991
+   */
+  videoCount: number
+}
+
+export interface PlaylistUpdateBody {
+  description?: string | null
+  /**
+   * @minLength 1
+   * @maxLength 200
+   */
+  title?: string
+}
+
+export interface PlaylistVideosUpdateBody {
+  /** @maxItems 50 */
+  videoIds: string[]
 }
 
 export interface ReadLibraryApiVideoChaptersParams {
@@ -1878,6 +2178,32 @@ export interface UpdateLibraryApiKeyParams {
   organizationSlug: string
 }
 
+export interface UpdateLibraryApiPlaylistParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  playlistId: string
+}
+
+export interface UpdateLibraryApiPlaylistVideosParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  playlistId: string
+}
+
 export interface UpdateLibraryApiVideoChaptersParams {
   /**
    * @format uuid
@@ -1964,6 +2290,34 @@ export interface UpdateLibraryStorageParams {
 
 export interface UpdateOrganizationParams {
   organizationSlug: string
+}
+
+export interface UpdatePlaylistParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  organizationSlug: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  playlistId: string
+}
+
+export interface UpdatePlaylistVideosParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  organizationSlug: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  playlistId: string
 }
 
 export interface UpdateStorageParams {
@@ -2056,6 +2410,7 @@ export interface Video {
    * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
    */
   createdAt: string
+  description: string | null
   durationSeconds: number | null
   failureReason: VideoFailureReason | null
   fileFormat: VideoFileFormat | null
@@ -2147,6 +2502,7 @@ export interface VideoCreateBody {
 export interface VideoEmbed {
   allowedPlaybackHosts: string[]
   chapters: VideoChapter[]
+  description: string | null
   /** @min 0 */
   durationSeconds: number
   /**
@@ -2307,11 +2663,12 @@ export interface VideoSuccessResponse {
 }
 
 export interface VideoUpdateBody {
+  description?: string | null
   /**
    * @minLength 1
    * @maxLength 200
    */
-  title: string
+  title?: string
 }
 
 export interface VideoView {
@@ -3905,7 +4262,7 @@ export class OpenStreamApi<
      *
      * @tags Libraries
      * @name UpdateVideo
-     * @summary Rename a video
+     * @summary Change a video's title or description
      * @request PATCH:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/videos/{videoId}
      */
     updateVideo: (
@@ -4106,6 +4463,129 @@ export class OpenStreamApi<
         path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/videos/${videoId}/thumbnails/${fileName}`,
         method: "GET",
         format: "blob",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Libraries
+     * @name ListPlaylists
+     * @summary List the library's playlists, newest first
+     * @request GET:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/playlists
+     */
+    listPlaylists: (
+      { organizationSlug, libraryId }: ListPlaylistsParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<PlaylistListSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/playlists`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Libraries
+     * @name CreatePlaylist
+     * @summary Create a playlist, empty or with videos of the library
+     * @request POST:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/playlists
+     */
+    createPlaylist: (
+      { organizationSlug, libraryId }: CreatePlaylistParams,
+      data: PlaylistCreateBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<PlaylistSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/playlists`,
+        method: "POST",
+        body: data,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Libraries
+     * @name GetPlaylist
+     * @summary Read a playlist and its videos in playback order
+     * @request GET:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/playlists/{playlistId}
+     */
+    getPlaylist: (
+      { organizationSlug, libraryId, playlistId }: GetPlaylistParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<PlaylistSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/playlists/${playlistId}`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Libraries
+     * @name UpdatePlaylist
+     * @summary Change a playlist's title or description
+     * @request PATCH:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/playlists/{playlistId}
+     */
+    updatePlaylist: (
+      { organizationSlug, libraryId, playlistId }: UpdatePlaylistParams,
+      data: PlaylistUpdateBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<PlaylistSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/playlists/${playlistId}`,
+        method: "PATCH",
+        body: data,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Libraries
+     * @name DeletePlaylist
+     * @summary Delete a playlist; its videos stay in the library
+     * @request DELETE:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/playlists/{playlistId}
+     */
+    deletePlaylist: (
+      { organizationSlug, libraryId, playlistId }: DeletePlaylistParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<LibraryEmptySuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/playlists/${playlistId}`,
+        method: "DELETE",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Libraries
+     * @name UpdatePlaylistVideos
+     * @summary Replace a playlist's videos, in playback order; an empty list removes them
+     * @request PUT:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/playlists/{playlistId}/videos
+     */
+    updatePlaylistVideos: (
+      { organizationSlug, libraryId, playlistId }: UpdatePlaylistVideosParams,
+      data: PlaylistVideosUpdateBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<PlaylistSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/playlists/${playlistId}/videos`,
+        method: "PUT",
+        body: data,
+        type: "application/json",
+        format: "json",
         ...params,
       }),
   }
@@ -4324,6 +4804,26 @@ export class OpenStreamApi<
       }),
 
     /**
+     * No description
+     *
+     * @tags Library API
+     * @name GetLibraryApiPlaylistEmbed
+     * @summary Read what the embeddable player needs to play a playlist; the `Referer` is the page that frames it, and signed libraries need the playlist's `key`, `expires` and `token`
+     * @request GET:/api/v1/libraries/{libraryId}/playlists/{playlistId}/embed
+     */
+    getLibraryApiPlaylistEmbed: (
+      { libraryId, playlistId, ...query }: GetLibraryApiPlaylistEmbedParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<PlaylistEmbedSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/playlists/${playlistId}/embed`,
+        method: "GET",
+        query: query,
+        format: "json",
+        ...params,
+      }),
+
+    /**
      * @description Needs the `analytics:read` scope.
      *
      * @tags Library API
@@ -4463,7 +4963,7 @@ export class OpenStreamApi<
      *
      * @tags Library API
      * @name UpdateLibraryApiVideo
-     * @summary Rename a video
+     * @summary Change a video's title or description
      * @request PATCH:/api/v1/libraries/{libraryId}/videos/{videoId}
      * @secure
      */
@@ -4634,6 +5134,165 @@ export class OpenStreamApi<
       this.request<VideoSuccessResponse, ApiErrorResponse>({
         path: `/api/v1/libraries/${libraryId}/videos/${videoId}/chapters`,
         method: "PUT",
+        body: data,
+        secure: true,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Needs the `videos:read` scope.
+     *
+     * @tags Library API
+     * @name ListLibraryApiPlaylists
+     * @summary List the library's playlists, newest first
+     * @request GET:/api/v1/libraries/{libraryId}/playlists
+     * @secure
+     */
+    listLibraryApiPlaylists: (
+      { libraryId }: ListLibraryApiPlaylistsParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<PlaylistListSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/playlists`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Needs the `videos:manage` scope.
+     *
+     * @tags Library API
+     * @name CreateLibraryApiPlaylist
+     * @summary Create a playlist, empty or with videos of the library
+     * @request POST:/api/v1/libraries/{libraryId}/playlists
+     * @secure
+     */
+    createLibraryApiPlaylist: (
+      { libraryId }: CreateLibraryApiPlaylistParams,
+      data: PlaylistCreateBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<PlaylistSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/playlists`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Needs the `videos:read` scope.
+     *
+     * @tags Library API
+     * @name GetLibraryApiPlaylist
+     * @summary Read a playlist and its videos in playback order
+     * @request GET:/api/v1/libraries/{libraryId}/playlists/{playlistId}
+     * @secure
+     */
+    getLibraryApiPlaylist: (
+      { libraryId, playlistId }: GetLibraryApiPlaylistParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<PlaylistSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/playlists/${playlistId}`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Needs the `videos:manage` scope.
+     *
+     * @tags Library API
+     * @name UpdateLibraryApiPlaylist
+     * @summary Change a playlist's title or description
+     * @request PATCH:/api/v1/libraries/{libraryId}/playlists/{playlistId}
+     * @secure
+     */
+    updateLibraryApiPlaylist: (
+      { libraryId, playlistId }: UpdateLibraryApiPlaylistParams,
+      data: PlaylistUpdateBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<PlaylistSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/playlists/${playlistId}`,
+        method: "PATCH",
+        body: data,
+        secure: true,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Needs the `videos:manage` scope.
+     *
+     * @tags Library API
+     * @name DeleteLibraryApiPlaylist
+     * @summary Delete a playlist; its videos stay in the library
+     * @request DELETE:/api/v1/libraries/{libraryId}/playlists/{playlistId}
+     * @secure
+     */
+    deleteLibraryApiPlaylist: (
+      { libraryId, playlistId }: DeleteLibraryApiPlaylistParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<LibraryEmptySuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/playlists/${playlistId}`,
+        method: "DELETE",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Needs the `videos:manage` scope.
+     *
+     * @tags Library API
+     * @name UpdateLibraryApiPlaylistVideos
+     * @summary Replace a playlist's videos, in playback order; an empty list removes them
+     * @request PUT:/api/v1/libraries/{libraryId}/playlists/{playlistId}/videos
+     * @secure
+     */
+    updateLibraryApiPlaylistVideos: (
+      { libraryId, playlistId }: UpdateLibraryApiPlaylistVideosParams,
+      data: PlaylistVideosUpdateBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<PlaylistSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/playlists/${playlistId}/videos`,
+        method: "PUT",
+        body: data,
+        secure: true,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Needs the `playback:sign` scope.
+     *
+     * @tags Library API
+     * @name CreateLibraryApiPlaylistPlaybackUrl
+     * @summary Sign a playlist embed URL that expires; required when the library only allows signed playback
+     * @request POST:/api/v1/libraries/{libraryId}/playlists/{playlistId}/playback-urls
+     * @secure
+     */
+    createLibraryApiPlaylistPlaybackUrl: (
+      { libraryId, playlistId }: CreateLibraryApiPlaylistPlaybackUrlParams,
+      data: PlaybackUrlCreateBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<PlaylistPlaybackUrlSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/playlists/${playlistId}/playback-urls`,
+        method: "POST",
         body: data,
         secure: true,
         type: "application/json",

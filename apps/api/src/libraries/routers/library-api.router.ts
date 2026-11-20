@@ -8,6 +8,9 @@ import {
   publicVideoUploadParamSchema,
 } from "../dto/libraries.schemas"
 import type { AnalyticsModule } from "../../analytics/analytics.module"
+import type { PlaylistsModule } from "../../playlists/playlists.module"
+import { createLibraryApiPlaylistsRouter } from "../../playlists/routers/library-api-playlists.router"
+import { createPlaylistPlaybackRouter } from "../../playlists/routers/playlist-playback.router"
 import { createLibraryApiAnalyticsRouter } from "../../analytics/routers/library-api-analytics.router"
 import { createVideoViewsRouter } from "../../analytics/routers/video-views.router"
 import type { LibrariesModule } from "../libraries.module"
@@ -22,7 +25,7 @@ import { createVideoPlaybackRouter } from "./video-playback.router"
  * the API root.
  */
 export function createLibraryApiRouter(
-  module: LibrariesModule & AnalyticsModule
+  module: LibrariesModule & AnalyticsModule & PlaylistsModule
 ) {
   return new Hono().route(
     LIBRARY_API_PATH,
@@ -39,7 +42,15 @@ export function createLibraryApiRouter(
             TUS_HEADERS.UPLOAD_OFFSET,
             TUS_HEADERS.UPLOAD_METADATA,
           ],
-          allowMethods: ["GET", "HEAD", "POST", "PATCH", "DELETE", "OPTIONS"],
+          allowMethods: [
+            "GET",
+            "HEAD",
+            "POST",
+            "PUT",
+            "PATCH",
+            "DELETE",
+            "OPTIONS",
+          ],
           exposeHeaders: [
             TUS_HEADERS.LOCATION,
             TUS_HEADERS.RESUMABLE,
@@ -52,6 +63,7 @@ export function createLibraryApiRouter(
         })
       )
       .route("/", createVideoPlaybackRouter(module.videoPlaybackService))
+      .route("/", createPlaylistPlaybackRouter(module.playlistPlaybackService))
       .route("/", createVideoViewsRouter(module.videoViewsService))
       .route(
         "/",
@@ -69,6 +81,14 @@ export function createLibraryApiRouter(
           module.videoProcessingService,
           module.videoPostersService,
           module.videoImportsService
+        )
+      )
+      .route(
+        "/",
+        createLibraryApiPlaylistsRouter(
+          module.libraryApiAccessService,
+          module.playlistsService,
+          module.playlistPlaybackService
         )
       )
       .route(

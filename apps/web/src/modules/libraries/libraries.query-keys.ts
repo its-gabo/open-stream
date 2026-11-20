@@ -29,6 +29,23 @@ export const libraryVideosQueryKey = (
   libraryId: string
 ) => [...LIBRARIES_QUERY_KEY, "videos", organizationSlug, libraryId] as const
 
+/** Prefix of the library's playlist list and of each playlist. */
+export const libraryPlaylistsQueryKey = (
+  organizationSlug: string,
+  libraryId: string
+) => [...LIBRARIES_QUERY_KEY, "playlists", organizationSlug, libraryId] as const
+
+export const playlistQueryKey = (
+  organizationSlug: string,
+  libraryId: string,
+  playlistId: string
+) =>
+  [
+    ...libraryPlaylistsQueryKey(organizationSlug, libraryId),
+    "detail",
+    playlistId,
+  ] as const
+
 export const libraryApiAccessQueryKey = (
   organizationSlug: string,
   libraryId: string

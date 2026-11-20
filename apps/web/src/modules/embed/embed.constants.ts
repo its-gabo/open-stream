@@ -17,5 +17,17 @@ export const EMBED_OPTION_KEYS = [
   VIDEO_EMBED_QUERY_KEYS.LOOP,
 ] as const
 
+/** Prefix of the `localStorage` keys that keep how far the viewer got in each video, by video id. */
+export const WATCH_PROGRESS_STORAGE_PREFIX = "openstream:watch-progress:"
+
+/** Progress is saved again once playback moves this far from the last save. */
+export const WATCH_PROGRESS_SAVE_STEP_SECONDS = 5
+
+/** A video watched this far counts as finished: it shows as watched and plays again from the start. */
+export const WATCHED_SHARE_FINISHED = 0.95
+
+/** A playlist's videos can differ in shape, so its iframe keeps the common 16:9. */
+export const PLAYLIST_EMBED_SIZE = { width: 16, height: 9 } as const
+
 export const EMBED_IFRAME_ALLOW =
   "autoplay; fullscreen; picture-in-picture; encrypted-media"

@@ -87,67 +87,70 @@ export function VideoPosterSection({
       <p className="text-xs text-muted-foreground">
         {t("videos.poster.description")}
       </p>
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+      <div className="flex items-center gap-4 overflow-hidden rounded-lg border">
         <img
           src={buildVideoPosterUrl(organizationSlug, libraryId, video)}
           alt={t("videos.poster.preview_alt")}
-          className="aspect-video w-full rounded-lg border bg-muted object-contain sm:w-56"
+          className="aspect-video w-32 shrink-0 border-r bg-muted object-contain sm:w-44"
         />
-        <div className="flex min-w-0 flex-1 flex-col gap-3">
-          <p className="text-sm">{sourceDescription}</p>
-          <div className="flex flex-wrap gap-2">
-            <Button
-              size="sm"
-              disabled={isSaving}
-              onClick={() =>
-                posterUpdate.mutate({
-                  source: VIDEO_POSTER_SOURCES.FRAME,
-                  atSeconds: currentSeconds,
-                })
-              }
-            >
-              <ScanIcon />
-              {t("videos.poster.use_frame", {
-                time: formatPlaybackTime(currentSeconds),
-              })}
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              disabled={isSaving}
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <ImageUpIcon />
-              {t("videos.poster.upload_image")}
-            </Button>
-            {video.poster.source !== VIDEO_POSTER_SOURCES.AUTOMATIC && (
-              <Button
-                size="sm"
-                variant="ghost"
-                disabled={isSaving}
-                onClick={() =>
-                  posterUpdate.mutate({
-                    source: VIDEO_POSTER_SOURCES.AUTOMATIC,
-                  })
-                }
-              >
-                <RotateCcwIcon />
-                {t("videos.poster.reset")}
-              </Button>
-            )}
-          </div>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept={VIDEO_POSTER_IMAGE_ACCEPT}
-            className="hidden"
-            onChange={(event) => {
-              uploadImage(event.target.files?.[0])
-              // Lets the same file be picked again after a failed upload.
-              event.target.value = ""
-            }}
-          />
-        </div>
+        <dl className="flex min-w-0 flex-col gap-0.5 text-sm">
+          <dt className="text-xs text-muted-foreground">
+            {t("videos.poster.source_label")}
+          </dt>
+          <dd>{sourceDescription}</dd>
+        </dl>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <Button
+          size="sm"
+          disabled={isSaving}
+          onClick={() =>
+            posterUpdate.mutate({
+              source: VIDEO_POSTER_SOURCES.FRAME,
+              atSeconds: currentSeconds,
+            })
+          }
+        >
+          <ScanIcon />
+          {t("videos.poster.use_frame", {
+            time: formatPlaybackTime(currentSeconds),
+          })}
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={isSaving}
+          onClick={() => fileInputRef.current?.click()}
+        >
+          <ImageUpIcon />
+          {t("videos.poster.upload_image")}
+        </Button>
+        {video.poster.source !== VIDEO_POSTER_SOURCES.AUTOMATIC && (
+          <Button
+            size="sm"
+            variant="ghost"
+            disabled={isSaving}
+            onClick={() =>
+              posterUpdate.mutate({
+                source: VIDEO_POSTER_SOURCES.AUTOMATIC,
+              })
+            }
+          >
+            <RotateCcwIcon />
+            {t("videos.poster.reset")}
+          </Button>
+        )}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept={VIDEO_POSTER_IMAGE_ACCEPT}
+          className="hidden"
+          onChange={(event) => {
+            uploadImage(event.target.files?.[0])
+            // Lets the same file be picked again after a failed upload.
+            event.target.value = ""
+          }}
+        />
       </div>
     </section>
   )

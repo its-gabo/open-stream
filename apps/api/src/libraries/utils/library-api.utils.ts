@@ -28,22 +28,28 @@ export const readBearerApiKey = (authorization: string | undefined) => {
 }
 
 /**
- * Signature of a playback URL. The key is derived from the server secret and
- * the signing API key's secret, so rolling or deleting that key revokes its URLs.
+ * Signature of a playback URL for `subject`: a video's id, or what
+ * `playlistPlaybackSubject` makes of a playlist's. The key is derived from the
+ * server secret and the signing API key's secret, so rolling or deleting that
+ * key revokes its URLs.
  */
 export const signPlayback = (
   serverSecret: string,
   apiKeyHash: string,
-  playback: { libraryId: string; videoId: string; expires: number }
+  playback: { libraryId: string; subject: string; expires: number }
 ) => {
   const signingKey = createHmac("sha256", serverSecret)
     .update(`library-playback:${playback.libraryId}:${apiKeyHash}`)
     .digest()
 
   return createHmac("sha256", signingKey)
-    .update(`${playback.videoId}:${playback.expires}`)
+    .update(`${playback.subject}:${playback.expires}`)
     .digest("base64url")
 }
+
+/** Sets a playlist's signatures apart from its videos', which are signed by their bare ids. */
+export const playlistPlaybackSubject = (playlistId: string) =>
+  `playlist:${playlistId}`
 
 /** Host of the page that asked for the video, from `Origin` or else `Referer`. */
 export const readRequestingHost = (

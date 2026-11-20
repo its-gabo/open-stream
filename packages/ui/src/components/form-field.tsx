@@ -5,6 +5,7 @@ import { Label } from "@workspace/ui/components/label"
 import { PasswordField } from "@workspace/ui/components/password-field"
 import { SearchableSelect } from "@workspace/ui/components/searchable-select"
 import { TextField } from "@workspace/ui/components/text-field"
+import { Textarea } from "@workspace/ui/components/textarea"
 
 import type { Control, FieldError, FieldValues, Path } from "react-hook-form"
 import type { FormFieldType } from "@workspace/ui/lib/form-field.types"
@@ -52,6 +53,19 @@ function FormField<T extends FieldValues>({
                 onBlur={field.onBlur}
                 onValueChange={field.onChange}
                 triggerRef={field.ref}
+              />
+            ))
+            .with("textarea", () => (
+              <Textarea
+                id={formField.name}
+                name={formField.name}
+                placeholder={formField.placeholder}
+                aria-invalid={isInvalid}
+                className="max-h-48"
+                value={typeof field.value === "string" ? field.value : ""}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                ref={field.ref}
               />
             ))
             .with("email", "text", undefined, (type) => (

@@ -1,7 +1,13 @@
-import { VIDEO_EMBED_PATH } from "../constants/video-embed.constants"
+import {
+  PLAYLIST_EMBED_SEGMENT,
+  VIDEO_EMBED_PATH,
+} from "../constants/video-embed.constants"
 
 export const videoEmbedPath = (libraryId: string, videoId: string) =>
   `${VIDEO_EMBED_PATH}/${libraryId}/${videoId}`
+
+export const playlistEmbedPath = (libraryId: string, playlistId: string) =>
+  `${VIDEO_EMBED_PATH}/${libraryId}/${PLAYLIST_EMBED_SEGMENT}/${playlistId}`
 
 /**
  * The `frame-ancestors` source list for a library's playback hosts: the app

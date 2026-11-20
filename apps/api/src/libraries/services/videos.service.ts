@@ -131,22 +131,32 @@ export class VideosService {
     }
   }
 
-  async renameVideo(
+  /** Changes the title or description; saving the same values again changes and records nothing. */
+  async updateVideoDetails(
     library: LibraryProfile,
     actor: ActivityActor,
     videoId: string,
     input: VideoUpdateBody
   ) {
     const video = await this.findVideo(library, videoId)
-    const renamed = await this.videosRepository.transaction(
+    const before = { title: video.title, description: video.description }
+    const changes = diffActivityValues(before, {
+      title: input.title ?? video.title,
+      description:
+        input.description === undefined ? video.description : input.description,
+    })
+
+    if (!changes) return { video: await this.toVideoDtoWithImport(video) }
+
+    const updated = await this.videosRepository.transaction(
       async (transaction) => {
-        const updated = await this.videosRepository.updateVideo(
+        const changed = await this.videosRepository.updateVideo(
           video.id,
-          { title: input.title },
+          { title: input.title, description: input.description },
           transaction
         )
 
-        if (!updated) throw new DomainError(LIBRARY_ERRORS.VIDEO_NOT_FOUND)
+        if (!changed) throw new DomainError(LIBRARY_ERRORS.VIDEO_NOT_FOUND)
 
         await this.recordVideoChange(
           library,
@@ -154,20 +164,17 @@ export class VideosService {
           {
             eventType: WEBHOOK_EVENT_TYPES.VIDEO_UPDATED,
             action: ACTIVITY_ACTIONS.VIDEO_UPDATED,
-            video: updated,
-            ...diffActivityValues(
-              { title: video.title },
-              { title: updated.title }
-            ),
+            video: changed,
+            ...changes,
           },
           transaction
         )
 
-        return updated
+        return changed
       }
     )
 
-    return { video: await this.toVideoDtoWithImport(renamed) }
+    return { video: await this.toVideoDtoWithImport(updated) }
   }
 
   /**

@@ -9,6 +9,7 @@ import {
   videoEmbedPath,
 } from "@workspace/shared"
 import { DomainError } from "../../common/errors/domain-error"
+import type { DomainErrorDefinition } from "../../common/errors/domain-error.types"
 import { API_BASE_PATH } from "../../common/http/http.constants"
 import type { AppConfig } from "../../config/app.config"
 import type { LibraryApiKeyRecord, VideoRecord } from "../../db/schema"
@@ -34,9 +35,12 @@ import type { LibrariesRepository } from "../repository/libraries.repository"
 import type { LibraryApiKeysRepository } from "../repository/library-api-keys.repository"
 import type { VideosRepository } from "../repository/videos.repository"
 import type {
+  LibraryPlaybackRequest,
   LibraryProfile,
   PlaybackFile,
   PlaybackRequest,
+  PlaybackSignature,
+  PublicLibrary,
   VideoStream,
   VideoStreamRequest,
 } from "../types/libraries.types"
@@ -96,15 +100,7 @@ export class VideoPlaybackService {
     if (!video) throw new DomainError(LIBRARY_ERRORS.VIDEO_NOT_FOUND)
 
     const expires = Math.floor(Date.now() / 1000) + input.expiresInSeconds
-    const query = new URLSearchParams({
-      [PLAYBACK_QUERY_KEYS.KEY_ID]: apiKey.id,
-      [PLAYBACK_QUERY_KEYS.EXPIRES]: String(expires),
-      [PLAYBACK_QUERY_KEYS.TOKEN]: signPlayback(
-        this.config.AUTH_SECRET,
-        apiKey.keyHash,
-        { libraryId: library.id, videoId: video.id, expires }
-      ),
-    }).toString()
+    const query = this.toSignedQuery(library.id, video.id, { apiKey, expires })
     const urls = this.toPlaybackUrls(library.id, video.id, query)
 
     return {
@@ -128,38 +124,73 @@ export class VideoPlaybackService {
    */
   async getVideoEmbed(request: PlaybackRequest) {
     const { library, video } = await this.authorizePlayback(request)
+    const embeddedVideo = this.toEmbeddedVideo(
+      library.id,
+      video,
+      toSignatureQuery(request)
+    )
 
+    if (!embeddedVideo) throw new DomainError(LIBRARY_ERRORS.VIDEO_NOT_READY)
+
+    return {
+      embed: {
+        ...embeddedVideo,
+        allowedPlaybackHosts: library.allowedPlaybackHosts,
+        player: toLibraryPlayerSettingsDto(library),
+      },
+    }
+  }
+
+  /**
+   * What a player needs to play a processed video, its URLs carrying
+   * `signatureQuery`; null while the video cannot play yet.
+   */
+  toEmbeddedVideo(
+    libraryId: string,
+    video: VideoRecord,
+    signatureQuery: string
+  ) {
     if (
       video.processingStatus !== VIDEO_PROCESSING_STATUSES.READY ||
       video.durationSeconds === null ||
       video.width === null ||
       video.height === null
     ) {
-      throw new DomainError(LIBRARY_ERRORS.VIDEO_NOT_READY)
+      return null
     }
 
-    const urls = this.toPlaybackUrls(
-      library.id,
-      video.id,
-      toSignatureQuery(request)
-    )
+    const urls = this.toPlaybackUrls(libraryId, video.id, signatureQuery)
 
     return {
-      embed: {
-        videoId: video.id,
-        title: video.title,
-        durationSeconds: video.durationSeconds,
-        width: video.width,
-        height: video.height,
-        hlsUrl: urls.hlsUrl,
-        posterUrl: urls.posterUrl,
-        storyboardUrl: urls.storyboardUrl,
-        viewsUrl: urls.viewsUrl,
-        chapters: video.chapters,
-        allowedPlaybackHosts: library.allowedPlaybackHosts,
-        player: toLibraryPlayerSettingsDto(library),
-      },
+      videoId: video.id,
+      title: video.title,
+      description: video.description,
+      durationSeconds: video.durationSeconds,
+      width: video.width,
+      height: video.height,
+      hlsUrl: urls.hlsUrl,
+      posterUrl: urls.posterUrl,
+      storyboardUrl: urls.storyboardUrl,
+      viewsUrl: urls.viewsUrl,
+      chapters: video.chapters,
     }
+  }
+
+  /** The `key`, `expires` and `token` query of a URL signed for `subject`. */
+  toSignedQuery(
+    libraryId: string,
+    subject: string,
+    { apiKey, expires }: PlaybackSignature
+  ) {
+    return new URLSearchParams({
+      [PLAYBACK_QUERY_KEYS.KEY_ID]: apiKey.id,
+      [PLAYBACK_QUERY_KEYS.EXPIRES]: String(expires),
+      [PLAYBACK_QUERY_KEYS.TOKEN]: signPlayback(
+        this.config.AUTH_SECRET,
+        apiKey.keyHash,
+        { libraryId, subject, expires }
+      ),
+    }).toString()
   }
 
   /** The library API URLs a player reads, with `query` (a signature, or empty) added to each. */
@@ -352,23 +383,11 @@ export class VideoPlaybackService {
    * also guards what players report about their viewing.
    */
   async authorizePlayback(request: PlaybackRequest) {
-    const library = await this.librariesRepository.findPublicLibrary(
-      request.libraryId
+    const { library } = await this.authorizeLibraryPlayback(
+      request,
+      request.videoId,
+      LIBRARY_ERRORS.VIDEO_NOT_FOUND
     )
-
-    if (
-      !library ||
-      library.organizationStatus !== ORGANIZATION_STATUSES.ACTIVE
-    ) {
-      throw new DomainError(LIBRARY_ERRORS.VIDEO_NOT_FOUND)
-    }
-
-    this.assertHostAllowed(library, request.requestingHost)
-
-    if (library.requireSignedPlayback) {
-      await this.assertPlaybackSigned(library, request)
-    }
-
     const video = await this.videosRepository.findVideo({
       organizationId: library.organizationId,
       libraryId: library.id,
@@ -378,6 +397,39 @@ export class VideoPlaybackService {
     if (!video) throw new DomainError(LIBRARY_ERRORS.VIDEO_NOT_FOUND)
 
     return { library, video }
+  }
+
+  /**
+   * Checks the library's playback rules for something of it, e.g. a playlist,
+   * whose signature is made for `subject`. The library's absence is reported
+   * as `notFoundError`, so it reads as the thing asked for being missing.
+   * Returns the signature a signed library's request carried, to sign what
+   * the thing plays.
+   */
+  async authorizeLibraryPlayback(
+    request: LibraryPlaybackRequest,
+    subject: string,
+    notFoundError: DomainErrorDefinition
+  ): Promise<{ library: PublicLibrary; signature: PlaybackSignature | null }> {
+    const library = await this.librariesRepository.findPublicLibrary(
+      request.libraryId
+    )
+
+    if (
+      !library ||
+      library.organizationStatus !== ORGANIZATION_STATUSES.ACTIVE
+    ) {
+      throw new DomainError(notFoundError)
+    }
+
+    this.assertHostAllowed(library, request.requestingHost)
+
+    return {
+      library,
+      signature: library.requireSignedPlayback
+        ? await this.assertPlaybackSigned(library, request, subject)
+        : null,
+    }
   }
 
   private readProcessedSource(video: VideoRecord) {
@@ -413,8 +465,9 @@ export class VideoPlaybackService {
   /** The signing key must still exist and still be allowed to sign. */
   private async assertPlaybackSigned(
     library: LibraryProfile,
-    { videoId, keyId, expires, token }: PlaybackRequest
-  ) {
+    { keyId, expires, token }: LibraryPlaybackRequest,
+    subject: string
+  ): Promise<PlaybackSignature> {
     const parsedKeyId = apiKeyIdSchema.safeParse(keyId)
     const apiKey = parsedKeyId.success
       ? await this.libraryApiKeysRepository.findApiKey(
@@ -433,13 +486,15 @@ export class VideoPlaybackService {
         token,
         signPlayback(this.config.AUTH_SECRET, apiKey.keyHash, {
           libraryId: library.id,
-          videoId,
+          subject,
           expires: expiresAt,
         })
       )
     ) {
       throw new DomainError(LIBRARY_ERRORS.PLAYBACK_SIGNATURE_INVALID)
     }
+
+    return { apiKey, expires: expiresAt }
   }
 
   /** Playlists and WebVTT are read whole to pass the signature on; images and segments are streamed. */

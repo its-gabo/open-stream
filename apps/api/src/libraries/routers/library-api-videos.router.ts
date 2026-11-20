@@ -235,7 +235,7 @@ export function createLibraryApiVideosRouter(
         security: API_KEY_SECURITY,
         operationId: "updateLibraryApiVideo",
         description: "Needs the `videos:manage` scope.",
-        summary: "Rename a video",
+        summary: "Change a video's title or description",
         responses: {
           200: describeJsonResponse(
             "Video updated",
@@ -250,7 +250,7 @@ export function createLibraryApiVideosRouter(
       validateRequest("json", videoUpdateBodySchema),
       requireScope(LIBRARY_API_KEY_SCOPES.VIDEOS_MANAGE),
       async (c) => {
-        const updated = await videosService.renameVideo(
+        const updated = await videosService.updateVideoDetails(
           c.get("library"),
           c.get("activityActor"),
           c.req.valid("param").videoId,

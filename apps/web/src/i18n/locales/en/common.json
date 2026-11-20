@@ -38,7 +38,8 @@
       "max_length": "Use at most {{max}} characters."
     },
     "video_title": {
-      "max_length": "Use at most {{max}} characters."
+      "max_length": "Use at most {{max}} characters.",
+      "required": "Enter a title."
     },
     "storage": {
       "endpoint": "Enter the full URL of the S3 endpoint, starting with https://.",
@@ -84,6 +85,13 @@
       "too_close_other": "Start at least {{count}} seconds after the chapter before.",
       "too_close_to_end_one": "Start at least {{count}} second before the video ends at {{time}}.",
       "too_close_to_end_other": "Start at least {{count}} seconds before the video ends at {{time}}."
+    },
+    "playlist_title": {
+      "required": "Enter a title.",
+      "max_length": "Use at most {{max}} characters."
+    },
+    "description": {
+      "max_length": "Use at most {{max}} characters."
     }
   },
   "pages": {
@@ -204,7 +212,15 @@
       "video.status.get.success": "Video status fetched.",
       "activity.list.success": "Activity fetched.",
       "video.poster.update.success": "Poster saved.",
-      "video.chapters.update.success": "Chapters saved."
+      "video.chapters.update.success": "Chapters saved.",
+      "playlist.list.success": "Playlists loaded.",
+      "playlist.create.success": "Playlist created.",
+      "playlist.get.success": "Playlist loaded.",
+      "playlist.update.success": "Playlist saved.",
+      "playlist.videos.update.success": "Playlist videos saved.",
+      "playlist.delete.success": "Playlist deleted.",
+      "playlist.playback_url.create.success": "Playlist playback URL created.",
+      "playlist.embed.get.success": "Playlist embed loaded."
     },
     "error": {
       "fallback": "Oops something went wrong..",
@@ -271,7 +287,9 @@
       "video.poster.frame_out_of_range": "That frame is past the end of the video.",
       "video.poster.image_too_large": "This image is larger than the 5 MB limit.",
       "video.poster.unsupported_image": "Only real JPEG, PNG and WebP images can be posters.",
-      "video.chapters.out_of_range": "A chapter starts less than a second before the end of the video."
+      "video.chapters.out_of_range": "A chapter starts less than a second before the end of the video.",
+      "playlist.not_found": "This playlist doesn't exist or was deleted.",
+      "playlist.video_not_in_library": "A playlist can only hold videos of its own library."
     }
   },
   "errors": {
@@ -501,10 +519,12 @@
       "videos": "Videos",
       "analytics": "Analytics",
       "storage": "Storage",
+      "security": "Security",
       "api": "API",
       "encoding": "Encoding",
       "player": "Player",
-      "webhooks": "Webhooks"
+      "webhooks": "Webhooks",
+      "playlists": "Playlists"
     },
     "storage": {
       "current_title": "Where videos are stored",
@@ -535,19 +555,6 @@
     "api": {
       "owner_only_title": "Only the owner can manage API access",
       "owner_only_description": "Ask the organization owner for the library's API key.",
-      "security": {
-        "title": "Playback security",
-        "description": "Decide which sites may play this library's videos. Uploading always needs the API key.",
-        "hosts_label": "Allowed sites",
-        "hosts_hint": "A site is a host such as example.com, or *.example.com for all of its subdomains. With no sites, every site may play the videos; once you add one, players that hide the page they run on are blocked.",
-        "signed_label": "Require signed URLs",
-        "signed_hint": "Videos play only through expiring URLs your server creates with the API key.",
-        "save": "Save security settings",
-        "add_host": "Add site",
-        "remove_host": "Remove {{host}}",
-        "no_hosts": "Every site may play this library’s videos.",
-        "host_placeholder": "example.com"
-      },
       "usage": {
         "title": "Using the API",
         "description": "Call the API from your server, never from a web page: the key gives access to the library.",
@@ -693,6 +700,10 @@
         "showChapters": {
           "label": "Chapters",
           "hint": "Splits the seek bar at each chapter and lets viewers jump between them, for videos that have chapters."
+        },
+        "autoplayNext": {
+          "label": "Autoplay next video",
+          "hint": "In playlists, the next video starts by itself after a short countdown."
         }
       },
       "hint": "Changes apply to every embed of this library the next time it loads.",
@@ -702,6 +713,21 @@
       "owner_only_title": "Only the owner can change the player",
       "owner_only_description": "Ask the organization owner to change how this library's player looks.",
       "preview_chapter": "Getting started"
+    },
+    "security": {
+      "title": "Playback security",
+      "description": "Decide which sites may play this library's videos, and whether they need signed URLs.",
+      "hosts_label": "Allowed sites",
+      "hosts_hint": "A site is a host such as example.com, or *.example.com for all of its subdomains. With no sites, every site may play the videos; once you add one, players that hide the page they run on are blocked.",
+      "signed_label": "Require signed URLs",
+      "signed_hint": "Videos play only through expiring URLs your server creates with the API key.",
+      "save": "Save security settings",
+      "add_host": "Add site",
+      "remove_host": "Remove {{host}}",
+      "no_hosts": "Every site may play this library’s videos.",
+      "host_placeholder": "example.com",
+      "owner_only_title": "Only the owner can change playback security",
+      "owner_only_description": "Ask the organization owner to change which sites may play this library's videos."
     },
     "webhooks": {
       "owner_only_title": "Only the owner can manage webhooks",
@@ -785,7 +811,9 @@
       "title_placeholder": "Leave empty to use the file name",
       "file": "Video file",
       "import_url": "File URL",
-      "import_url_placeholder": "https://example.com/video.mp4"
+      "import_url_placeholder": "https://example.com/video.mp4",
+      "description": "Description",
+      "description_placeholder": "Shown with the video in playlists"
     },
     "create": {
       "trigger": "Add video",
@@ -889,7 +917,8 @@
       "use_frame": "Use frame at {{time}}",
       "upload_image": "Upload image",
       "reset": "Pick automatically",
-      "image_too_large": "Choose an image up to {{size}}."
+      "image_too_large": "Choose an image up to {{size}}.",
+      "source_label": "Source"
     },
     "player": {
       "failed": "The video could not be played. Try again in a moment.",
@@ -910,7 +939,15 @@
       "picture_in_picture": "Picture in picture",
       "fullscreen": "Fullscreen",
       "exit_fullscreen": "Exit fullscreen",
-      "chapters": "Chapters"
+      "chapters": "Chapters",
+      "episodes": "Episodes",
+      "watched": "Watched",
+      "now_playing": "Now playing",
+      "next_episode": "Next episode",
+      "next_episode_named": "Next episode: {{title}}",
+      "next_episode_in_one": "Next episode in {{count}} second",
+      "next_episode_in_other": "Next episode in {{count}} seconds",
+      "dismiss_next_episode": "Stay on this video"
     },
     "chapters": {
       "title": "Chapters",
@@ -937,6 +974,12 @@
         "skipped_one": "{{count}} chapter starts less than a second before the video ends at {{duration}} and is left out.",
         "skipped_other": "{{count}} chapters start less than a second before the video ends at {{duration}} and are left out."
       }
+    },
+    "edit": {
+      "trigger": "Edit title and description",
+      "title": "Edit video",
+      "description": "Viewers see the title and description, for example in a playlist’s episodes menu.",
+      "submit": "Save changes"
     }
   },
   "embed": {
@@ -944,7 +987,8 @@
       "title": "Embed",
       "description": "Paste this code into any page to show the video in OpenStream's player.",
       "autoplay_muted": "Browsers only autoplay muted video, so the player starts muted.",
-      "restrictions": "The library's playback rules still apply: only allowed hosts can show the player, and a library that requires signed playback needs an embed URL signed through the API (the embedUrl of the playback URLs)."
+      "restrictions": "The library's playback rules still apply: only allowed hosts can show the player, and a library that requires signed playback needs an embed URL signed through the API (the embedUrl of the playback URLs).",
+      "playlist_description": "Paste this code into any page to show the playlist in OpenStream's player. Viewers move between its videos with the episodes menu."
     },
     "options": {
       "autoplay": "Autoplay",
@@ -956,7 +1000,8 @@
     "unavailable": {
       "not_ready": "This video is still being processed. Try again in a moment.",
       "not_allowed": "This video can't be played on this site.",
-      "not_found": "This video is not available."
+      "not_found": "This video is not available.",
+      "playlist_empty": "This playlist has no videos to play yet."
     }
   },
   "analytics": {
@@ -1118,7 +1163,8 @@
       "api_key": "API key",
       "webhook": "Webhook",
       "video": "Video",
-      "account": "Account"
+      "account": "Account",
+      "playlist": "Playlist"
     },
     "columns": {
       "action": "What happened",
@@ -1188,12 +1234,80 @@
       "account_signed_out": "Signed out",
       "account_password_reset_requested": "Asked to reset the password",
       "account_password_reset": "Reset the password",
-      "organization_deleted": "Deleted the organization"
+      "organization_deleted": "Deleted the organization",
+      "playlist_created": "Created a playlist",
+      "playlist_updated": "Updated a playlist",
+      "playlist_videos_updated": "Changed a playlist's videos",
+      "playlist_deleted": "Deleted a playlist"
     }
   },
   "account_activity": {
     "title": "Account activity",
     "description": "Sign-ins to your account, failed attempts, password resets, and organizations you owned that were deleted. Expand an entry to see where it came from.",
     "search_placeholder": "Search actions and emails"
+  },
+  "playlists": {
+    "description": "Group videos into playlists that play one after another in a single embed.",
+    "fields": {
+      "title": "Title",
+      "title_placeholder": "e.g. Getting started",
+      "description": "Description",
+      "description_placeholder": "Shown at the top of the episodes menu"
+    },
+    "create": {
+      "trigger": "New playlist",
+      "title": "New playlist",
+      "description": "Name the playlist; you add its videos next.",
+      "submit": "Create playlist"
+    },
+    "columns": {
+      "title": "Title",
+      "videos": "Videos",
+      "updated": "Updated"
+    },
+    "video_count_one": "{{count}} video",
+    "video_count_other": "{{count}} videos",
+    "actions": {
+      "delete": "Delete playlist"
+    },
+    "delete": {
+      "title": "Delete playlist?",
+      "description": "\"{{title}}\" will be deleted and its embeds will stop working. Its videos stay in the library.",
+      "confirm": "Delete playlist"
+    },
+    "empty": {
+      "title": "No playlists yet",
+      "description": "Create a playlist to embed several videos in one player, like a course or a series."
+    },
+    "tabs": {
+      "videos": "Videos"
+    },
+    "videos": {
+      "add": "Add video",
+      "search_placeholder": "Search videos",
+      "none_to_add": "No more videos to add.",
+      "not_ready": "Not ready yet",
+      "drag_handle": "Drag to reorder {{title}}",
+      "remove": "Remove from playlist",
+      "empty": {
+        "title": "No videos in this playlist",
+        "description": "Add videos from the library; you can change their order at any time."
+      },
+      "failed": "Failed",
+      "failed_title_one": "{{count}} video can’t play",
+      "failed_title_other": "{{count}} videos can’t play",
+      "failed_hint_one": "Its upload or processing failed, so viewers skip it. Open it in the Videos tab to upload the file again or reprocess it, or remove it here.",
+      "failed_hint_other": "Their upload or processing failed, so viewers skip them. Open them in the Videos tab to upload the files again or reprocess them, or remove them here.",
+      "waiting_title_one": "{{count}} video isn’t ready yet",
+      "waiting_title_other": "{{count}} videos aren’t ready yet",
+      "waiting_hint_one": "Viewers see it in the playlist once its file is uploaded and processed.",
+      "waiting_hint_other": "Viewers see them in the playlist once their files are uploaded and processed."
+    },
+    "edit": {
+      "trigger": "Edit title and description",
+      "title": "Edit playlist",
+      "description": "Viewers see the title and description at the top of the episodes menu.",
+      "submit": "Save changes"
+    }
   }
 }

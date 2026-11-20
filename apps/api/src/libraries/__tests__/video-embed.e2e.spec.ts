@@ -90,6 +90,7 @@ describe("Video embeds (e2e)", () => {
     expect((await response.json()).data.embed).toEqual({
       videoId,
       title: "Launch",
+      description: null,
       durationSeconds: 3,
       width: 640,
       height: 360,
@@ -112,6 +113,7 @@ describe("Video embeds (e2e)", () => {
       showPictureInPicture: false,
       showFullscreen: false,
       showChapters: false,
+      autoplayNext: false,
     }
 
     await ownerClient.put(`${libraryPath}/player`, player)

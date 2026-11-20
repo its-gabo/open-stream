@@ -10,12 +10,14 @@ import { readConfig } from "../../config/app.config"
 import type { LibraryProfile } from "../../libraries/types/libraries.types"
 import type { OrganizationAccess } from "../../organizations/types/organizations.types"
 import { users, videoViews, videos, type NewVideoViewRecord } from "../schema"
+import { ensureSeedBucket } from "./seed-bucket"
 import {
   SEED_API_KEY,
   SEED_DEVICE_TYPES,
   SEED_LIBRARIES,
   SEED_ORGANIZATION,
   SEED_PASSWORD,
+  SEED_STORAGE,
   SEED_USERS,
   SEED_VIEW_DAYS,
   type SeedLibrary,
@@ -156,11 +158,40 @@ async function createSeedOrganization(
   return access!
 }
 
+/** Creates the seed storage's bucket, then the storage pointing at it, on the same server as the default storage. */
+async function createSeedStorage(
+  appModule: AppModule,
+  access: OrganizationAccess,
+  owner: AuthUserSession
+) {
+  const { config } = appModule
+
+  await ensureSeedBucket(config, SEED_STORAGE.bucket)
+
+  const { storage } = await appModule.storagesService.createStorage(
+    access,
+    activityActorOfUser(owner, SEED_REQUEST_SOURCE),
+    {
+      name: SEED_STORAGE.name,
+      endpoint: config.OBJECT_STORAGE_ENDPOINT,
+      region: config.OBJECT_STORAGE_REGION,
+      bucket: SEED_STORAGE.bucket,
+      forcePathStyle: config.OBJECT_STORAGE_FORCE_PATH_STYLE,
+      pathTemplate: SEED_STORAGE.pathTemplate,
+      accessKeyId: config.OBJECT_STORAGE_ACCESS_KEY_ID,
+      secretAccessKey: config.OBJECT_STORAGE_SECRET_ACCESS_KEY,
+    }
+  )
+
+  return storage.id
+}
+
 async function createSeedLibrary(
   appModule: AppModule,
   access: OrganizationAccess,
   owner: AuthUserSession,
-  seedLibrary: SeedLibrary
+  seedLibrary: SeedLibrary,
+  seedStorageId: string
 ) {
   const actor = activityActorOfUser(owner, SEED_REQUEST_SOURCE)
   const { library: created } = await appModule.librariesService.createLibrary(
@@ -168,6 +199,18 @@ async function createSeedLibrary(
     actor,
     { name: seedLibrary.name }
   )
+  if (seedLibrary.usesSeedStorage) {
+    // Before any upload: a library's storage is locked once it holds a file.
+    await appModule.libraryStorageService.assignStorage(
+      (await appModule.librariesService.findLibrary(
+        access.organization.id,
+        created.id
+      ))!,
+      actor,
+      { storageId: seedStorageId }
+    )
+  }
+
   const library = (await appModule.librariesService.findLibrary(
     access.organization.id,
     created.id
@@ -203,6 +246,12 @@ async function createSeedVideo(
   const { video } = await appModule.videosService.createVideo(library, actor, {
     title: seedVideo.title,
   })
+
+  if (seedVideo.description) {
+    await appModule.videosService.updateVideoDetails(library, actor, video.id, {
+      description: seedVideo.description,
+    })
+  }
 
   if (!seedVideo.file) return video
 
@@ -285,6 +334,7 @@ async function seed(appModule: AppModule) {
   const owner = await createSeedUser(appModule, SEED_USERS.OWNER)
   const member = await createSeedUser(appModule, SEED_USERS.MEMBER)
   const access = await createSeedOrganization(appModule, owner, member)
+  const seedStorageId = await createSeedStorage(appModule, access, owner)
   let apiKeySecret: string | null = null
 
   for (const seedLibrary of SEED_LIBRARIES) {
@@ -292,7 +342,8 @@ async function seed(appModule: AppModule) {
       appModule,
       access,
       owner,
-      seedLibrary
+      seedLibrary,
+      seedStorageId
     )
 
     apiKeySecret ??= (
@@ -303,13 +354,33 @@ async function seed(appModule: AppModule) {
       )
     ).secret
 
+    const videoIdsByTitle = new Map<string, string>()
+
     for (const seedVideo of seedLibrary.videos) {
       const video = await createSeedVideo(appModule, library, owner, seedVideo)
       const views = buildSeedViews(library, video.id, seedLibrary, seedVideo)
 
       if (views.length > 0) await appModule.db.insert(videoViews).values(views)
 
+      videoIdsByTitle.set(seedVideo.title, video.id)
       console.log(`  ${seedLibrary.name} / ${seedVideo.title}`)
+    }
+
+    if (seedLibrary.playlist) {
+      const { title, description, videoTitles } = seedLibrary.playlist
+
+      await appModule.playlistsService.createPlaylist(
+        library,
+        activityActorOfUser(owner, SEED_REQUEST_SOURCE),
+        {
+          title,
+          description,
+          videoIds: videoTitles.map((videoTitle) =>
+            videoIdsByTitle.get(videoTitle)!
+          ),
+        }
+      )
+      console.log(`  ${seedLibrary.name} / playlist "${title}"`)
     }
   }
 

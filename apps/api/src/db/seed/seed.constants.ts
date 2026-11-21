@@ -165,6 +165,7 @@ export const SEED_LIBRARIES: SeedLibrary[] = [
       showPictureInPicture: false,
       showFullscreen: true,
       showChapters: true,
+      showCaptions: true,
       autoplayNext: true,
     },
     embeddingHosts: ["courses.example.com", "learn.example.com"],

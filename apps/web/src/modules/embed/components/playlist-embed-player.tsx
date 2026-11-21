@@ -4,6 +4,7 @@ import { ClientOnly } from "@tanstack/react-router"
 import { Suspense, lazy, useCallback, useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 
+import { useEmbedCaptions } from "../hooks/use-embed-captions"
 import { useEmbedCtas } from "../hooks/use-embed-ctas"
 import {
   toResumeSeconds,
@@ -87,6 +88,10 @@ function PlaylistPlayer({
   }))
   const video = embed.videos[selection.index]
   const ctas = useEmbedCtas(video.ctasUrl, options.ctas !== false)
+  const captions = useEmbedCaptions(
+    video.captionsUrl,
+    embed.player.showCaptions
+  )
   const { progressById, recordProgress } = useWatchProgress(
     embed.videos.map(({ videoId }) => videoId)
   )
@@ -191,6 +196,7 @@ function PlaylistPlayer({
           viewsUrl={video.viewsUrl}
           chapters={video.chapters}
           ctas={ctas}
+          captions={captions}
           controls={embed.player}
           onTimeUpdate={handleTimeUpdate}
           playlist={playlist}

@@ -12,6 +12,7 @@ import { organizationsConfigSchema } from "./organizations-config.schema"
 import { outboxConfigSchema } from "./outbox-config.schema"
 import { serverConfigSchema } from "./server-config.schema"
 import { storageConfigSchema } from "./storage-config.schema"
+import { transcriptionConfigSchema } from "./transcription-config.schema"
 import { videoImportConfigSchema } from "./video-import-config.schema"
 import { videoProcessingConfigSchema } from "./video-processing-config.schema"
 import { webhooksConfigSchema } from "./webhooks-config.schema"
@@ -27,6 +28,7 @@ const environmentSchema = z.object({
   ...storageConfigSchema.shape,
   ...videoProcessingConfigSchema.shape,
   ...videoImportConfigSchema.shape,
+  ...transcriptionConfigSchema.shape,
   ...webhooksConfigSchema.shape,
 })
 
@@ -54,6 +56,9 @@ export const appConfigSchema = environmentSchema
       environment.NODE_ENV !== APP_ENVIRONMENTS.PRODUCTION,
     VIDEO_IMPORT_ALLOW_PRIVATE_URLS:
       environment.VIDEO_IMPORT_ALLOW_PRIVATE_URLS ??
+      environment.NODE_ENV !== APP_ENVIRONMENTS.PRODUCTION,
+    TRANSCRIPTION_ALLOW_PRIVATE_ENDPOINTS:
+      environment.TRANSCRIPTION_ALLOW_PRIVATE_ENDPOINTS ??
       environment.NODE_ENV !== APP_ENVIRONMENTS.PRODUCTION,
   }))
   .refine(
@@ -91,5 +96,15 @@ export const appConfigSchema = environmentSchema
       message:
         "The video processing stall timeout must be at least twice the heartbeat interval",
       path: ["VIDEO_PROCESSING_STALL_TIMEOUT_MS"],
+    }
+  )
+  .refine(
+    (config) =>
+      config.TRANSCRIPTION_STALL_TIMEOUT_MS >=
+      2 * config.TRANSCRIPTION_HEARTBEAT_INTERVAL_MS,
+    {
+      message:
+        "The transcription stall timeout must be at least twice the heartbeat interval",
+      path: ["TRANSCRIPTION_STALL_TIMEOUT_MS"],
     }
   )

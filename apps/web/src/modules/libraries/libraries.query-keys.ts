@@ -117,3 +117,32 @@ export const libraryLeadPageQueryKey = (
   libraryId: string,
   params: ListPageParams
 ) => [...libraryLeadsQueryKey(organizationSlug, libraryId), params] as const
+
+/** A video's caption tracks and latest transcriptions. */
+export const videoCaptionsQueryKey = (
+  organizationSlug: string,
+  libraryId: string,
+  videoId: string
+) =>
+  [
+    ...LIBRARIES_QUERY_KEY,
+    "captions",
+    organizationSlug,
+    libraryId,
+    videoId,
+  ] as const
+
+export const libraryTranscriptionQueryKey = (
+  organizationSlug: string,
+  libraryId: string
+) =>
+  [
+    ...LIBRARIES_QUERY_KEY,
+    "transcription",
+    organizationSlug,
+    libraryId,
+  ] as const
+
+/** A track's cues never change for a URL: changing the track changes the URL. */
+export const videoCaptionCuesQueryKey = (vttUrl: string) =>
+  [...LIBRARIES_QUERY_KEY, "caption-cues", vttUrl] as const

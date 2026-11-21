@@ -42,12 +42,16 @@ export type ActivityAction =
   | "storage.created"
   | "storage.updated"
   | "storage.deleted"
+  | "transcription_provider.created"
+  | "transcription_provider.updated"
+  | "transcription_provider.deleted"
   | "library.created"
   | "library.updated"
   | "library.storage_changed"
   | "library.encoding_updated"
   | "library.security_updated"
   | "library.player_updated"
+  | "library.transcription_updated"
   | "api_key.created"
   | "api_key.updated"
   | "api_key.rolled"
@@ -65,6 +69,10 @@ export type ActivityAction =
   | "video.cta_created"
   | "video.cta_updated"
   | "video.cta_deleted"
+  | "video.caption_uploaded"
+  | "video.caption_updated"
+  | "video.caption_deleted"
+  | "video.transcription_requested"
   | "video.deleted"
   | "video.uploaded"
   | "video.upload_canceled"
@@ -124,6 +132,7 @@ export type ActivityResourceType =
   | "invitation"
   | "membership"
   | "storage"
+  | "transcription_provider"
   | "library"
   | "api_key"
   | "webhook"
@@ -440,6 +449,10 @@ export interface CreateStorageParams {
   organizationSlug: string
 }
 
+export interface CreateTranscriptionProviderParams {
+  organizationSlug: string
+}
+
 export interface CreateVideoCtaParams {
   /**
    * @format uuid
@@ -543,6 +556,24 @@ export interface DeleteLibraryApiPlaylistParams {
   playlistId: string
 }
 
+export interface DeleteLibraryApiVideoCaptionParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  captionId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+}
+
 export interface DeleteLibraryApiVideoCtaParams {
   /**
    * @format uuid
@@ -604,6 +635,34 @@ export interface DeleteStorageParams {
    * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
    */
   storageId: string
+}
+
+export interface DeleteTranscriptionProviderParams {
+  organizationSlug: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  providerId: string
+}
+
+export interface DeleteVideoCaptionParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  captionId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  organizationSlug: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
 }
 
 export interface DeleteVideoCtaParams {
@@ -727,6 +786,22 @@ export interface GetLibraryApiVideoAnalyticsParams {
   videoId: string
 }
 
+export interface GetLibraryApiVideoEmbedCaptionsParams {
+  expires?: string
+  key?: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  token?: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+}
+
 export interface GetLibraryApiVideoEmbedCtasParams {
   expires?: string
   key?: string
@@ -821,6 +896,15 @@ export interface GetLibraryStorageParams {
   organizationSlug: string
 }
 
+export interface GetLibraryTranscriptionSettingsParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  organizationSlug: string
+}
+
 export interface GetLibraryWebhookParams {
   /**
    * @format uuid
@@ -870,6 +954,25 @@ export interface GetStorageParams {
 export interface GetVideoAnalyticsParams {
   /** @default 30 */
   days?: number
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  organizationSlug: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+}
+
+export interface GetVideoCaptionFileParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  captionId: string
   /**
    * @format uuid
    * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
@@ -1162,6 +1265,7 @@ export interface LibraryPlayerSettings {
   /** @pattern ^#[0-9a-f]{6}$ */
   accentColor: string
   autoplayNext: boolean
+  showCaptions: boolean
   showChapters: boolean
   showFullscreen: boolean
   showPictureInPicture: boolean
@@ -1181,6 +1285,7 @@ export interface LibraryPlayerUpdateBody {
   /** @pattern ^#[0-9a-f]{6}$ */
   accentColor: string
   autoplayNext: boolean
+  showCaptions: boolean
   showChapters: boolean
   showFullscreen: boolean
   showPictureInPicture: boolean
@@ -1226,6 +1331,26 @@ export interface LibrarySuccessResponse {
     library: Library
   }
   message: string
+}
+
+export interface LibraryTranscriptionSettings {
+  autoTranscribe: boolean
+  language: string | null
+  providerId: string | null
+}
+
+export interface LibraryTranscriptionSettingsSuccessResponse {
+  code: string
+  data: {
+    transcription: LibraryTranscriptionSettings
+  }
+  message: string
+}
+
+export interface LibraryTranscriptionUpdateBody {
+  autoTranscribe: boolean
+  language: string | null
+  providerId: string | null
 }
 
 export interface LibraryUpdateBody {
@@ -1372,6 +1497,19 @@ export interface ListLibraryApiPlaylistsParams {
   libraryId: string
 }
 
+export interface ListLibraryApiVideoCaptionsParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+}
+
 export interface ListLibraryApiVideoCtasParams {
   /**
    * @format uuid
@@ -1480,6 +1618,24 @@ export interface ListStoragesParams {
   pageSize?: number
   /** @maxLength 100 */
   search?: string
+}
+
+export interface ListTranscriptionProvidersParams {
+  organizationSlug: string
+}
+
+export interface ListVideoCaptionsParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  organizationSlug: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
 }
 
 export interface ListVideoCtasParams {
@@ -1788,6 +1944,8 @@ export interface Pagination {
 
 export interface PlaybackUrl {
   /** @format uri */
+  captionsUrl: string
+  /** @format uri */
   chaptersUrl: string
   /** @format uri */
   embedUrl: string
@@ -1889,6 +2047,8 @@ export interface PlaylistEmbedSuccessResponse {
 }
 
 export interface PlaylistEmbedVideo {
+  /** @format uri */
+  captionsUrl: string
   chapters: VideoChapter[]
   /** @format uri */
   ctasUrl: string
@@ -1999,6 +2159,24 @@ export interface PlaylistUpdateBody {
 export interface PlaylistVideosUpdateBody {
   /** @maxItems 50 */
   videoIds: string[]
+}
+
+export interface ReadLibraryApiVideoCaptionFileParams {
+  expires?: string
+  /** @pattern ^[0-9a-f-]{36}\.vtt$ */
+  fileName: string
+  key?: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  token?: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
 }
 
 export interface ReadLibraryApiVideoChaptersParams {
@@ -2117,6 +2295,33 @@ export interface ReprocessLibraryApiVideoParams {
 }
 
 export interface ReprocessVideoParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  organizationSlug: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+}
+
+export interface RequestLibraryApiVideoTranscriptionParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+}
+
+export interface RequestVideoTranscriptionParams {
   /**
    * @format uuid
    * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
@@ -2438,6 +2643,126 @@ export interface TestStorageConnectionParams {
   organizationSlug: string
 }
 
+export interface TestTranscriptionProviderParams {
+  organizationSlug: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  providerId: string
+}
+
+export interface TranscriptionConnectionTest {
+  isAuthorized: boolean
+  isReachable: boolean
+}
+
+export interface TranscriptionConnectionTestSuccessResponse {
+  code: string
+  data: {
+    connection: TranscriptionConnectionTest
+  }
+  message: string
+}
+
+export interface TranscriptionProvider {
+  apiKeyHint: string | null
+  /** @format uri */
+  baseUrl: string
+  /**
+   * @format date-time
+   * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+   */
+  createdAt: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  id: string
+  kind: TranscriptionProviderKind
+  /**
+   * @min 0
+   * @max 9007199254740991
+   */
+  libraryCount: number
+  model: string
+  name: string
+  /**
+   * @format date-time
+   * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+   */
+  updatedAt: string
+}
+
+export type TranscriptionProviderCreateBody =
+  | {
+      /**
+       * @minLength 1
+       * @maxLength 512
+       */
+      apiKey: string
+      kind: "openai"
+      /**
+       * @minLength 1
+       * @maxLength 120
+       */
+      model: string
+      /**
+       * @minLength 1
+       * @maxLength 80
+       */
+      name: string
+    }
+  | {
+      apiKey: string | null
+      /** @maxLength 2048 */
+      baseUrl: string
+      kind: "openai_compatible"
+      /**
+       * @minLength 1
+       * @maxLength 120
+       */
+      model: string
+      /**
+       * @minLength 1
+       * @maxLength 80
+       */
+      name: string
+    }
+
+export type TranscriptionProviderKind = "openai" | "openai_compatible"
+
+export interface TranscriptionProviderListSuccessResponse {
+  code: string
+  data: {
+    providers: TranscriptionProvider[]
+  }
+  message: string
+}
+
+export interface TranscriptionProviderSuccessResponse {
+  code: string
+  data: {
+    provider: TranscriptionProvider
+  }
+  message: string
+}
+
+export interface TranscriptionProviderUpdateBody {
+  apiKey?: string | null
+  baseUrl?: string | null
+  /**
+   * @minLength 1
+   * @maxLength 120
+   */
+  model: string
+  /**
+   * @minLength 1
+   * @maxLength 80
+   */
+  name: string
+}
+
 export interface TransferOrganizationOwnershipParams {
   organizationSlug: string
 }
@@ -2480,6 +2805,24 @@ export interface UpdateLibraryApiPlaylistVideosParams {
    * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
    */
   playlistId: string
+}
+
+export interface UpdateLibraryApiVideoCaptionParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  captionId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
 }
 
 export interface UpdateLibraryApiVideoChaptersParams {
@@ -2584,6 +2927,15 @@ export interface UpdateLibraryStorageParams {
   organizationSlug: string
 }
 
+export interface UpdateLibraryTranscriptionSettingsParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  organizationSlug: string
+}
+
 export interface UpdateOrganizationParams {
   organizationSlug: string
 }
@@ -2623,6 +2975,34 @@ export interface UpdateStorageParams {
    * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
    */
   storageId: string
+}
+
+export interface UpdateTranscriptionProviderParams {
+  organizationSlug: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  providerId: string
+}
+
+export interface UpdateVideoCaptionParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  captionId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  organizationSlug: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
 }
 
 export interface UpdateVideoChaptersParams {
@@ -2686,12 +3066,39 @@ export interface UpdateVideoPosterParams {
   videoId: string
 }
 
+export interface UploadLibraryApiVideoCaptionParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+}
+
 export interface UploadLibraryApiVideoPosterImageParams {
   /**
    * @format uuid
    * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
    */
   libraryId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+}
+
+export interface UploadVideoCaptionParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  organizationSlug: string
   /**
    * @format uuid
    * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
@@ -2781,6 +3188,88 @@ export interface VideoAnalyticsSuccessResponse {
     analytics: VideoAnalytics
   }
   message: string
+}
+
+export interface VideoCaption {
+  /**
+   * @format date-time
+   * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+   */
+  createdAt: string
+  /**
+   * @exclusiveMin 0
+   * @max 9007199254740991
+   */
+  cueCount: number
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  id: string
+  isDefault: boolean
+  kind: VideoCaptionKind
+  label: string
+  language: string
+  /**
+   * @exclusiveMin 0
+   * @max 9007199254740991
+   */
+  sizeBytes: number
+  source: VideoCaptionSource
+  transcriptionId: string | null
+  /**
+   * @format date-time
+   * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+   */
+  updatedAt: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+}
+
+export type VideoCaptionKind = "subtitles" | "captions"
+
+export interface VideoCaptionListSuccessResponse {
+  code: string
+  data: {
+    captions: VideoCaption[]
+    transcriptions: VideoTranscription[]
+  }
+  message: string
+}
+
+export type VideoCaptionSource = "upload" | "transcription"
+
+export interface VideoCaptionSuccessResponse {
+  code: string
+  data: {
+    caption: VideoCaption
+  }
+  message: string
+}
+
+export interface VideoCaptionUpdateBody {
+  isDefault: boolean
+  /**
+   * @minLength 1
+   * @maxLength 60
+   */
+  label: string
+}
+
+export interface VideoCaptionUploadBody {
+  /** @format binary */
+  file: File
+  /** @default "subtitles" */
+  kind?: "subtitles" | "captions"
+  /**
+   * @minLength 1
+   * @maxLength 60
+   */
+  label: string
+  language: string
 }
 
 export interface VideoChapter {
@@ -2942,6 +3431,8 @@ export type VideoCtaTiming = "fixed" | "random"
 
 export interface VideoEmbed {
   allowedPlaybackHosts: string[]
+  /** @format uri */
+  captionsUrl: string
   chapters: VideoChapter[]
   /** @format uri */
   ctasUrl: string
@@ -2973,6 +3464,28 @@ export interface VideoEmbed {
    * @max 9007199254740991
    */
   width: number
+}
+
+export interface VideoEmbedCaption {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  id: string
+  isDefault: boolean
+  kind: VideoCaptionKind
+  label: string
+  language: string
+  /** @format uri */
+  url: string
+}
+
+export interface VideoEmbedCaptionListSuccessResponse {
+  code: string
+  data: {
+    captions: VideoEmbedCaption[]
+  }
+  message: string
 }
 
 export interface VideoEmbedCta {
@@ -3133,6 +3646,59 @@ export interface VideoSuccessResponse {
   message: string
 }
 
+export interface VideoTranscription {
+  /**
+   * @format date-time
+   * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+   */
+  createdAt: string
+  detectedLanguage: string | null
+  failureReason: VideoTranscriptionFailureReason | null
+  finishedAt: string | null
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  id: string
+  kind: VideoCaptionKind
+  language: string | null
+  model: string
+  providerId: string | null
+  providerName: string | null
+  status: VideoTranscriptionStatus
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+}
+
+export type VideoTranscriptionFailureReason =
+  | "provider_auth"
+  | "provider_rejected"
+  | "provider_unreachable"
+  | "provider_removed"
+  | "no_audio"
+  | "no_speech"
+  | "transcription_failed"
+
+export interface VideoTranscriptionRequestBody {
+  /** @default "subtitles" */
+  kind?: "subtitles" | "captions"
+  language?: string | null
+}
+
+export type VideoTranscriptionStatus =
+  "pending" | "processing" | "succeeded" | "failed"
+
+export interface VideoTranscriptionSuccessResponse {
+  code: string
+  data: {
+    transcription: VideoTranscription
+  }
+  message: string
+}
+
 export interface VideoUpdateBody {
   description?: string | null
   /**
@@ -3244,7 +3810,12 @@ export interface WebhookEmptySuccessResponse {
 }
 
 export interface WebhookEvent {
-  data: VideoStatusDetails | VideoCtaLead | WebhookTestEventData
+  data:
+    | VideoStatusDetails
+    | VideoCtaLead
+    | VideoCaption
+    | VideoTranscription
+    | WebhookTestEventData
   /**
    * @format uuid
    * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
@@ -3268,6 +3839,9 @@ export type WebhookEventType =
   | "video.processing.started"
   | "video.processing.ready"
   | "video.processing.failed"
+  | "video.caption.ready"
+  | "video.caption.deleted"
+  | "video.transcription.failed"
   | "video.cta.submitted"
   | "webhook.test"
 
@@ -4189,6 +4763,111 @@ export class OpenStreamApi<
     ) =>
       this.request<StorageConnectionTestSuccessResponse, ApiErrorResponse>({
         path: `/api/v1/organizations/${organizationSlug}/storages/${storageId}/connection-tests`,
+        method: "POST",
+        format: "json",
+        ...params,
+      }),
+  }
+  transcriptionProviders = {
+    /**
+     * No description
+     *
+     * @tags Transcription providers
+     * @name ListTranscriptionProviders
+     * @summary List the organization's transcription providers by name
+     * @request GET:/api/v1/organizations/{organizationSlug}/transcription-providers
+     */
+    listTranscriptionProviders: (
+      { organizationSlug }: ListTranscriptionProvidersParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<TranscriptionProviderListSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/transcription-providers`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Transcription providers
+     * @name CreateTranscriptionProvider
+     * @summary Connect OpenAI, or a server of your own speaking OpenAI's transcription API
+     * @request POST:/api/v1/organizations/{organizationSlug}/transcription-providers
+     */
+    createTranscriptionProvider: (
+      { organizationSlug }: CreateTranscriptionProviderParams,
+      data: TranscriptionProviderCreateBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<TranscriptionProviderSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/transcription-providers`,
+        method: "POST",
+        body: data,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Transcription providers
+     * @name UpdateTranscriptionProvider
+     * @summary Change a provider's name, address, model or API key; its kind stays
+     * @request PUT:/api/v1/organizations/{organizationSlug}/transcription-providers/{providerId}
+     */
+    updateTranscriptionProvider: (
+      { organizationSlug, providerId }: UpdateTranscriptionProviderParams,
+      data: TranscriptionProviderUpdateBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<TranscriptionProviderSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/transcription-providers/${providerId}`,
+        method: "PUT",
+        body: data,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Transcription providers
+     * @name DeleteTranscriptionProvider
+     * @summary Delete a provider no library uses; tracks it wrote stay
+     * @request DELETE:/api/v1/organizations/{organizationSlug}/transcription-providers/{providerId}
+     */
+    deleteTranscriptionProvider: (
+      { organizationSlug, providerId }: DeleteTranscriptionProviderParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<LibraryEmptySuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/transcription-providers/${providerId}`,
+        method: "DELETE",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Transcription providers
+     * @name TestTranscriptionProvider
+     * @summary Check a saved provider answers and takes its API key, without transcribing anything
+     * @request POST:/api/v1/organizations/{organizationSlug}/transcription-providers/{providerId}/connection-tests
+     */
+    testTranscriptionProvider: (
+      { organizationSlug, providerId }: TestTranscriptionProviderParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<
+        TranscriptionConnectionTestSuccessResponse,
+        ApiErrorResponse
+      >({
+        path: `/api/v1/organizations/${organizationSlug}/transcription-providers/${providerId}/connection-tests`,
         method: "POST",
         format: "json",
         ...params,
@@ -5200,6 +5879,190 @@ export class OpenStreamApi<
         format: "json",
         ...params,
       }),
+
+    /**
+     * No description
+     *
+     * @tags Libraries
+     * @name ListVideoCaptions
+     * @summary List a video's caption tracks by language, with its latest transcriptions
+     * @request GET:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/videos/{videoId}/captions
+     */
+    listVideoCaptions: (
+      { organizationSlug, libraryId, videoId }: ListVideoCaptionsParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<VideoCaptionListSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/videos/${videoId}/captions`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Libraries
+     * @name UploadVideoCaption
+     * @summary Upload a WebVTT or SRT file as a caption track of a processed video; a track of the same language and kind is replaced
+     * @request POST:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/videos/{videoId}/captions
+     */
+    uploadVideoCaption: (
+      { organizationSlug, libraryId, videoId }: UploadVideoCaptionParams,
+      data: VideoCaptionUploadBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<VideoCaptionSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/videos/${videoId}/captions`,
+        method: "POST",
+        body: data,
+        type: "multipart/form-data",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Libraries
+     * @name UpdateVideoCaption
+     * @summary Rename a caption track, or make it the one players turn on by themselves
+     * @request PUT:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/videos/{videoId}/captions/{captionId}
+     */
+    updateVideoCaption: (
+      {
+        organizationSlug,
+        libraryId,
+        videoId,
+        captionId,
+      }: UpdateVideoCaptionParams,
+      data: VideoCaptionUpdateBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<VideoCaptionSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/videos/${videoId}/captions/${captionId}`,
+        method: "PUT",
+        body: data,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Libraries
+     * @name DeleteVideoCaption
+     * @summary Delete a caption track and its file
+     * @request DELETE:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/videos/{videoId}/captions/{captionId}
+     */
+    deleteVideoCaption: (
+      {
+        organizationSlug,
+        libraryId,
+        videoId,
+        captionId,
+      }: DeleteVideoCaptionParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<LibraryEmptySuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/videos/${videoId}/captions/${captionId}`,
+        method: "DELETE",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Libraries
+     * @name GetVideoCaptionFile
+     * @summary Download a caption track's WebVTT, for the web app's player and for editing it elsewhere
+     * @request GET:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/videos/{videoId}/captions/{captionId}/file
+     */
+    getVideoCaptionFile: (
+      {
+        organizationSlug,
+        libraryId,
+        videoId,
+        captionId,
+      }: GetVideoCaptionFileParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<File, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/videos/${videoId}/captions/${captionId}/file`,
+        method: "GET",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Libraries
+     * @name RequestVideoTranscription
+     * @summary Transcribe a processed video into a caption track with the library's provider; the worker does it in the background
+     * @request POST:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/videos/{videoId}/transcriptions
+     */
+    requestVideoTranscription: (
+      { organizationSlug, libraryId, videoId }: RequestVideoTranscriptionParams,
+      data: VideoTranscriptionRequestBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<VideoTranscriptionSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/videos/${videoId}/transcriptions`,
+        method: "POST",
+        body: data,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Libraries
+     * @name GetLibraryTranscriptionSettings
+     * @summary Read which provider transcribes the library's videos, and whether it does so by itself
+     * @request GET:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/transcription
+     */
+    getLibraryTranscriptionSettings: (
+      { organizationSlug, libraryId }: GetLibraryTranscriptionSettingsParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<
+        LibraryTranscriptionSettingsSuccessResponse,
+        ApiErrorResponse
+      >({
+        path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/transcription`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Libraries
+     * @name UpdateLibraryTranscriptionSettings
+     * @summary Choose the organization's provider that transcribes the library's videos, and whether each is transcribed once processed
+     * @request PUT:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/transcription
+     */
+    updateLibraryTranscriptionSettings: (
+      { organizationSlug, libraryId }: UpdateLibraryTranscriptionSettingsParams,
+      data: LibraryTranscriptionUpdateBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<
+        LibraryTranscriptionSettingsSuccessResponse,
+        ApiErrorResponse
+      >({
+        path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/transcription`,
+        method: "PUT",
+        body: data,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
   }
   analytics = {
     /**
@@ -5496,6 +6359,50 @@ export class OpenStreamApi<
         body: data,
         type: "application/json",
         format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Library API
+     * @name GetLibraryApiVideoEmbedCaptions
+     * @summary Read a processed video's caption tracks with the URL of each WebVTT; signed libraries need `key`, `expires` and `token`
+     * @request GET:/api/v1/libraries/{libraryId}/videos/{videoId}/embed/captions
+     */
+    getLibraryApiVideoEmbedCaptions: (
+      { libraryId, videoId, ...query }: GetLibraryApiVideoEmbedCaptionsParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<VideoEmbedCaptionListSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/videos/${videoId}/embed/captions`,
+        method: "GET",
+        query: query,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Library API
+     * @name ReadLibraryApiVideoCaptionFile
+     * @summary Read a caption track's WebVTT, `<captionId>.vtt`; signed libraries need `key`, `expires` and `token`
+     * @request GET:/api/v1/libraries/{libraryId}/videos/{videoId}/captions/{fileName}
+     */
+    readLibraryApiVideoCaptionFile: (
+      {
+        libraryId,
+        videoId,
+        fileName,
+        ...query
+      }: ReadLibraryApiVideoCaptionFileParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<File, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/videos/${videoId}/captions/${fileName}`,
+        method: "GET",
+        query: query,
         ...params,
       }),
 
@@ -6084,6 +6991,120 @@ export class OpenStreamApi<
         method: "GET",
         query: query,
         secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Needs the `videos:read` scope.
+     *
+     * @tags Library API
+     * @name ListLibraryApiVideoCaptions
+     * @summary List a video's caption tracks by language, with its latest transcriptions
+     * @request GET:/api/v1/libraries/{libraryId}/videos/{videoId}/captions
+     * @secure
+     */
+    listLibraryApiVideoCaptions: (
+      { libraryId, videoId }: ListLibraryApiVideoCaptionsParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<VideoCaptionListSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/videos/${videoId}/captions`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Needs the `videos:manage` scope.
+     *
+     * @tags Library API
+     * @name UploadLibraryApiVideoCaption
+     * @summary Upload a WebVTT or SRT file as a caption track of a processed video; a track of the same language and kind is replaced
+     * @request POST:/api/v1/libraries/{libraryId}/videos/{videoId}/captions
+     * @secure
+     */
+    uploadLibraryApiVideoCaption: (
+      { libraryId, videoId }: UploadLibraryApiVideoCaptionParams,
+      data: VideoCaptionUploadBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<VideoCaptionSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/videos/${videoId}/captions`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: "multipart/form-data",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Needs the `videos:manage` scope.
+     *
+     * @tags Library API
+     * @name UpdateLibraryApiVideoCaption
+     * @summary Rename a caption track, or make it the one players turn on by themselves
+     * @request PUT:/api/v1/libraries/{libraryId}/videos/{videoId}/captions/{captionId}
+     * @secure
+     */
+    updateLibraryApiVideoCaption: (
+      { libraryId, videoId, captionId }: UpdateLibraryApiVideoCaptionParams,
+      data: VideoCaptionUpdateBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<VideoCaptionSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/videos/${videoId}/captions/${captionId}`,
+        method: "PUT",
+        body: data,
+        secure: true,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Needs the `videos:manage` scope.
+     *
+     * @tags Library API
+     * @name DeleteLibraryApiVideoCaption
+     * @summary Delete a caption track and its file
+     * @request DELETE:/api/v1/libraries/{libraryId}/videos/{videoId}/captions/{captionId}
+     * @secure
+     */
+    deleteLibraryApiVideoCaption: (
+      { libraryId, videoId, captionId }: DeleteLibraryApiVideoCaptionParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<LibraryEmptySuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/videos/${videoId}/captions/${captionId}`,
+        method: "DELETE",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Needs the `videos:manage` scope.
+     *
+     * @tags Library API
+     * @name RequestLibraryApiVideoTranscription
+     * @summary Transcribe a processed video into a caption track with the library's provider; `video.caption.ready` or `video.transcription.failed` tells the outcome
+     * @request POST:/api/v1/libraries/{libraryId}/videos/{videoId}/transcriptions
+     * @secure
+     */
+    requestLibraryApiVideoTranscription: (
+      { libraryId, videoId }: RequestLibraryApiVideoTranscriptionParams,
+      data: VideoTranscriptionRequestBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<VideoTranscriptionSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/videos/${videoId}/transcriptions`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: "application/json",
         format: "json",
         ...params,
       }),

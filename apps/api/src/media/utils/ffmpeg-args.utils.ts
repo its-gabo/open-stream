@@ -1,6 +1,7 @@
 import { match } from "ts-pattern"
 import { VIDEO_ENCODERS } from "../constants/media.constants"
 import type {
+  AudioExtractionJob,
   HlsTranscodeJob,
   ImageCaptureJob,
   ImageConversionJob,
@@ -228,6 +229,54 @@ export function buildImageConversionArgs(job: ImageConversionJob) {
     JPEG_QUALITY,
     job.outputPath,
   ]
+}
+
+/** Speech recognition needs no more than 16 kHz mono; at 32 kbit/s ten minutes take under 3 MB. */
+const SPEECH_AUDIO_ARGS = [
+  "-vn",
+  "-ac",
+  "1",
+  "-ar",
+  "16000",
+  "-c:a",
+  "libmp3lame",
+  "-b:a",
+  "32k",
+]
+
+/** Splits the sound into numbered chunks, listing each with its start in `listPath`. */
+export function buildAudioExtractionArgs(
+  job: AudioExtractionJob,
+  { listPath, chunkPattern }: { listPath: string; chunkPattern: string }
+) {
+  return [
+    ...COMMON_ARGS,
+    ...inputArgs(job.source),
+    ...SPEECH_AUDIO_ARGS,
+    "-f",
+    "segment",
+    "-segment_time",
+    String(job.chunkSeconds),
+    "-segment_list",
+    listPath,
+    "-segment_list_type",
+    "csv",
+    "-reset_timestamps",
+    "1",
+    chunkPattern,
+  ]
+}
+
+/** Lines of ffmpeg's CSV segment list: `<file>,<start>,<end>`. */
+export function parseAudioChunkList(list: string, outputDir: string) {
+  return list
+    .split(/\r?\n/)
+    .map((line) => line.split(","))
+    .filter(([fileName, start]) => fileName && start !== undefined)
+    .map(([fileName, start]) => ({
+      path: `${outputDir}/${fileName}`,
+      startSeconds: Number(start),
+    }))
 }
 
 export const buildProbeArgs = (source: string) => [

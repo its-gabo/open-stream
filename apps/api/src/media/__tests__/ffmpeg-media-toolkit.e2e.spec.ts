@@ -177,6 +177,44 @@ describe("ffmpeg media toolkit (e2e)", () => {
       expect(await Bun.file(outputPath).exists()).toBe(true)
     })
 
+    it("extracts the sound as small mono MP3 chunks with their starts", async () => {
+      const source = await writeSource({ seconds: 5 })
+      const outputDir = join(workDir, "audio")
+
+      const chunks = await createToolkit().extractAudioChunks({
+        source,
+        outputDir,
+        chunkSeconds: 2,
+      })
+
+      expect(chunks.map(({ path }) => path)).toEqual([
+        join(outputDir, "chunk_000.mp3"),
+        join(outputDir, "chunk_001.mp3"),
+        join(outputDir, "chunk_002.mp3"),
+      ])
+      expect(chunks[0]!.startSeconds).toBe(0)
+      expect(chunks[1]!.startSeconds).toBeCloseTo(2, 0)
+      expect(chunks[2]!.startSeconds).toBeCloseTo(4, 0)
+
+      const probe = Bun.spawn(
+        [
+          "ffprobe",
+          "-v",
+          "error",
+          "-show_entries",
+          "stream=codec_name,channels,sample_rate",
+          "-of",
+          "csv=p=0",
+          chunks[0]!.path,
+        ],
+        { stdout: "pipe" }
+      )
+
+      expect((await new Response(probe.stdout).text()).trim()).toBe(
+        "mp3,16000,1"
+      )
+    })
+
     it("fails a capture that matched no frame", async () => {
       const source = await writeSource({ seconds: 1 })
 

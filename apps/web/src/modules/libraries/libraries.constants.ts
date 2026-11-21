@@ -72,6 +72,11 @@ export const LIBRARY_TABS = [
     isOwnerOnly: true,
   },
   {
+    suffix: "transcription",
+    labelKey: "libraries.tabs.transcription",
+    isOwnerOnly: true,
+  },
+  {
     suffix: "security",
     labelKey: "libraries.tabs.security",
     isOwnerOnly: true,
@@ -114,6 +119,10 @@ export const WEBHOOK_EVENT_TYPE_TRANSLATION_KEYS = {
   [WEBHOOK_EVENT_TYPES.VIDEO_PROCESSING_STARTED]: "video_processing_started",
   [WEBHOOK_EVENT_TYPES.VIDEO_PROCESSING_READY]: "video_processing_ready",
   [WEBHOOK_EVENT_TYPES.VIDEO_PROCESSING_FAILED]: "video_processing_failed",
+  [WEBHOOK_EVENT_TYPES.VIDEO_CAPTION_READY]: "video_caption_ready",
+  [WEBHOOK_EVENT_TYPES.VIDEO_CAPTION_DELETED]: "video_caption_deleted",
+  [WEBHOOK_EVENT_TYPES.VIDEO_TRANSCRIPTION_FAILED]:
+    "video_transcription_failed",
   [WEBHOOK_EVENT_TYPES.VIDEO_CTA_SUBMITTED]: "video_cta_submitted",
   [WEBHOOK_EVENT_TYPES.WEBHOOK_TEST]: "webhook_test",
 } as const satisfies Record<WebhookEventType, string>
@@ -142,6 +151,14 @@ export const WEBHOOK_EVENT_GROUPS = [
       WEBHOOK_EVENT_TYPES.VIDEO_PROCESSING_STARTED,
       WEBHOOK_EVENT_TYPES.VIDEO_PROCESSING_READY,
       WEBHOOK_EVENT_TYPES.VIDEO_PROCESSING_FAILED,
+    ],
+  },
+  {
+    key: "captions",
+    events: [
+      WEBHOOK_EVENT_TYPES.VIDEO_CAPTION_READY,
+      WEBHOOK_EVENT_TYPES.VIDEO_CAPTION_DELETED,
+      WEBHOOK_EVENT_TYPES.VIDEO_TRANSCRIPTION_FAILED,
     ],
   },
   { key: "leads", events: [WEBHOOK_EVENT_TYPES.VIDEO_CTA_SUBMITTED] },
@@ -224,6 +241,7 @@ export const VIDEO_DETAILS_TABS = {
   THUMBNAIL: "thumbnail",
   CHAPTERS: "chapters",
   CTAS: "ctas",
+  CAPTIONS: "captions",
   ANALYTICS: "analytics",
   EMBED: "embed",
 } as const
@@ -260,6 +278,13 @@ export const PLAYER_CTA_FORM_STATES = {
 
 /** The controls hide after this long without the pointer moving while the video plays. */
 export const PLAYER_CONTROLS_HIDE_DELAY_MS = 2500
+
+/** Where the viewer's choice of caption language is remembered between videos; `off` turns captions off. */
+export const PLAYER_CAPTIONS_STORAGE_KEY = "openstream-player-captions"
+export const PLAYER_CAPTIONS_OFF = "off"
+
+/** How often a video's captions are checked while one of its transcriptions runs. */
+export const VIDEO_TRANSCRIPTION_POLL_INTERVAL_MS = 5000
 
 /** Which way the arrow keys move a player slider. */
 export const PLAYER_SLIDER_KEY_DIRECTIONS = {
@@ -337,3 +362,45 @@ export const PLAYER_ACCENT_SWATCHES = [
   { value: "#6366f1", labelKey: "indigo" },
   { value: "#d946ef", labelKey: "fuchsia" },
 ] as const
+
+/** Languages offered for caption tracks, by code; players show each in its own language. */
+export const CAPTION_LANGUAGE_CODES = [
+  "en",
+  "es",
+  "fr",
+  "de",
+  "it",
+  "pt",
+  "pt-BR",
+  "nl",
+  "pl",
+  "cs",
+  "sk",
+  "uk",
+  "ru",
+  "ro",
+  "hu",
+  "sv",
+  "da",
+  "no",
+  "fi",
+  "el",
+  "tr",
+  "ar",
+  "he",
+  "hi",
+  "bn",
+  "ur",
+  "fa",
+  "id",
+  "ms",
+  "vi",
+  "th",
+  "ja",
+  "ko",
+  "zh",
+  "zh-Hant",
+] as const
+
+/** Select value for letting the provider tell the language. */
+export const DETECT_CAPTION_LANGUAGE = "auto"

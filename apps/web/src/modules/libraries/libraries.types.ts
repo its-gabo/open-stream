@@ -1,4 +1,4 @@
-import type { LibraryPlayerSettings } from "@workspace/shared"
+import type { LibraryPlayerSettings, VideoCaptionKind } from "@workspace/shared"
 import type { z } from "zod"
 
 import type {
@@ -18,8 +18,11 @@ import type {
   playlistFormSchema,
   videoChaptersFormSchema,
   videoCreateFormSchema,
+  videoCaptionEditFormSchema,
+  videoCaptionUploadFormSchema,
   videoCtaFormSchema,
   videoDetailsFormSchema,
+  videoTranscriptionFormSchema,
 } from "./libraries.schemas"
 
 export type LibraryFormValues = z.infer<ReturnType<typeof libraryFormSchema>>
@@ -43,6 +46,15 @@ export type VideoCreateFormValues = z.infer<
 >
 export type VideoDetailsFormValues = z.infer<
   ReturnType<typeof videoDetailsFormSchema>
+>
+export type VideoCaptionUploadFormValues = z.infer<
+  ReturnType<typeof videoCaptionUploadFormSchema>
+>
+export type VideoCaptionEditFormValues = z.infer<
+  ReturnType<typeof videoCaptionEditFormSchema>
+>
+export type VideoTranscriptionFormValues = z.infer<
+  ReturnType<typeof videoTranscriptionFormSchema>
 >
 export type PlaylistFormValues = z.infer<ReturnType<typeof playlistFormSchema>>
 
@@ -89,6 +101,23 @@ export type VideoUploadTarget = {
 }
 
 /** A rendition the player offers; `level` is its index in hls.js. */
+/** A caption track the player can show, with the URL of its WebVTT. */
+export type PlayerCaptionTrack = {
+  id: string
+  language: string
+  label: string
+  kind: VideoCaptionKind
+  isDefault: boolean
+  url: string
+}
+
+/** A cue of a caption track: its text keeps the bold, italic, underline and voice markup it was stored with. */
+export type PlayerCaptionCue = {
+  startSeconds: number
+  endSeconds: number
+  text: string
+}
+
 export type VideoPlayerQuality = {
   level: number
   height: number

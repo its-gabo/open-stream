@@ -6,6 +6,7 @@ import { createActivityRouter } from "./activity/routers/activity.router"
 import { createAnalyticsRouter } from "./analytics/routers/analytics.router"
 import type { AppModule } from "./app.module"
 import { createAuthRouter } from "./auth/routers/auth.router"
+import { createTranscriptionProvidersRouter } from "./captions/routers/transcription-providers.router"
 import {
   createApiErrorHandler,
   handleApiNotFound,
@@ -48,6 +49,7 @@ export function createAppRouter(appModule: AppModule) {
     .route("/auth", createAuthRouter(appModule))
     .route("/", createOrganizationsRouter(appModule))
     .route("/", createStoragesRouter(appModule))
+    .route("/", createTranscriptionProvidersRouter(appModule))
     .route("/", createLibrariesRouter(appModule))
     .route("/", createLibraryApiRouter(appModule))
     .route("/", createActivityRouter(appModule))

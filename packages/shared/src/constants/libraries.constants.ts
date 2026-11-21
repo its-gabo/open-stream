@@ -119,6 +119,7 @@ export const DEFAULT_LIBRARY_PLAYER_SETTINGS = {
   showPictureInPicture: true,
   showFullscreen: true,
   showChapters: true,
+  showCaptions: true,
   autoplayNext: true,
 } as const satisfies LibraryPlayerSettings
 
@@ -131,11 +132,11 @@ export const PLAYBACK_URL_TTL_SECONDS = {
 
 /** What a library API key may do; each key holds any combination. */
 export const LIBRARY_API_KEY_SCOPES = {
-  /** List and read videos, their calls to action, and playlists. */
+  /** List and read videos, their captions and calls to action, and playlists. */
   VIDEOS_READ: "videos:read",
   /** Create videos and upload their files with tus. */
   VIDEOS_UPLOAD: "videos:upload",
-  /** Rename and delete videos, change their posters, chapters and calls to action, and manage playlists. */
+  /** Rename and delete videos, change their posters, chapters, captions and calls to action, and manage playlists. */
   VIDEOS_MANAGE: "videos:manage",
   /** Sign playback URLs. */
   PLAYBACK_SIGN: "playback:sign",

@@ -18,7 +18,9 @@ import type {
   StorageByteRange,
 } from "../../storage/types/storage.types"
 import {
+  CAPTION_FILES_PATH,
   CHAPTERS_TRACK_PATH,
+  EMBED_CAPTIONS_PATH,
   EMBED_CTAS_PATH,
   LIBRARY_API_PATH,
   PLAYBACK_QUERY_KEYS,
@@ -111,6 +113,7 @@ export class VideoPlaybackService {
         posterUrl: urls.posterUrl,
         storyboardUrl: urls.storyboardUrl,
         chaptersUrl: urls.chaptersUrl,
+        captionsUrl: urls.captionsUrl,
         embedUrl: `${this.config.WEB_ORIGIN}${videoEmbedPath(library.id, video.id)}?${query}`,
         expiresAt: new Date(expires * 1000).toISOString(),
       },
@@ -174,6 +177,7 @@ export class VideoPlaybackService {
       storyboardUrl: urls.storyboardUrl,
       viewsUrl: urls.viewsUrl,
       ctasUrl: urls.ctasUrl,
+      captionsUrl: urls.captionsUrl,
       chapters: video.chapters,
     }
   }
@@ -215,7 +219,20 @@ export class VideoPlaybackService {
       viewsUrl: withQuery("views"),
       chaptersUrl: withQuery(CHAPTERS_TRACK_PATH),
       ctasUrl: withQuery(EMBED_CTAS_PATH),
+      captionsUrl: withQuery(EMBED_CAPTIONS_PATH),
     }
+  }
+
+  /** The URL a player reads a track's WebVTT at, with `signatureQuery` (a signature, or empty). */
+  toCaptionFileUrl(
+    libraryId: string,
+    videoId: string,
+    fileName: string,
+    signatureQuery: string
+  ) {
+    const url = `${this.config.WEB_ORIGIN}${API_BASE_PATH}${LIBRARY_API_PATH}/${libraryId}/videos/${videoId}/${CAPTION_FILES_PATH}/${fileName}`
+
+    return signatureQuery ? `${url}?${signatureQuery}` : url
   }
 
   /** The uploaded file as it is, or the requested part of it. */

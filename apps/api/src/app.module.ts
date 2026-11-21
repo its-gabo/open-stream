@@ -1,6 +1,8 @@
 import { createActivityModule } from "./activity/activity.module"
 import { createAnalyticsModule } from "./analytics/analytics.module"
 import { createAuthModule } from "./auth/auth.module"
+import { createCaptionsModule } from "./captions/captions.module"
+import type { TranscriptionClient } from "./captions/types/captions.types"
 import { createCtasModule } from "./ctas/ctas.module"
 import { createLoggingModule } from "./common/logging/logging.module"
 import type { LogSink } from "./common/logging/logging.types"
@@ -22,6 +24,7 @@ export type AppModuleOverrides = {
   objectStorage?: ObjectStorage
   logSink?: LogSink
   mediaToolkit?: MediaToolkit
+  transcriptionClient?: TranscriptionClient
 }
 
 /**
@@ -89,6 +92,20 @@ export function createAppModule(
     videoPlaybackService: libraries.videoPlaybackService,
     webhookEventsService: webhooks.webhookEventsService,
   })
+  const captions = createCaptionsModule({
+    db: database.db,
+    config,
+    logger: logging.logger,
+    outboxService: outbox.outboxService,
+    activityLogService: activity.activityLogService,
+    webhookEventsService: webhooks.webhookEventsService,
+    videoPlaybackService: libraries.videoPlaybackService,
+    libraryStorageService: libraries.libraryStorageService,
+    storageSecretCipherService: storage.storageSecretCipherService,
+    objectStorage: storage.objectStorage,
+    mediaToolkit: media.mediaToolkit,
+    transcriptionClient: overrides.transcriptionClient,
+  })
   const organizations = createOrganizationsModule({
     db: database.db,
     config,
@@ -115,6 +132,7 @@ export function createAppModule(
     ...analytics,
     ...playlists,
     ...ctas,
+    ...captions,
     async close() {
       email.emailSenderService.close()
       await database.close()

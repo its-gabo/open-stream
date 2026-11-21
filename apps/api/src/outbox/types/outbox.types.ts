@@ -9,6 +9,10 @@ import type {
   ProcessVideoPayload,
 } from "../../libraries/types/libraries.types"
 import type { DeliverWebhookPayload } from "../../webhooks/types/webhooks.types"
+import type {
+  TranscribeVideoPayload,
+  VideoProcessedPayload,
+} from "../../captions/types/captions.types"
 import type { OUTBOX_MESSAGE_TYPES } from "../constants/outbox.constants"
 import type { OutboxRepository } from "../repository/outbox.repository"
 
@@ -19,6 +23,8 @@ export type OutboxMessagePayloads = {
   [OUTBOX_MESSAGE_TYPES.SEND_EMAIL]: SendEmailPayload
   [OUTBOX_MESSAGE_TYPES.PROCESS_VIDEO]: ProcessVideoPayload
   [OUTBOX_MESSAGE_TYPES.IMPORT_VIDEO]: ImportVideoPayload
+  [OUTBOX_MESSAGE_TYPES.VIDEO_PROCESSED]: VideoProcessedPayload
+  [OUTBOX_MESSAGE_TYPES.TRANSCRIBE_VIDEO]: TranscribeVideoPayload
   [OUTBOX_MESSAGE_TYPES.DELIVER_WEBHOOK]: DeliverWebhookPayload
   [OUTBOX_MESSAGE_TYPES.CLEAN_UP_STORAGE]: StorageCleanupPayload
 }

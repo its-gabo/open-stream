@@ -99,6 +99,7 @@ describe("Video embeds (e2e)", () => {
       storyboardUrl: `${filesUrl}/thumbnails/storyboard.vtt`,
       viewsUrl: `${filesUrl}/views`,
       ctasUrl: `${filesUrl}/embed/ctas`,
+      captionsUrl: `${filesUrl}/embed/captions`,
       chapters: [],
       allowedPlaybackHosts: [],
       player: DEFAULT_LIBRARY_PLAYER_SETTINGS,
@@ -114,6 +115,7 @@ describe("Video embeds (e2e)", () => {
       showPictureInPicture: false,
       showFullscreen: false,
       showChapters: false,
+      showCaptions: false,
       autoplayNext: false,
     }
 

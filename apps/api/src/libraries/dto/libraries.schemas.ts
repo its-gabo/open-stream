@@ -383,6 +383,8 @@ export const playbackUrlDtoSchema = z
     storyboardUrl: z.url(),
     /** WebVTT chapters track, for players of your own; empty while the video has no chapters. */
     chaptersUrl: z.url(),
+    /** The video's caption tracks with a WebVTT URL each, for players of your own. */
+    captionsUrl: z.url(),
     /** The embeddable player page, for an iframe; signed like the other URLs. */
     embedUrl: z.url(),
     expiresAt: z.iso.datetime(),
@@ -406,6 +408,8 @@ export const videoEmbedDtoSchema = z
     viewsUrl: z.url(),
     /** Where the player reads the video's calls to action, carrying the same signature. */
     ctasUrl: z.url(),
+    /** Where the player reads the video's caption tracks, carrying the same signature. */
+    captionsUrl: z.url(),
     chapters: z.array(videoChapterDtoSchema),
     /** Hosts allowed to frame the player; empty when any site may. */
     allowedPlaybackHosts: z.array(z.string()),

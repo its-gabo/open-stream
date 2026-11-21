@@ -106,6 +106,20 @@
     },
     "description": {
       "max_length": "Use at most {{max}} characters."
+    },
+    "caption_label": {
+      "required": "Enter a label.",
+      "max_length": "Use at most {{max}} characters."
+    },
+    "caption_language": {
+      "required": "Choose a language."
+    },
+    "transcription_provider": {
+      "name": "Enter a name.",
+      "model": "Enter the model to use.",
+      "base_url": "Enter the server's address, starting with http:// or https://.",
+      "api_key": "Enter your OpenAI API key.",
+      "auto_needs_provider": "Choose a provider to transcribe videos automatically."
     }
   },
   "pages": {
@@ -243,7 +257,20 @@
       "video.cta.event.report.success": "Recorded.",
       "video.cta.lead.submit.success": "Email address received.",
       "video.cta.lead.list.success": "Leads fetched.",
-      "video.cta.lead.delete.success": "Lead deleted."
+      "video.cta.lead.delete.success": "Lead deleted.",
+      "video.caption.list.success": "Captions fetched.",
+      "video.caption.upload.success": "Caption track saved.",
+      "video.caption.update.success": "Caption track saved.",
+      "video.caption.delete.success": "Caption track deleted.",
+      "video.caption.embed.list.success": "Captions fetched.",
+      "video.transcription.request.success": "Transcription started. The track appears here once it's ready.",
+      "transcription_provider.list.success": "Providers fetched.",
+      "transcription_provider.create.success": "Provider connected.",
+      "transcription_provider.update.success": "Provider saved.",
+      "transcription_provider.delete.success": "Provider deleted.",
+      "transcription_provider.test.success": "Connection tested.",
+      "library.transcription.get.success": "Transcription settings fetched.",
+      "library.transcription.update.success": "Transcription settings saved."
     },
     "error": {
       "fallback": "Oops something went wrong..",
@@ -318,7 +345,20 @@
       "video.cta.limit_reached": "This video has as many calls to action as it can have.",
       "video.cta.end_screen_taken": "This video already has an end screen.",
       "video.cta.not_an_email_form": "Only an email form takes email addresses.",
-      "video.cta.lead.not_found": "This lead doesn't exist or was deleted."
+      "video.cta.lead.not_found": "This lead doesn't exist or was deleted.",
+      "video.caption.not_found": "This caption track doesn't exist or was deleted.",
+      "video.caption.limit_reached": "This video has as many caption tracks as it can have.",
+      "video.caption.file_too_large": "The file is too large. Caption files can be up to 2 MB.",
+      "video.caption.invalid_file": "This isn't a WebVTT or SRT file, or none of its cues fall within the video.",
+      "video.caption.too_many_cues": "This file has more cues than a track can have.",
+      "video.transcription.not_configured": "This library has no transcription provider. The organization's owner can choose one in the library's Transcription settings.",
+      "video.transcription.in_progress": "This video is already being transcribed.",
+      "video.transcription.no_audio": "This video has no sound to transcribe.",
+      "transcription_provider.not_found": "This provider doesn't exist or was deleted.",
+      "transcription_provider.endpoint_not_allowed": "The provider's address must be a public HTTPS address.",
+      "transcription_provider.limit_reached": "Your organization has as many providers as it can have.",
+      "transcription_provider.in_use": "Libraries still use this provider. Choose another one for them first.",
+      "transcription_provider.api_key_required": "OpenAI needs an API key."
     }
   },
   "errors": {
@@ -340,7 +380,8 @@
     "settings": "Settings",
     "libraries": "Libraries",
     "storages": "Storages",
-    "activity": "Activity"
+    "activity": "Activity",
+    "transcription": "Transcription"
   },
   "organizations": {
     "roles": {
@@ -554,7 +595,8 @@
       "encoding": "Encoding",
       "player": "Player",
       "webhooks": "Webhooks",
-      "playlists": "Playlists"
+      "playlists": "Playlists",
+      "transcription": "Transcription"
     },
     "storage": {
       "current_title": "Where videos are stored",
@@ -738,6 +780,10 @@
         "autoplayNext": {
           "label": "Autoplay next video",
           "hint": "In playlists, the next video starts by itself after a short countdown."
+        },
+        "showCaptions": {
+          "label": "Captions",
+          "hint": "A captions button and menu, for videos that have caption tracks."
         }
       },
       "hint": "Changes apply to every embed of this library the next time it loads.",
@@ -787,7 +833,10 @@
         "video_processing_ready": "HLS, poster and storyboard are ready to play.",
         "video_processing_failed": "Transcoding failed on every attempt, or the file has no picture.",
         "video_cta_submitted": "A viewer left their email address in a call to action. Carries the address and the consent they gave.",
-        "webhook_test": "Sent when you click \"Send test event\" on this page."
+        "webhook_test": "Sent when you click \"Send test event\" on this page.",
+        "video_caption_ready": "A caption track was added or replaced, by an upload or a transcription. Carries the track.",
+        "video_caption_deleted": "A caption track was deleted. Carries the track as it was.",
+        "video_transcription_failed": "A transcription couldn't make a track. Carries the transcription and why it failed."
       },
       "secret_title": "Copy the signing secret now",
       "secret_description": "Your server uses it to check that requests come from OpenStream. It is shown only once; if you lose it, give the webhook a new secret.",
@@ -819,7 +868,8 @@
         "uploads": "Uploads",
         "processing": "Processing",
         "leads": "Leads",
-        "testing": "Testing"
+        "testing": "Testing",
+        "captions": "Captions"
       },
       "example_title": "Example request body",
       "example_description": "Every video event carries the video’s status as its data, the same shape the status endpoint returns. This is a video.processing.ready event.",
@@ -837,6 +887,23 @@
         "create_title": "Add a webhook",
         "edit_title": "Change the webhook URL",
         "description": "OpenStream POSTs every event to this URL. In production it must be a public HTTPS address."
+      }
+    },
+    "transcription": {
+      "owner_only_title": "Only the owner can change transcription",
+      "owner_only_description": "Ask your organization's owner to choose the library's transcription provider.",
+      "title": "Transcription",
+      "description": "Turn this library's videos into caption tracks with one of your organization's providers.",
+      "no_providers": "Your organization has no transcription provider yet.",
+      "add_provider": "Connect one",
+      "save": "Save",
+      "fields": {
+        "provider": "Provider",
+        "no_provider": "None",
+        "language": "Spoken language",
+        "language_hint": "Telling the provider the language makes transcription more accurate. Each request can still choose another.",
+        "auto_transcribe": "Transcribe new videos automatically",
+        "auto_transcribe_hint": "Each video is transcribed once it's processed, unless it already has captions. Providers charge for each transcription."
       }
     }
   },
@@ -991,7 +1058,10 @@
         "email_placeholder": "you@example.com",
         "failed": "That didn't go through. Try again in a moment.",
         "preview": "A preview: email addresses are taken in embeds only."
-      }
+      },
+      "captions": "Captions",
+      "captions_off": "Off",
+      "captions_track_cc": "{{label}} (CC)"
     },
     "chapters": {
       "title": "Chapters",
@@ -1103,6 +1173,78 @@
       "title": "Edit video",
       "description": "Viewers see the title and description, for example in a playlist’s episodes menu.",
       "submit": "Save changes"
+    },
+    "captions": {
+      "title": "Captions",
+      "description": "Subtitles and captions players offer in a menu. Upload a WebVTT or SRT file, or transcribe the video with the library's provider. A new track in a language and kind the video already has replaces that one.",
+      "empty": "No caption tracks yet.",
+      "default": "Default",
+      "cue_count_one": "{{count}} cue",
+      "cue_count_other": "{{count}} cues",
+      "kinds": {
+        "subtitles": "Subtitles",
+        "captions": "Captions (CC)"
+      },
+      "sources": {
+        "upload": "Uploaded",
+        "transcription": "Transcribed"
+      },
+      "set_default": "Turn {{label}} on by default",
+      "unset_default": "Stop turning {{label}} on by default",
+      "download": "Download {{label}}",
+      "rename": "Rename {{label}}",
+      "delete": "Delete {{label}}",
+      "delete_title": "Delete this caption track?",
+      "delete_description": "{{label}} is removed from the video and its file deleted.",
+      "delete_confirm": "Delete track",
+      "too_many": "A video can have up to {{max}} caption tracks.",
+      "edit_hint": "To fix a track, download it, edit it in any subtitle editor, and upload it again in the same language.",
+      "transcribing": {
+        "title": "Transcribing…",
+        "description": "The provider is listening to the video. The track appears here when it's ready, usually within a few minutes."
+      },
+      "failed": {
+        "title": "The last transcription failed",
+        "reasons": {
+          "provider_auth": "The provider refused its API key. The organization's owner can update the key in Transcription.",
+          "provider_rejected": "The provider refused the request, e.g. it doesn't know the model.",
+          "provider_unreachable": "The provider couldn't be reached. Try again later.",
+          "provider_removed": "The provider was deleted before the video was transcribed.",
+          "no_audio": "The video has no sound to transcribe.",
+          "no_speech": "The provider heard no speech in the video.",
+          "transcription_failed": "Something went wrong while transcribing. Try again."
+        }
+      },
+      "fields": {
+        "label": "Label",
+        "label_placeholder": "e.g. English",
+        "kind": "Kind",
+        "language": "Language",
+        "language_placeholder": "Choose a language",
+        "spoken_language": "Spoken language",
+        "detect_language": "Detect automatically"
+      },
+      "upload": {
+        "trigger": "Upload file",
+        "title": "Upload a caption file",
+        "description": "A WebVTT (.vtt) or SRT (.srt) file. Its timings are kept and its text cleaned of anything but bold, italics and underline.",
+        "dropzone_title": "Drop a .vtt or .srt file here, or click to choose one",
+        "dropzone_description": "Up to {{size}}",
+        "remove_file": "Remove file",
+        "too_large": "The file is larger than {{size}}.",
+        "submit": "Upload"
+      },
+      "transcribe": {
+        "trigger": "Transcribe",
+        "title": "Transcribe this video",
+        "description": "The library's provider turns the video's speech into a track. Providers charge for each transcription.",
+        "submit": "Transcribe"
+      },
+      "edit": {
+        "title": "Rename caption track",
+        "description": "Players list the track by this label.",
+        "submit": "Save"
+      }
     }
   },
   "embed": {
@@ -1305,7 +1447,8 @@
       "video": "Video",
       "account": "Account",
       "playlist": "Playlist",
-      "lead": "Lead"
+      "lead": "Lead",
+      "transcription_provider": "Transcription provider"
     },
     "columns": {
       "action": "What happened",
@@ -1384,7 +1527,15 @@
       "video_cta_updated": "Changed a call to action",
       "video_cta_deleted": "Deleted a call to action",
       "lead_deleted": "Deleted a lead",
-      "library_leads_exported": "Exported leads"
+      "library_leads_exported": "Exported leads",
+      "transcription_provider_created": "Connected a transcription provider",
+      "transcription_provider_updated": "Changed a transcription provider",
+      "transcription_provider_deleted": "Deleted a transcription provider",
+      "library_transcription_updated": "Changed the library's transcription",
+      "video_caption_uploaded": "Uploaded a caption track",
+      "video_caption_updated": "Changed a caption track",
+      "video_caption_deleted": "Deleted a caption track",
+      "video_transcription_requested": "Asked for a transcription"
     }
   },
   "account_activity": {
@@ -1480,6 +1631,72 @@
       "title": "Delete this lead?",
       "description": "{{email}} is deleted for good, e.g. when the viewer asks to be forgotten. The activity log keeps no copy of the address.",
       "confirm": "Delete lead"
+    }
+  },
+  "transcription": {
+    "owner_only_title": "Only the owner can manage transcription providers",
+    "owner_only_description": "Providers hold API keys, so only your organization's owner can see and change them.",
+    "title": "Transcription providers",
+    "description": "Connect OpenAI, or a speech-to-text server of your own that speaks OpenAI's API, and choose it in any library to turn videos into captions.",
+    "key_hint": "key …{{hint}}",
+    "empty": {
+      "title": "No providers yet",
+      "description": "Connect OpenAI with an API key, or point OpenStream at your own Whisper server."
+    },
+    "columns": {
+      "name": "Name",
+      "model": "Model",
+      "libraries": "Libraries",
+      "actions": "Actions"
+    },
+    "create": {
+      "trigger": "Connect provider",
+      "title": "Connect a transcription provider",
+      "submit": "Connect"
+    },
+    "edit": {
+      "trigger": "Edit",
+      "title": "Edit transcription provider",
+      "submit": "Save"
+    },
+    "delete": {
+      "trigger": "Delete",
+      "title": "Delete this provider?",
+      "description": "{{name}} and its API key are removed for good. Caption tracks it made stay.",
+      "confirm": "Delete provider",
+      "in_use": "Libraries still use this provider."
+    },
+    "connection": {
+      "test": "Test",
+      "working": "The provider answered and accepted the key.",
+      "unauthorized": "The provider answered but refused the API key.",
+      "unreachable": "The provider couldn't be reached."
+    },
+    "kinds": {
+      "openai": {
+        "label": "OpenAI",
+        "short": "OpenAI",
+        "description": "Transcribe with OpenAI's speech-to-text API, billed to your OpenAI account."
+      },
+      "openai_compatible": {
+        "label": "Your own server (OpenAI-compatible)",
+        "short": "Self-hosted",
+        "description": "Transcribe with a server you run that speaks OpenAI's transcription API, e.g. Speaches, faster-whisper-server or LocalAI."
+      }
+    },
+    "fields": {
+      "kind": "Provider",
+      "name": "Name",
+      "name_placeholder": "e.g. Whisper on our GPU box",
+      "base_url": "API address",
+      "model": "Model",
+      "api_key": "API key",
+      "api_key_keep": "Leave empty to keep the saved key"
+    },
+    "hints": {
+      "openai": "Use whisper-1: it returns the timings captions need. Keys are stored encrypted and never shown again.",
+      "openai_compatible": "Enter the address that /audio/transcriptions is below, usually ending in /v1. The API key is optional.",
+      "address_changed": "Changing the address removes the saved API key. Enter it again if the new server needs one."
     }
   }
 }

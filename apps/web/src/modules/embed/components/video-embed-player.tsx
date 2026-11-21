@@ -3,6 +3,7 @@ import { ClientOnly } from "@tanstack/react-router"
 import { Suspense, lazy } from "react"
 import { useTranslation } from "react-i18next"
 
+import { useEmbedCaptions } from "../hooks/use-embed-captions"
 import { useEmbedCtas } from "../hooks/use-embed-ctas"
 
 import type { VideoEmbedSearch } from "../embed.schemas"
@@ -25,6 +26,10 @@ export function VideoEmbedPlayer({ result, options }: VideoEmbedPlayerProps) {
   const ctas = useEmbedCtas(
     result.embed?.ctasUrl ?? "",
     Boolean(result.embed) && options.ctas !== false
+  )
+  const captions = useEmbedCaptions(
+    result.embed?.captionsUrl ?? "",
+    Boolean(result.embed?.player.showCaptions)
   )
 
   if (!result.embed) {
@@ -62,6 +67,7 @@ export function VideoEmbedPlayer({ result, options }: VideoEmbedPlayerProps) {
           viewsUrl={embed.viewsUrl}
           chapters={embed.chapters}
           ctas={ctas}
+          captions={captions}
           controls={embed.player}
         />
       </Suspense>

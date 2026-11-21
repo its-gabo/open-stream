@@ -1,4 +1,5 @@
 import {
+  CaptionsIcon,
   ChevronRightIcon,
   MaximizeIcon,
   PictureInPicture2Icon,
@@ -86,6 +87,7 @@ export function LibraryPlayerPreview({ settings }: LibraryPlayerPreviewProps) {
             </span>
           )}
           <div className="ml-auto flex items-center gap-3">
+            {settings.showCaptions && <CaptionsIcon />}
             {settings.showSettingsMenu && <SettingsIcon />}
             {settings.showPictureInPicture && <PictureInPicture2Icon />}
             {settings.showFullscreen && <MaximizeIcon />}

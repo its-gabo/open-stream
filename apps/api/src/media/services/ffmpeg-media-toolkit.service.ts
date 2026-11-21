@@ -1,18 +1,25 @@
 import { mkdir } from "node:fs/promises"
 import { dirname } from "node:path"
 import type { AppConfig } from "../../config/app.config"
-import { ERROR_OUTPUT_TAIL_LENGTH } from "../constants/media.constants"
+import {
+  AUDIO_CHUNK_LIST_NAME,
+  AUDIO_CHUNK_PATTERN,
+  ERROR_OUTPUT_TAIL_LENGTH,
+} from "../constants/media.constants"
 import type {
+  AudioExtractionJob,
   HlsTranscodeJob,
   ImageCaptureJob,
   ImageConversionJob,
   MediaToolkit,
 } from "../types/media.types"
 import {
+  buildAudioExtractionArgs,
   buildHlsTranscodeArgs,
   buildImageCaptureArgs,
   buildImageConversionArgs,
   buildProbeArgs,
+  parseAudioChunkList,
   redactUrlQueries,
 } from "../utils/ffmpeg-args.utils"
 import { parseFfmpegProgressLine } from "../utils/ffmpeg-progress.utils"
@@ -74,6 +81,25 @@ export class FfmpegMediaToolkitService implements MediaToolkit {
     await mkdir(dirname(job.outputPath), { recursive: true })
     await this.run(this.config.FFMPEG_PATH, buildImageConversionArgs(job))
     await assertOutputWritten(job.outputPath)
+  }
+
+  async extractAudioChunks(job: AudioExtractionJob) {
+    const listPath = `${job.outputDir}/${AUDIO_CHUNK_LIST_NAME}`
+
+    await mkdir(job.outputDir, { recursive: true })
+    await this.run(
+      this.config.FFMPEG_PATH,
+      buildAudioExtractionArgs(job, {
+        listPath,
+        chunkPattern: `${job.outputDir}/${AUDIO_CHUNK_PATTERN}`,
+      })
+    )
+
+    const list = Bun.file(listPath)
+
+    return (await list.exists())
+      ? parseAudioChunkList(await list.text(), job.outputDir)
+      : []
   }
 
   /**

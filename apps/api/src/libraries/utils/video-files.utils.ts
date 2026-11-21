@@ -15,6 +15,9 @@ export const hlsPrefixOf = (sourceObjectKey: string) =>
 export const thumbnailsPrefixOf = (sourceObjectKey: string) =>
   `${videoFolderOf(sourceObjectKey)}/${VIDEO_DERIVED_FILES.THUMBNAILS_FOLDER}/`
 
+export const captionsPrefixOf = (sourceObjectKey: string) =>
+  `${videoFolderOf(sourceObjectKey)}/${VIDEO_DERIVED_FILES.CAPTIONS_FOLDER}/`
+
 export const posterKeyOf = (sourceObjectKey: string) =>
   `${thumbnailsPrefixOf(sourceObjectKey)}${VIDEO_DERIVED_FILES.POSTER}`
 

@@ -361,6 +361,11 @@ export class VideoProcessingService {
 
       if (!completed) return false
 
+      await this.outboxService.publishMessage(
+        OUTBOX_MESSAGE_TYPES.VIDEO_PROCESSED,
+        { videoId: completed.id },
+        transaction
+      )
       await this.webhookEventsService.publishEvent(
         completed.libraryId,
         toVideoWebhookEvent(

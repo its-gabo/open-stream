@@ -45,6 +45,7 @@ const failingMediaToolkit: MediaToolkit = {
   },
   captureImage: async () => {},
   convertImage: async () => {},
+  extractAudioChunks: async () => [],
 }
 
 /** Polls until `read` returns something truthy, as the worker runs on its own schedule. */

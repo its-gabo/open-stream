@@ -5,6 +5,7 @@ import { createLibraryAnalyticsRouter } from "../../analytics/routers/library-an
 import { createLibraryWebhooksRouter } from "../../webhooks/routers/library-webhooks.router"
 import { createPlaylistsRouter } from "../../playlists/routers/playlists.router"
 import { createVideoCtasRouter } from "../../ctas/routers/video-ctas.router"
+import { createVideoCaptionsRouter } from "../../captions/routers/video-captions.router"
 import { createLibrariesCoreRouter } from "./libraries-core.router"
 import { createLibraryApiAccessRouter } from "./library-api-access.router"
 import { createLibraryEncodingRouter } from "./library-encoding.router"
@@ -105,6 +106,16 @@ export function createLibrariesRouter(module: LibrariesRouterDependencies) {
           module.librariesService,
           module.videoCtasService,
           module.videoCtaLeadsService
+        )
+      )
+      .route(
+        "/",
+        createVideoCaptionsRouter(
+          module.organizationsService,
+          module.librariesService,
+          module.videoCaptionsService,
+          module.videoTranscriptionsService,
+          module.libraryTranscriptionSettingsService
         )
       )
       .route(

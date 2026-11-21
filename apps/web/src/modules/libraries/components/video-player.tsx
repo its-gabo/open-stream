@@ -21,6 +21,7 @@ import { P, match } from "ts-pattern"
 import { useCtaReporting } from "../hooks/use-cta-reporting"
 import { useHlsPlayback } from "../hooks/use-hls-playback"
 import { useMediaState } from "../hooks/use-media-state"
+import { usePlayerCaptions } from "../hooks/use-player-captions"
 import { usePlayerCtas } from "../hooks/use-player-ctas"
 import { useStoryboard } from "../hooks/use-storyboard"
 import { useViewReporting } from "../hooks/use-view-reporting"
@@ -36,6 +37,8 @@ import {
   formatPlaybackTime,
 } from "../libraries.utils"
 import { PlayerButton } from "./player-button"
+import { PlayerCaptionText } from "./player-caption-text"
+import { PlayerCaptionsMenu } from "./player-captions-menu"
 import { PlayerChaptersMenu } from "./player-chapters-menu"
 import { PlayerCtaCard } from "./player-cta-card"
 import { PlayerEpisodesMenu } from "./player-episodes-menu"
@@ -48,7 +51,11 @@ import { StoryboardTile } from "./storyboard-tile"
 import { VIDEO_CTA_EVENT_TYPES, type VideoChapter } from "@workspace/shared"
 import type { CSSProperties } from "react"
 import type { VideoEmbedCta } from "@/api/generated-api"
-import type { PlayerControlsSettings, PlayerPlaylist } from "../libraries.types"
+import type {
+  PlayerCaptionTrack,
+  PlayerControlsSettings,
+  PlayerPlaylist,
+} from "../libraries.types"
 
 type VideoPlayerProps = {
   /** The HLS master playlist. */
@@ -75,6 +82,8 @@ type VideoPlayerProps = {
   chapters?: VideoChapter[]
   /** Shown over the video at their times; with `viewsUrl`, what viewers do with them is reported. */
   ctas?: VideoEmbedCta[]
+  /** Offered in a captions menu, unless the controls turn it off; the default one starts on. */
+  captions?: PlayerCaptionTrack[]
   /** The library's accent color and controls; the stock player when left out. */
   controls?: PlayerControlsSettings
   /** Told where playback is whenever it moves, e.g. to pick the frame shown. */
@@ -85,7 +94,7 @@ type VideoPlayerProps = {
 
 /**
  * Plays an HLS video with hls.js and the app's own controls: seeking with
- * storyboard previews, chapters, volume, quality and speed, picture-in-picture,
+ * storyboard previews, chapters, captions, volume, quality and speed, picture-in-picture,
  * fullscreen and keyboard shortcuts. Where hls.js cannot run, e.g. on older
  * iPhones, the browser plays the stream with its own controls.
  */
@@ -104,6 +113,7 @@ export function VideoPlayer({
   viewsUrl,
   chapters = [],
   ctas = [],
+  captions = [],
   controls = DEFAULT_LIBRARY_PLAYER_SETTINGS,
   onTimeUpdate,
   playlist,
@@ -129,6 +139,7 @@ export function VideoPlayer({
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [isChaptersOpen, setIsChaptersOpen] = useState(false)
   const [isEpisodesOpen, setIsEpisodesOpen] = useState(false)
+  const [isCaptionsOpen, setIsCaptionsOpen] = useState(false)
   /** The source whose offer of the next episode the viewer dismissed. */
   const [upNextDismissedSrc, setUpNextDismissedSrc] = useState<string | null>(
     null
@@ -137,8 +148,14 @@ export function VideoPlayer({
   const isPlaying = media?.isPlaying ?? false
   const duration = media?.duration ?? 0
   const areControlsVisible =
-    !isPlaying || !isIdle || isSettingsOpen || isChaptersOpen || isEpisodesOpen
+    !isPlaying ||
+    !isIdle ||
+    isSettingsOpen ||
+    isChaptersOpen ||
+    isEpisodesOpen ||
+    isCaptionsOpen
   const shownChapters = controls.showChapters ? chapters : []
+  const shownCaptions = controls.showCaptions ? captions : []
   const nextEpisodeIndex =
     playlist && playlist.currentIndex + 1 < playlist.episodes.length
       ? playlist.currentIndex + 1
@@ -146,6 +163,9 @@ export function VideoPlayer({
   const nextEpisode =
     nextEpisodeIndex !== null ? playlist?.episodes[nextEpisodeIndex] : undefined
   const currentTime = media?.currentTime ?? 0
+  const playerCaptions = usePlayerCaptions(shownCaptions, currentTime, {
+    sendsCredentials,
+  })
   const reportCtaShown = useCallback(
     (ctaId: string) =>
       reportCtaEvent({ ctaId, type: VIDEO_CTA_EVENT_TYPES.SHOWN }),
@@ -249,6 +269,23 @@ export function VideoPlayer({
     (isOpen: boolean) => setIsEpisodesOpen(isOpen),
     []
   )
+  const handleCaptionsOpenChange = useCallback(
+    (isOpen: boolean) => setIsCaptionsOpen(isOpen),
+    []
+  )
+  /** Turns captions off, or on in the default track, else the first one. */
+  const toggleCaptions = () => {
+    if (playerCaptions.selectedTrack) {
+      playerCaptions.selectTrack(null)
+
+      return
+    }
+
+    const track =
+      shownCaptions.find(({ isDefault }) => isDefault) ?? shownCaptions.at(0)
+
+    playerCaptions.selectTrack(track?.id ?? null)
+  }
   const onSelectEpisode = playlist?.onSelectEpisode
   const playNextEpisode = useCallback(() => {
     if (nextEpisodeIndex !== null) onSelectEpisode?.(nextEpisodeIndex)
@@ -279,6 +316,9 @@ export function VideoPlayer({
       { hotkey: "M", callback: toggleMute },
       ...(controls.showFullscreen
         ? [{ hotkey: "F" as const, callback: toggleFullscreen }]
+        : []),
+      ...(shownCaptions.length > 0
+        ? [{ hotkey: "C" as const, callback: toggleCaptions }]
         : []),
     ],
     { target: containerRef, enabled: usesOwnControls, capture: true }
@@ -315,7 +355,18 @@ export function VideoPlayer({
         autoPlay={autoPlay}
         muted={muted}
         loop={loop}
-      />
+      >
+        {shownCaptions.map((track) => (
+          <track
+            key={track.id}
+            kind={track.kind}
+            src={track.url}
+            srcLang={track.language}
+            label={track.label}
+            default={track.isDefault}
+          />
+        ))}
+      </video>
     )
   }
 
@@ -370,6 +421,26 @@ export function VideoPlayer({
           )}
         >
           <p className="truncate text-sm font-medium text-white">{title}</p>
+        </div>
+      )}
+
+      {playerCaptions.activeCues.length > 0 && (
+        <div
+          aria-live="off"
+          className={cn(
+            "pointer-events-none absolute inset-x-0 flex flex-col items-center gap-1 px-[5%] text-center transition-[bottom] duration-200",
+            areControlsVisible ? "bottom-20" : "bottom-[6%]"
+          )}
+        >
+          {playerCaptions.activeCues.map((cue) => (
+            <p
+              key={`${cue.startSeconds}-${cue.text}`}
+              lang={playerCaptions.selectedTrack?.language}
+              className="max-w-full rounded bg-black/75 px-2 py-0.5 text-[clamp(0.875rem,4.5cqh,2rem)] leading-snug text-white"
+            >
+              <PlayerCaptionText text={cue.text} />
+            </p>
+          ))}
         </div>
       )}
 
@@ -539,6 +610,14 @@ export function VideoPlayer({
               <PlayerEpisodesMenu
                 playlist={playlist}
                 onOpenChange={handleEpisodesOpenChange}
+              />
+            )}
+            {shownCaptions.length > 0 && (
+              <PlayerCaptionsMenu
+                tracks={shownCaptions}
+                selectedTrackId={playerCaptions.selectedTrack?.id ?? null}
+                onSelectTrack={playerCaptions.selectTrack}
+                onOpenChange={handleCaptionsOpenChange}
               />
             )}
             {controls.showSettingsMenu && (

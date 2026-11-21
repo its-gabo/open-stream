@@ -29,3 +29,7 @@ export const SOURCE_URL_TTL_SECONDS = 12 * 60 * 60
 
 /** Characters of ffmpeg's error output kept in a failure message. */
 export const ERROR_OUTPUT_TAIL_LENGTH = 2000
+
+/** Files an audio extraction writes to its output folder. */
+export const AUDIO_CHUNK_LIST_NAME = "chunks.csv"
+export const AUDIO_CHUNK_PATTERN = "chunk_%03d.mp3"

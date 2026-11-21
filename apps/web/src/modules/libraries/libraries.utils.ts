@@ -11,6 +11,7 @@ import { match } from "ts-pattern"
 import { DetailedError } from "tus-js-client"
 
 import {
+  CAPTION_LANGUAGE_CODES,
   CHAPTER_LINE_TIME_FIRST_PATTERN,
   CHAPTER_LINE_TIME_LAST_PATTERN,
   CHAPTER_TIME_PATTERN,
@@ -26,6 +27,7 @@ import { buildOrganizationPath } from "@/modules/organizations/organizations.uti
 import type { LibrarySecuritySettings, Video } from "@/api/generated-api"
 import type {
   LibrarySecurityFormInput,
+  PlayerCaptionCue,
   PlayerMediaState,
   PlaylistVideoState,
   StoryboardCue,
@@ -295,6 +297,56 @@ export function parseStoryboardVtt(text: string, vttUrl: string) {
   })
 }
 
+/**
+ * The cues of a caption track's WebVTT, as the API stores it: a timing line
+ * then the text, blocks apart by blank lines; other blocks are skipped.
+ */
+export function parseCaptionVtt(text: string): PlayerCaptionCue[] {
+  return text.split(/\r?\n\r?\n/).flatMap((block): PlayerCaptionCue[] => {
+    const lines = block.trim().split(/\r?\n/)
+    const timingIndex = lines.findIndex((line) => line.includes("-->"))
+
+    if (timingIndex === -1) return []
+
+    const [start = "", end = ""] = lines[timingIndex]
+      .split("-->")
+      .map((part) => part.trim().split(/\s+/)[0] ?? "")
+    const cueText = lines.slice(timingIndex + 1).join("\n")
+
+    return cueText
+      ? [
+          {
+            startSeconds: parseVttTime(start),
+            endSeconds: parseVttTime(end),
+            text: cueText,
+          },
+        ]
+      : []
+  })
+}
+
+/** The cues showing at `seconds`; overlapping cues show together. */
+export const findCaptionCuesAt = (cues: PlayerCaptionCue[], seconds: number) =>
+  cues.filter(
+    ({ startSeconds, endSeconds }) =>
+      seconds >= startSeconds && seconds < endSeconds
+  )
+
+/** A track's WebVTT as the API serves it to members; a change to the track gives it a new URL. */
+export const buildVideoCaptionUrl = (
+  organizationSlug: string,
+  libraryId: string,
+  videoId: string,
+  caption: { id: string; updatedAt: string }
+) =>
+  buildVersionedVideoFileUrl(
+    organizationSlug,
+    libraryId,
+    videoId,
+    `captions/${caption.id}/file`,
+    caption.updatedAt
+  )
+
 export const findStoryboardCue = (cues: StoryboardCue[], seconds: number) =>
   cues.find(
     ({ startSeconds, endSeconds }) =>
@@ -447,3 +499,22 @@ export const buildLeadsExportUrl = (
     `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/leads/export`,
     API_URL || window.location.origin
   ).toString()
+
+/** A caption language's name in `locale`, e.g. `Polish` for `pl` in English; the code itself where the browser does not know it. */
+export function formatCaptionLanguage(language: string, locale: string) {
+  try {
+    return (
+      new Intl.DisplayNames([locale], { type: "language" }).of(language) ??
+      language
+    )
+  } catch {
+    return language
+  }
+}
+
+/** The offered caption languages as select options, named in `locale`. */
+export const toCaptionLanguageOptions = (locale: string) =>
+  CAPTION_LANGUAGE_CODES.map((language) => ({
+    value: language,
+    label: `${formatCaptionLanguage(language, locale)} (${language})`,
+  })).sort((left, right) => left.label.localeCompare(right.label, locale))

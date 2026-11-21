@@ -1526,6 +1526,12 @@
                 "minLength": 1,
                 "maxLength": 80
               },
+              "model": {
+                "default": "gpt-6-luna",
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
               "apiKey": {
                 "type": "string",
                 "minLength": 1,
@@ -1562,6 +1568,12 @@
               "baseUrl": {
                 "type": "string",
                 "maxLength": 2048
+              },
+              "model": {
+                "default": "gpt-6-luna",
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
               },
               "apiKey": {
                 "anyOf": [
@@ -1612,6 +1624,11 @@
               }
             ]
           },
+          "model": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
           "apiKey": {
             "anyOf": [
               {
@@ -1637,7 +1654,7 @@
             ]
           }
         },
-        "required": ["name"]
+        "required": ["name", "model"]
       },
       "ChapterGenerationConnectionTestSuccessResponse": {
         "type": "object",
@@ -8609,7 +8626,7 @@
       "post": {
         "operationId": "createChapterGenerationProvider",
         "tags": ["Chapter generation providers"],
-        "summary": "Connect OpenAI, or a server of your own speaking OpenAI's chat completions API, to write chapters with gpt-6-luna",
+        "summary": "Connect OpenAI, or a server of your own speaking OpenAI's chat completions API, to write chapters with a model of your choice",
         "responses": {
           "201": {
             "description": "Chapter generation provider created",
@@ -8708,7 +8725,7 @@
       "put": {
         "operationId": "updateChapterGenerationProvider",
         "tags": ["Chapter generation providers"],
-        "summary": "Change a provider's name, address or API key; its kind and model stay",
+        "summary": "Change a provider's name, address, model or API key; its kind stays",
         "responses": {
           "200": {
             "description": "Chapter generation provider saved",

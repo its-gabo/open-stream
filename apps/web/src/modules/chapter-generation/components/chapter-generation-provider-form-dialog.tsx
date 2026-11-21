@@ -1,8 +1,8 @@
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema"
 import {
-  CHAPTER_GENERATION_MODEL,
   CHAPTER_GENERATION_PROVIDER_KINDS,
   CHAPTER_GENERATION_PROVIDER_LIMITS,
+  DEFAULT_CHAPTER_GENERATION_MODEL,
 } from "@workspace/shared"
 import { Button } from "@workspace/ui/components/button"
 import {
@@ -83,6 +83,7 @@ function ChapterGenerationProviderForm({
         provider?.kind === CHAPTER_GENERATION_PROVIDER_KINDS.OPENAI_COMPATIBLE
           ? provider.baseUrl
           : "",
+      model: provider?.model ?? DEFAULT_CHAPTER_GENERATION_MODEL,
       apiKey: "",
       monthlyTokenLimit: toUsageLimitInput(provider?.monthlyTokenLimit ?? null),
     },
@@ -123,6 +124,7 @@ function ChapterGenerationProviderForm({
         providerId: provider.id,
         payload: {
           name: values.name,
+          model: values.model,
           baseUrl:
             provider.kind ===
             CHAPTER_GENERATION_PROVIDER_KINDS.OPENAI_COMPATIBLE
@@ -140,6 +142,7 @@ function ChapterGenerationProviderForm({
         .with(CHAPTER_GENERATION_PROVIDER_KINDS.OPENAI, (openAi) => ({
           kind: openAi,
           name: values.name,
+          model: values.model,
           apiKey: apiKey ?? "",
           monthlyTokenLimit,
         }))
@@ -148,6 +151,7 @@ function ChapterGenerationProviderForm({
           (compatible) => ({
             kind: compatible,
             name: values.name,
+            model: values.model,
             baseUrl: values.baseUrl,
             apiKey,
             monthlyTokenLimit,
@@ -181,9 +185,6 @@ function ChapterGenerationProviderForm({
         fields={fields}
       />
       <p className="text-xs text-muted-foreground">
-        {t("chapter_generation.hints.model", {
-          model: CHAPTER_GENERATION_MODEL,
-        })}{" "}
         {kind === CHAPTER_GENERATION_PROVIDER_KINDS.OPENAI
           ? t("chapter_generation.hints.openai")
           : t("chapter_generation.hints.openai_compatible")}

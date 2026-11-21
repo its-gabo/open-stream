@@ -1,9 +1,6 @@
 import { createOpenAI } from "@ai-sdk/openai"
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible"
-import {
-  CHAPTER_GENERATION_MODEL,
-  CHAPTER_GENERATION_PROVIDER_KINDS,
-} from "@workspace/shared"
+import { CHAPTER_GENERATION_PROVIDER_KINDS } from "@workspace/shared"
 import {
   APICallError,
   NoObjectGeneratedError,
@@ -126,7 +123,7 @@ export class AiSdkChapterGenerationClientService implements ChapterGenerationCli
           baseURL: endpoint.baseUrl,
           apiKey: endpoint.apiKey ?? "",
           fetch: fetchFromProvider,
-        }).responses(CHAPTER_GENERATION_MODEL)
+        }).responses(endpoint.model)
       )
       .with(CHAPTER_GENERATION_PROVIDER_KINDS.OPENAI_COMPATIBLE, () =>
         createOpenAICompatible({
@@ -135,7 +132,7 @@ export class AiSdkChapterGenerationClientService implements ChapterGenerationCli
           apiKey: endpoint.apiKey ?? undefined,
           fetch: fetchFromProvider,
           supportsStructuredOutputs: true,
-        }).chatModel(CHAPTER_GENERATION_MODEL)
+        }).chatModel(endpoint.model)
       )
       .exhaustive()
   }

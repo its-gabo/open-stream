@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test"
 
 import { createTestConfig } from "../../../test/helpers/test-app"
-import { CHAPTER_GENERATION_MODEL } from "@workspace/shared"
 
 import { CHAPTER_GENERATION_FAILURES } from "../constants/chapter-generation.constants"
 import { ChapterGenerationProviderError } from "../errors/chapter-generation-provider.error"
@@ -21,7 +20,7 @@ const responsesAnswer = (text: string) => ({
   object: "response",
   created_at: 1_700_000_000,
   status: "completed",
-  model: CHAPTER_GENERATION_MODEL,
+  model: "gpt-5.5",
   output: [
     {
       type: "message",
@@ -68,16 +67,16 @@ describe("AiSdkChapterGenerationClientService", () => {
 
   afterEach(() => server.stop(true))
 
-  it("asks OpenAI for gpt-6-luna's chapters through the Responses API, as structured output", async () => {
+  it("asks OpenAI for the provider's model's chapters through the Responses API, as structured output", async () => {
     const proposal = await client.proposeChapters(
-      { kind: "openai", baseUrl, apiKey: "sk-openai" },
+      { kind: "openai", baseUrl, model: "gpt-5.5", apiKey: "sk-openai" },
       { prompt, maxOutputTokens: 16_000 }
     )
     const [request] = received
 
     expect(proposal).toEqual({ chapters: CHAPTERS.chapters, tokens: 120 })
     expect(request!.path).toBe("/v1/responses")
-    expect(request!.body.model).toBe(CHAPTER_GENERATION_MODEL)
+    expect(request!.body.model).toBe("gpt-5.5")
     expect(request!.body.max_output_tokens).toBe(16_000)
     expect(request!.body.text).toMatchObject({
       format: { type: "json_schema", name: "video_chapters" },
@@ -95,7 +94,7 @@ describe("AiSdkChapterGenerationClientService", () => {
 
     const failure = await client
       .proposeChapters(
-        { kind: "openai", baseUrl, apiKey: "sk-openai" },
+        { kind: "openai", baseUrl, model: "gpt-5.5", apiKey: "sk-openai" },
         { prompt, maxOutputTokens: 16_000 }
       )
       .catch((error: unknown) => error)
@@ -113,7 +112,7 @@ describe("AiSdkChapterGenerationClientService", () => {
 
     const failure = await client
       .proposeChapters(
-        { kind: "openai", baseUrl, apiKey: "sk-openai" },
+        { kind: "openai", baseUrl, model: "gpt-5.5", apiKey: "sk-openai" },
         { prompt, maxOutputTokens: 16_000, abortSignal: controller.signal }
       )
       .catch((error: unknown) => error)
@@ -135,6 +134,7 @@ describe("AiSdkChapterGenerationClientService", () => {
         {
           kind: "openai_compatible",
           baseUrl: `http://localhost:${server.port}/v1`,
+          model: "llama-4",
           apiKey: null,
         },
         { prompt, maxOutputTokens: 16_000 }

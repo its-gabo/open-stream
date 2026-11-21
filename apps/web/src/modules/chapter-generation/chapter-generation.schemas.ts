@@ -1,6 +1,7 @@
 import {
   CHAPTER_GENERATION_PROVIDER_KINDS,
   CHAPTER_GENERATION_PROVIDER_LIMITS,
+  DEFAULT_CHAPTER_GENERATION_MODEL,
 } from "@workspace/shared"
 import { z } from "zod"
 
@@ -15,7 +16,7 @@ import type { FormFieldSelectOption } from "@workspace/ui/lib/form-field.types"
 /**
  * A provider as the form edits it. OpenAI needs a key when created; a
  * server of one's own needs its address. When editing, an empty key keeps
- * the saved one. The model is fixed, so it is not asked for.
+ * the saved one.
  */
 export const chapterGenerationProviderFormSchema = (
   t: TranslationFunction,
@@ -51,6 +52,17 @@ export const chapterGenerationProviderFormSchema = (
         .meta({
           label: t("chapter_generation.fields.base_url"),
           placeholder: "https://llm.example.com/v1",
+          type: "text",
+          autoComplete: "off",
+        }),
+      model: z
+        .string()
+        .trim()
+        .min(1, t("validation.chapter_generation_provider.model"))
+        .max(CHAPTER_GENERATION_PROVIDER_LIMITS.MODEL_MAX_LENGTH)
+        .meta({
+          label: t("chapter_generation.fields.model"),
+          placeholder: DEFAULT_CHAPTER_GENERATION_MODEL,
           type: "text",
           autoComplete: "off",
         }),

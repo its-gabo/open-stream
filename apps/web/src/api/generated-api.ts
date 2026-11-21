@@ -429,6 +429,12 @@ export type ChapterGenerationProviderCreateBody =
        */
       apiKey: string
       kind: "openai"
+      /**
+       * @minLength 1
+       * @maxLength 120
+       * @default "gpt-6-luna"
+       */
+      model?: string
       /** @default null */
       monthlyTokenLimit?: number | null
       /**
@@ -442,6 +448,12 @@ export type ChapterGenerationProviderCreateBody =
       /** @maxLength 2048 */
       baseUrl: string
       kind: "openai_compatible"
+      /**
+       * @minLength 1
+       * @maxLength 120
+       * @default "gpt-6-luna"
+       */
+      model?: string
       /** @default null */
       monthlyTokenLimit?: number | null
       /**
@@ -472,6 +484,11 @@ export interface ChapterGenerationProviderSuccessResponse {
 export interface ChapterGenerationProviderUpdateBody {
   apiKey?: string | null
   baseUrl?: string | null
+  /**
+   * @minLength 1
+   * @maxLength 120
+   */
+  model: string
   monthlyTokenLimit?: number | null
   /**
    * @minLength 1
@@ -5121,7 +5138,7 @@ export class OpenStreamApi<
      *
      * @tags Chapter generation providers
      * @name CreateChapterGenerationProvider
-     * @summary Connect OpenAI, or a server of your own speaking OpenAI's chat completions API, to write chapters with gpt-6-luna
+     * @summary Connect OpenAI, or a server of your own speaking OpenAI's chat completions API, to write chapters with a model of your choice
      * @request POST:/api/v1/organizations/{organizationSlug}/chapter-generation-providers
      */
     createChapterGenerationProvider: (
@@ -5143,7 +5160,7 @@ export class OpenStreamApi<
      *
      * @tags Chapter generation providers
      * @name UpdateChapterGenerationProvider
-     * @summary Change a provider's name, address or API key; its kind and model stay
+     * @summary Change a provider's name, address, model or API key; its kind stays
      * @request PUT:/api/v1/organizations/{organizationSlug}/chapter-generation-providers/{providerId}
      */
     updateChapterGenerationProvider: (

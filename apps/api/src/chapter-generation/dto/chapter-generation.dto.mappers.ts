@@ -1,7 +1,4 @@
-import {
-  CHAPTER_GENERATION_MODEL,
-  OPENAI_CHAPTER_GENERATION_BASE_URL,
-} from "@workspace/shared"
+import { OPENAI_CHAPTER_GENERATION_BASE_URL } from "@workspace/shared"
 import type {
   ChapterGenerationProviderSummary,
   LibraryChapterGenerationSettings,
@@ -16,7 +13,7 @@ export const toChapterGenerationProviderDto = (
   name: provider.name,
   kind: provider.kind,
   baseUrl: provider.baseUrl ?? OPENAI_CHAPTER_GENERATION_BASE_URL,
-  model: CHAPTER_GENERATION_MODEL,
+  model: provider.model,
   apiKeyHint: provider.apiKeyHint,
   monthlyTokenLimit: provider.monthlyTokenLimit,
   tokensUsedThisMonth: provider.tokensUsedThisMonth,

@@ -2,6 +2,7 @@ import { z } from "zod"
 import {
   CHAPTER_GENERATION_PROVIDER_KINDS,
   CHAPTER_GENERATION_PROVIDER_LIMITS,
+  DEFAULT_CHAPTER_GENERATION_MODEL,
 } from "../constants/chapter-generation.constants"
 
 const providerNameSchema = z
@@ -9,6 +10,13 @@ const providerNameSchema = z
   .trim()
   .min(1)
   .max(CHAPTER_GENERATION_PROVIDER_LIMITS.NAME_MAX_LENGTH)
+
+/** The model the provider is asked for, e.g. `gpt-6-luna`; it must support structured output. */
+const providerModelSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .max(CHAPTER_GENERATION_PROVIDER_LIMITS.MODEL_MAX_LENGTH)
 
 /** The API's root, e.g. `https://llm.example.com/v1`; requests go to `<baseUrl>/chat/completions`. */
 export const chapterGenerationProviderBaseUrlSchema = z
@@ -34,7 +42,7 @@ const providerApiKeySchema = z
 /**
  * A chapter generation provider. OpenAI needs an API key and is always
  * reached at its own address; a compatible server needs its `baseUrl`, and
- * a key only when it asks for one. The model is always the same one.
+ * a key only when it asks for one. Without a model, `gpt-6-luna` is used.
  */
 export const chapterGenerationProviderCreateInputSchema = z.discriminatedUnion(
   "kind",
@@ -42,6 +50,7 @@ export const chapterGenerationProviderCreateInputSchema = z.discriminatedUnion(
     z.object({
       kind: z.literal(CHAPTER_GENERATION_PROVIDER_KINDS.OPENAI),
       name: providerNameSchema,
+      model: providerModelSchema.default(DEFAULT_CHAPTER_GENERATION_MODEL),
       apiKey: providerApiKeySchema,
       monthlyTokenLimit: monthlyTokenLimitSchema.default(null),
     }),
@@ -49,6 +58,7 @@ export const chapterGenerationProviderCreateInputSchema = z.discriminatedUnion(
       kind: z.literal(CHAPTER_GENERATION_PROVIDER_KINDS.OPENAI_COMPATIBLE),
       name: providerNameSchema,
       baseUrl: chapterGenerationProviderBaseUrlSchema,
+      model: providerModelSchema.default(DEFAULT_CHAPTER_GENERATION_MODEL),
       apiKey: providerApiKeySchema.nullable(),
       monthlyTokenLimit: monthlyTokenLimitSchema.default(null),
     }),
@@ -64,6 +74,7 @@ export const chapterGenerationProviderCreateInputSchema = z.discriminatedUnion(
 export const chapterGenerationProviderUpdateInputSchema = z.object({
   name: providerNameSchema,
   baseUrl: chapterGenerationProviderBaseUrlSchema.nullable().default(null),
+  model: providerModelSchema,
   apiKey: providerApiKeySchema.nullable().optional(),
   monthlyTokenLimit: monthlyTokenLimitSchema.optional(),
 })

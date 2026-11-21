@@ -1,4 +1,3 @@
-import { CHAPTER_GENERATION_MODEL } from "@workspace/shared"
 import { Button } from "@workspace/ui/components/button"
 import {
   Dialog,
@@ -106,9 +105,7 @@ function ChapterSuggestionForm({
       <DialogHeader>
         <DialogTitle>{t("videos.chapters.suggest.title")}</DialogTitle>
         <DialogDescription>
-          {t("videos.chapters.suggest.description", {
-            model: CHAPTER_GENERATION_MODEL,
-          })}
+          {t("videos.chapters.suggest.description")}
         </DialogDescription>
       </DialogHeader>
       {!isCaptionsPending && captions.length === 0 ? (

@@ -28,6 +28,7 @@ export type ChapterGenerationModuleDependencies = {
 export type ChapterGenerationEndpoint = {
   kind: ChapterGenerationProviderKind
   baseUrl: string
+  model: string
   apiKey: string | null
 }
 

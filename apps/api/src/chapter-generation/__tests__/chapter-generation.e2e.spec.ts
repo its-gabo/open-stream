@@ -16,7 +16,7 @@ import {
   VIDEO_FILE_HEADERS,
   createFileBytes,
 } from "../../../test/helpers/video-files"
-import { CHAPTER_GENERATION_MODEL } from "@workspace/shared"
+import { DEFAULT_CHAPTER_GENERATION_MODEL } from "@workspace/shared"
 
 import { eq } from "drizzle-orm"
 
@@ -187,7 +187,7 @@ describe("Chapter generation (e2e)", () => {
         name: "Our model server",
         kind: "openai_compatible",
         baseUrl: generationServer.baseUrl,
-        model: CHAPTER_GENERATION_MODEL,
+        model: DEFAULT_CHAPTER_GENERATION_MODEL,
         apiKeyHint: "1234",
         libraryCount: 0,
       })
@@ -198,7 +198,7 @@ describe("Chapter generation (e2e)", () => {
       })
     })
 
-    it("refuses a model of the owner's choosing, and OpenAI without a key", async () => {
+    it("uses the model the owner chooses, and needs a key for OpenAI", async () => {
       const withoutKey = await ownerClient.post(providersPath, {
         kind: "openai",
         name: "OpenAI",
@@ -214,7 +214,36 @@ describe("Chapter generation (e2e)", () => {
       expect(withoutKey.status).toBe(422)
       expect(openAi).toMatchObject({
         baseUrl: "https://api.openai.com/v1",
-        model: CHAPTER_GENERATION_MODEL,
+        model: "gpt-4o",
+      })
+    })
+
+    it("asks for a changed model from then on, and records the change", async () => {
+      const provider = await useProvider()
+      const { videoId, captionId } = await createVideoWithCaptions()
+
+      const changed = await ownerClient.put(`${providersPath}/${provider.id}`, {
+        name: provider.name,
+        baseUrl: provider.baseUrl,
+        model: "llama-4-maverick",
+      })
+      await suggestChapters(videoId, captionId)
+      const [activity] = (
+        await (
+          await ownerClient.get(
+            `/organizations/acme/activity?resourceType=chapter_generation_provider&resourceId=${provider.id}`
+          )
+        ).json()
+      ).data.activities as ActivityLogDto[]
+
+      expect((await changed.json()).data.provider.model).toBe(
+        "llama-4-maverick"
+      )
+      expect(completionRequests()[0]!.body!.model).toBe("llama-4-maverick")
+      expect(activity).toMatchObject({
+        action: "chapter_generation_provider.updated",
+        before: { model: DEFAULT_CHAPTER_GENERATION_MODEL },
+        after: { model: "llama-4-maverick" },
       })
     })
 
@@ -270,6 +299,7 @@ describe("Chapter generation (e2e)", () => {
       const provider = await createProvider()
       const moved = await ownerClient.put(`${providersPath}/${provider.id}`, {
         name: "Moved",
+        model: provider.model,
         baseUrl: "http://127.0.0.1:9/v1",
       })
 
@@ -348,7 +378,7 @@ describe("Chapter generation (e2e)", () => {
   })
 
   describe("suggesting chapters", () => {
-    it("asks the provider for gpt-6-luna's chapters from the track, without saving them", async () => {
+    it("asks the provider's model for chapters from the track, without saving them", async () => {
       await useProvider()
       const { videoId, captionId } = await createVideoWithCaptions()
 
@@ -379,7 +409,7 @@ describe("Chapter generation (e2e)", () => {
         { startSeconds: 62.25, title: "Your first program" },
       ])
       expect(request!.authorization).toBe("Bearer sk-local-1234")
-      expect(request!.body!.model).toBe(CHAPTER_GENERATION_MODEL)
+      expect(request!.body!.model).toBe(DEFAULT_CHAPTER_GENERATION_MODEL)
       expect(request!.body!.response_format).toMatchObject({
         type: "json_schema",
       })
@@ -580,6 +610,7 @@ describe("Chapter generation (e2e)", () => {
           organizationId,
           providerId: provider.id,
           videoId,
+          model: provider.model,
           tokens: 30_000,
           createdAt: new Date(Date.now() - 10 * 60 * 1000),
         },
@@ -587,6 +618,7 @@ describe("Chapter generation (e2e)", () => {
           organizationId,
           providerId: provider.id,
           videoId,
+          model: provider.model,
           tokens: 20_000,
         },
       ])
@@ -598,10 +630,12 @@ describe("Chapter generation (e2e)", () => {
       const provider = await createProvider({ monthlyTokenLimit: 50_000 })
       const kept = await ownerClient.put(`${providersPath}/${provider.id}`, {
         name: "Renamed",
+        model: provider.model,
         baseUrl: generationServer.baseUrl,
       })
       const removed = await ownerClient.put(`${providersPath}/${provider.id}`, {
         name: "Renamed",
+        model: provider.model,
         baseUrl: generationServer.baseUrl,
         monthlyTokenLimit: null,
       })
@@ -618,6 +652,7 @@ describe("Chapter generation (e2e)", () => {
 
       await ownerClient.put(`${providersPath}/${provider.id}`, {
         name: "Gone",
+        model: provider.model,
         baseUrl: "http://127.0.0.1:9/v1",
       })
 

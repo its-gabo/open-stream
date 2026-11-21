@@ -43,7 +43,7 @@ const API_KEY_HINT_LENGTH = 4
 /**
  * Language model services an organization connects once and assigns to any
  * of its libraries to write chapters: OpenAI, or a server of its own
- * speaking OpenAI's API. Each is asked for the same model. API keys are
+ * speaking OpenAI's API, each asked for the model its owner chose. API keys are
  * stored encrypted and never returned.
  */
 export class ChapterGenerationProvidersService {
@@ -137,6 +137,7 @@ export class ChapterGenerationProvidersService {
               organizationId: locked.organizationId,
               providerId: locked.id,
               videoId: request.videoId,
+              model: locked.model,
               requestedById: request.requestedById,
               tokens: request.inputTokens + maxOutputTokens,
             },
@@ -188,6 +189,7 @@ export class ChapterGenerationProvidersService {
               name: input.name,
               kind: input.kind,
               baseUrl,
+              model: input.model,
               monthlyTokenLimit: input.monthlyTokenLimit,
               ...this.encryptApiKey(input.apiKey),
             },
@@ -261,6 +263,7 @@ export class ChapterGenerationProvidersService {
             {
               name: input.name,
               baseUrl,
+              model: input.model,
               ...(input.monthlyTokenLimit !== undefined && {
                 monthlyTokenLimit: input.monthlyTokenLimit,
               }),
@@ -364,6 +367,7 @@ export class ChapterGenerationProvidersService {
     return {
       kind: provider.kind,
       baseUrl: provider.baseUrl ?? OPENAI_CHAPTER_GENERATION_BASE_URL,
+      model: provider.model,
       apiKey: provider.apiKey
         ? this.storageSecretCipherService.decrypt(provider.apiKey)
         : null,

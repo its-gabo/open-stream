@@ -4,6 +4,7 @@ import {
   index,
   integer,
   pgTable,
+  text,
   timestamp,
   uuid,
 } from "drizzle-orm/pg-core"
@@ -32,6 +33,8 @@ export const chapterGenerationUsages = pgTable(
     requestedById: uuid("requested_by_id").references(() => users.id, {
       onDelete: "set null",
     }),
+    /** The provider's model when it was asked; the provider's own may change later. */
+    model: text("model").notNull(),
     /** Tokens read and written; an estimate until the provider answers. */
     tokens: integer("tokens").notNull(),
     /** When the provider answered or failed; null while it is being asked. */

@@ -1,5 +1,5 @@
 {
-  "id": "f39ab4bb-4033-4cc2-8022-0ea271059554",
+  "id": "204ea13b-1b8e-4bd0-95e5-30cb4a0476cd",
   "prevId": "3d82d6de-0288-43ef-be00-22ad5b551065",
   "version": "7",
   "dialect": "postgresql",
@@ -358,6 +358,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "model": {
+          "name": "model",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
         "api_key_hint": {
           "name": "api_key_hint",
           "type": "text",
@@ -442,7 +448,7 @@
         },
         "chapter_generation_providers_name_check": {
           "name": "chapter_generation_providers_name_check",
-          "value": "btrim(\"chapter_generation_providers\".\"name\") <> ''"
+          "value": "btrim(\"chapter_generation_providers\".\"name\") <> '' and btrim(\"chapter_generation_providers\".\"model\") <> ''"
         },
         "chapter_generation_providers_base_url_check": {
           "name": "chapter_generation_providers_base_url_check",
@@ -493,6 +499,12 @@
           "type": "uuid",
           "primaryKey": false,
           "notNull": false
+        },
+        "model": {
+          "name": "model",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
         },
         "tokens": {
           "name": "tokens",

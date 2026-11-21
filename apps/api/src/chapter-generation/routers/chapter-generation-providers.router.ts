@@ -103,7 +103,7 @@ export function createChapterGenerationProvidersRouter({
               tags: [OPENAPI_TAGS.CHAPTER_GENERATION_PROVIDERS],
               operationId: "createChapterGenerationProvider",
               summary:
-                "Connect OpenAI, or a server of your own speaking OpenAI's chat completions API, to write chapters with gpt-6-luna",
+                "Connect OpenAI, or a server of your own speaking OpenAI's chat completions API, to write chapters with a model of your choice",
               responses: {
                 201: describeJsonResponse(
                   "Chapter generation provider created",
@@ -136,7 +136,7 @@ export function createChapterGenerationProvidersRouter({
               tags: [OPENAPI_TAGS.CHAPTER_GENERATION_PROVIDERS],
               operationId: "updateChapterGenerationProvider",
               summary:
-                "Change a provider's name, address or API key; its kind and model stay",
+                "Change a provider's name, address, model or API key; its kind stays",
               responses: {
                 200: describeJsonResponse(
                   "Chapter generation provider saved",

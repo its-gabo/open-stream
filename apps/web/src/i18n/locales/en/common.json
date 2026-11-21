@@ -126,7 +126,8 @@
       "name": "Enter a name.",
       "base_url": "Enter the server's address, starting with http:// or https://.",
       "api_key": "Enter your OpenAI API key.",
-      "monthly_token_limit": "Enter a whole number of tokens, or leave it empty for no limit."
+      "monthly_token_limit": "Enter a whole number of tokens, or leave it empty for no limit.",
+      "model": "Enter the model to use."
     }
   },
   "pages": {
@@ -377,7 +378,7 @@
       "video.chapter_generation.not_configured": "This library has no chapter generation provider. Ask your organization's owner to choose one in the library's settings.",
       "video.chapter_generation.no_speech": "This caption track has no words to write chapters from.",
       "video.chapter_generation.provider_auth_failed": "The chapter generation provider refused its API key. Ask your organization's owner to check it.",
-      "video.chapter_generation.provider_rejected": "The chapter generation provider refused the request. Check that it serves gpt-6-luna.",
+      "video.chapter_generation.provider_rejected": "The chapter generation provider refused the request. Check that it serves the provider's model and supports structured outputs.",
       "video.chapter_generation.provider_unavailable": "The chapter generation provider couldn't be reached or took too long. Try again in a moment.",
       "video.chapter_generation.invalid_answer": "The provider didn't answer with usable chapters. Try again.",
       "chapter_generation_provider.not_found": "This provider doesn't exist or was deleted.",
@@ -940,7 +941,7 @@
       "owner_only_title": "Only the owner can change chapter generation",
       "owner_only_description": "Ask your organization's owner to choose the library's chapter generation provider.",
       "title": "Chapter generation",
-      "description": "Let members write chapters for this library's videos from their captions with one of your organization's providers, using {{model}}.",
+      "description": "Let members write chapters for this library's videos from their captions with one of your organization's providers.",
       "no_providers": "Your organization has no chapter generation provider yet.",
       "add_provider": "Connect one",
       "save": "Save",
@@ -1134,7 +1135,7 @@
       "suggest": {
         "trigger": "Suggest from captions",
         "title": "Suggest chapters",
-        "description": "The library's provider reads a caption track and proposes chapters with {{model}}. Review them before you save.",
+        "description": "The library's provider reads a caption track and proposes chapters. Review them before you save.",
         "track": "Caption track",
         "no_captions": "This video has no caption tracks yet. Upload or generate captions first.",
         "replaces": "The suggestions replace the chapters listed now. Nothing is saved until you save the chapters.",
@@ -1770,7 +1771,7 @@
     "owner_only_title": "Only the owner can manage chapter generation providers",
     "owner_only_description": "Providers hold API keys, so only your organization's owner can see and change them.",
     "title": "Chapter generation providers",
-    "description": "Connect OpenAI, or a model server of your own that speaks OpenAI's API, and choose it in any library to write chapters from captions with {{model}}.",
+    "description": "Connect OpenAI, or a model server of your own that speaks OpenAI's API, and choose it in any library to write chapters from captions.",
     "key_hint": "key …{{hint}}",
     "empty": {
       "title": "No providers yet",
@@ -1823,15 +1824,15 @@
       "name": "Name",
       "name_placeholder": "e.g. Our model server",
       "base_url": "API address",
+      "model": "Model",
       "api_key": "API key",
       "api_key_keep": "Leave empty to keep the saved key",
       "monthly_token_limit": "Monthly limit (tokens)",
       "no_limit": "No limit"
     },
     "hints": {
-      "model": "Chapters are always written with {{model}}.",
-      "openai": "Keys are stored encrypted and never shown again.",
-      "openai_compatible": "Enter the address that /chat/completions is below, usually ending in /v1. The server must serve a model named gpt-6-luna. The API key is optional.",
+      "openai": "Use a model that supports structured outputs, such as gpt-6-luna. Keys are stored encrypted and never shown again.",
+      "openai_compatible": "Enter the address that /chat/completions is below, usually ending in /v1. The model must support structured outputs. The API key is optional.",
       "address_changed": "Changing the address removes the saved API key. Enter it again if the new server needs one.",
       "monthly_limit": "Tokens this provider may use each month, counting the transcript it reads and the chapters it writes. A one-hour video needs about 15,000 tokens; leave empty for no limit."
     },

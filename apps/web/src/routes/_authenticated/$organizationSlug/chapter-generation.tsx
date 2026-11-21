@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router"
-import { CHAPTER_GENERATION_MODEL, ORGANIZATION_ROLES } from "@workspace/shared"
+import { ORGANIZATION_ROLES } from "@workspace/shared"
 import {
   Alert,
   AlertDescription,
@@ -125,9 +125,7 @@ function OrganizationChapterGenerationRoute() {
                       <div>
                         <CardTitle>{t("chapter_generation.title")}</CardTitle>
                         <CardDescription>
-                          {t("chapter_generation.description", {
-                            model: CHAPTER_GENERATION_MODEL,
-                          })}
+                          {t("chapter_generation.description")}
                         </CardDescription>
                       </div>
                     </div>

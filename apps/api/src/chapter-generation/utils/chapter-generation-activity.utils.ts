@@ -15,12 +15,13 @@ export const chapterGenerationProviderActivityResource = (
 export const toChapterGenerationProviderActivityValues = (
   provider: Pick<
     ChapterGenerationProviderRecord,
-    "name" | "kind" | "baseUrl" | "apiKeyHint" | "monthlyTokenLimit"
+    "name" | "kind" | "baseUrl" | "model" | "apiKeyHint" | "monthlyTokenLimit"
   >
 ) => ({
   name: provider.name,
   kind: provider.kind,
   baseUrl: provider.baseUrl,
+  model: provider.model,
   apiKeyHint: provider.apiKeyHint,
   monthlyTokenLimit: provider.monthlyTokenLimit,
 })

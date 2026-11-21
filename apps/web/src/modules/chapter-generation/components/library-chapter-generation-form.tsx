@@ -1,6 +1,5 @@
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema"
 import { Link } from "@tanstack/react-router"
-import { CHAPTER_GENERATION_MODEL } from "@workspace/shared"
 import { Button } from "@workspace/ui/components/button"
 import { CardDescription, CardTitle } from "@workspace/ui/components/card"
 import { FormFieldRenderer } from "@workspace/ui/components/form-field-renderer"
@@ -62,9 +61,7 @@ export function LibraryChapterGenerationForm({
         <div>
           <CardTitle>{t("libraries.chapter_generation.title")}</CardTitle>
           <CardDescription>
-            {t("libraries.chapter_generation.description", {
-              model: CHAPTER_GENERATION_MODEL,
-            })}
+            {t("libraries.chapter_generation.description")}
           </CardDescription>
         </div>
       </div>

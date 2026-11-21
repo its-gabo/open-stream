@@ -37,6 +37,8 @@ export const chapterGenerationProviders = pgTable(
       .notNull(),
     /** The API's root; null for OpenAI, which is always reached at its own address. */
     baseUrl: text("base_url"),
+    /** The model it is asked for. */
+    model: text("model").notNull(),
     /** Last characters of the API key, so owners can recognize it without it being readable. */
     apiKeyHint: text("api_key_hint"),
     /** Null when the server asks for no key. */
@@ -59,7 +61,7 @@ export const chapterGenerationProviders = pgTable(
     ),
     check(
       "chapter_generation_providers_name_check",
-      sql`btrim(${table.name}) <> ''`
+      sql`btrim(${table.name}) <> '' and btrim(${table.model}) <> ''`
     ),
     check(
       "chapter_generation_providers_base_url_check",

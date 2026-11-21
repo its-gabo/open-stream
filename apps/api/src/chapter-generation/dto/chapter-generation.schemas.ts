@@ -46,7 +46,7 @@ export const chapterGenerationProviderDtoSchema = z
     kind: chapterGenerationProviderKindSchema,
     /** Where requests go; OpenAI's own address for OpenAI. */
     baseUrl: z.url(),
-    /** The model the provider is asked for; the same for every provider. */
+    /** The model the provider is asked for. */
     model: z.string(),
     /** Last characters of the API key; null when it has none. */
     apiKeyHint: z.string().nullable(),

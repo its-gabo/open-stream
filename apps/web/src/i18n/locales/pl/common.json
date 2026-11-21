@@ -130,7 +130,8 @@
       "name": "Wpisz nazwę.",
       "base_url": "Wpisz adres serwera zaczynający się od http:// lub https://.",
       "api_key": "Wpisz klucz API OpenAI.",
-      "monthly_token_limit": "Wpisz liczbę całkowitą tokenów albo zostaw puste, aby nie ustawiać limitu."
+      "monthly_token_limit": "Wpisz liczbę całkowitą tokenów albo zostaw puste, aby nie ustawiać limitu.",
+      "model": "Wpisz model, którego chcesz użyć."
     }
   },
   "pages": {
@@ -381,7 +382,7 @@
       "video.chapter_generation.not_configured": "Ta biblioteka nie ma dostawcy generowania rozdziałów. Poproś właściciela organizacji o wybranie go w ustawieniach biblioteki.",
       "video.chapter_generation.no_speech": "Ta ścieżka napisów nie zawiera słów, z których można utworzyć rozdziały.",
       "video.chapter_generation.provider_auth_failed": "Dostawca generowania rozdziałów odrzucił klucz API. Poproś właściciela organizacji o jego sprawdzenie.",
-      "video.chapter_generation.provider_rejected": "Dostawca generowania rozdziałów odrzucił żądanie. Sprawdź, czy udostępnia model gpt-6-luna.",
+      "video.chapter_generation.provider_rejected": "Dostawca generowania rozdziałów odrzucił żądanie. Sprawdź, czy udostępnia model dostawcy i obsługuje strukturalne odpowiedzi.",
       "video.chapter_generation.provider_unavailable": "Nie udało się połączyć z dostawcą generowania rozdziałów albo odpowiadał zbyt długo. Spróbuj ponownie za chwilę.",
       "video.chapter_generation.invalid_answer": "Dostawca nie odpowiedział poprawnymi rozdziałami. Spróbuj ponownie.",
       "chapter_generation_provider.not_found": "Ten dostawca nie istnieje lub został usunięty.",
@@ -948,7 +949,7 @@
       "owner_only_title": "Tylko właściciel może zmieniać generowanie rozdziałów",
       "owner_only_description": "Poproś właściciela organizacji o wybranie dostawcy generowania rozdziałów dla biblioteki.",
       "title": "Generowanie rozdziałów",
-      "description": "Pozwól członkom tworzyć rozdziały filmów tej biblioteki na podstawie napisów, za pomocą jednego z dostawców organizacji i modelu {{model}}.",
+      "description": "Pozwól członkom tworzyć rozdziały filmów tej biblioteki na podstawie napisów za pomocą jednego z dostawców organizacji.",
       "no_providers": "Twoja organizacja nie ma jeszcze dostawcy generowania rozdziałów.",
       "add_provider": "Połącz dostawcę",
       "save": "Zapisz",
@@ -1150,7 +1151,7 @@
       "suggest": {
         "trigger": "Zaproponuj z napisów",
         "title": "Zaproponuj rozdziały",
-        "description": "Dostawca biblioteki czyta ścieżkę napisów i proponuje rozdziały za pomocą modelu {{model}}. Przejrzyj je przed zapisaniem.",
+        "description": "Dostawca biblioteki czyta ścieżkę napisów i proponuje rozdziały. Przejrzyj je przed zapisaniem.",
         "track": "Ścieżka napisów",
         "no_captions": "Ten film nie ma jeszcze ścieżek napisów. Najpierw prześlij lub wygeneruj napisy.",
         "replaces": "Propozycje zastąpią obecną listę rozdziałów. Nic nie zostanie zapisane, dopóki nie zapiszesz rozdziałów.",
@@ -1810,7 +1811,7 @@
     "owner_only_title": "Tylko właściciel może zarządzać dostawcami generowania rozdziałów",
     "owner_only_description": "Dostawcy przechowują klucze API, więc widzi je i zmienia tylko właściciel organizacji.",
     "title": "Dostawcy generowania rozdziałów",
-    "description": "Połącz OpenAI albo własny serwer modeli zgodny z API OpenAI i wybierz go w dowolnej bibliotece, aby tworzyć rozdziały z napisów za pomocą modelu {{model}}.",
+    "description": "Połącz OpenAI albo własny serwer modeli zgodny z API OpenAI i wybierz go w dowolnej bibliotece, aby tworzyć rozdziały z napisów.",
     "key_hint": "klucz …{{hint}}",
     "empty": {
       "title": "Brak dostawców",
@@ -1863,15 +1864,15 @@
       "name": "Nazwa",
       "name_placeholder": "np. Nasz serwer modeli",
       "base_url": "Adres API",
+      "model": "Model",
       "api_key": "Klucz API",
       "api_key_keep": "Zostaw puste, aby zachować zapisany klucz",
       "monthly_token_limit": "Miesięczny limit (tokeny)",
       "no_limit": "Bez limitu"
     },
     "hints": {
-      "model": "Rozdziały zawsze tworzy model {{model}}.",
-      "openai": "Klucze są szyfrowane i nigdy więcej nie są pokazywane.",
-      "openai_compatible": "Wpisz adres, pod którym jest /chat/completions, zwykle zakończony na /v1. Serwer musi udostępniać model o nazwie gpt-6-luna. Klucz API jest opcjonalny.",
+      "openai": "Użyj modelu obsługującego strukturalne odpowiedzi, np. gpt-6-luna. Klucze są szyfrowane i nigdy więcej nie są pokazywane.",
+      "openai_compatible": "Wpisz adres, pod którym jest /chat/completions, zwykle zakończony na /v1. Model musi obsługiwać strukturalne odpowiedzi. Klucz API jest opcjonalny.",
       "address_changed": "Zmiana adresu usuwa zapisany klucz API. Wpisz go ponownie, jeśli nowy serwer go wymaga.",
       "monthly_limit": "Tokeny, których ten dostawca może użyć w miesiącu, licząc czytaną transkrypcję i pisane rozdziały. Godzinny film potrzebuje około 15 000 tokenów; zostaw puste, aby nie ustawiać limitu."
     },

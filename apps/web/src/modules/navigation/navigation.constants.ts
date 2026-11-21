@@ -2,12 +2,13 @@ import {
   AudioLinesIcon,
   DatabaseIcon,
   HistoryIcon,
+  ListTreeIcon,
   LayoutDashboardIcon,
   LibraryBigIcon,
   SettingsIcon,
 } from "lucide-react"
 
-/** Sections of an organization; storages, transcription and activity are shown to its owner only. */
+/** Sections of an organization; storages, transcription, chapter generation and activity are shown to its owner only. */
 export const APP_NAVIGATION = [
   {
     to: "/$organizationSlug",
@@ -35,6 +36,13 @@ export const APP_NAVIGATION = [
     path: "transcription",
     labelKey: "navigation.transcription",
     icon: AudioLinesIcon,
+    isOwnerOnly: true,
+  },
+  {
+    to: "/$organizationSlug/chapter-generation",
+    path: "chapter-generation",
+    labelKey: "navigation.chapter_generation",
+    icon: ListTreeIcon,
     isOwnerOnly: true,
   },
   {

@@ -20,7 +20,7 @@ export class TranscriptionResponseTooLargeError extends Error {
  * Sends one request to a provider and reads its answer as text, without
  * following redirects. `lookup` resolves the host for the connection
  * itself, so its checks apply to the address actually used; the whole
- * exchange must finish within `timeoutMs`.
+ * exchange must finish within `timeoutMs`, and `signal` cancels it.
  */
 export function sendTranscriptionRequest(
   url: string,
@@ -31,18 +31,26 @@ export function sendTranscriptionRequest(
     timeoutMs,
     maxResponseBytes,
     lookup,
+    signal,
   }: {
-    method: "GET" | "POST"
+    method: string
     headers: Record<string, string>
     body?: Uint8Array
     timeoutMs: number
     maxResponseBytes: number
     lookup?: LookupFunction
+    signal?: AbortSignal
   }
 ) {
   const request = url.startsWith("https:") ? requestHttps : requestHttp
 
   return new Promise<{ status: number; text: string }>((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(signal.reason)
+
+      return
+    }
+
     const outgoing = request(
       url,
       {
@@ -70,14 +78,14 @@ export function sendTranscriptionRequest(
           chunks.push(chunk)
         })
         response.on("end", () => {
-          clearTimeout(timer)
+          settle()
           resolve({
             status: response.statusCode ?? 0,
             text: Buffer.concat(chunks).toString("utf8"),
           })
         })
         response.on("error", (error) => {
-          clearTimeout(timer)
+          settle()
           reject(error)
         })
       }
@@ -86,9 +94,20 @@ export function sendTranscriptionRequest(
       () => outgoing.destroy(new TranscriptionRequestTimeoutError(timeoutMs)),
       timeoutMs
     )
-
-    outgoing.on("error", (error) => {
+    const settle = () => {
       clearTimeout(timer)
+      signal?.removeEventListener("abort", abort)
+    }
+
+    function abort() {
+      settle()
+      outgoing.destroy()
+      reject(signal?.reason)
+    }
+
+    signal?.addEventListener("abort", abort, { once: true })
+    outgoing.on("error", (error) => {
+      settle()
       reject(error)
     })
     outgoing.end(body)

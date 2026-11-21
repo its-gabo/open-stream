@@ -7,6 +7,7 @@ import {
   LoaderCircleIcon,
   PlusIcon,
   SaveIcon,
+  SparklesIcon,
   Trash2Icon,
   XIcon,
 } from "lucide-react"
@@ -28,6 +29,7 @@ import {
 } from "../libraries.utils"
 import { StoryboardTile } from "./storyboard-tile"
 import { VideoChaptersPasteDialog } from "./video-chapters-paste-dialog"
+import { VideoChaptersSuggestDialog } from "./video-chapters-suggest-dialog"
 
 import type { VideoChapter } from "@workspace/shared"
 import type { Video } from "@/api/generated-api"
@@ -55,7 +57,8 @@ const toFormValues = (chapters: VideoChapter[]): VideoChaptersFormInput => ({
 
 /**
  * A video's chapters, one row each: typed, added at the player's position,
- * or pasted as a list like `0:00 Intro`. Saving replaces all of them.
+ * pasted as a list like `0:00 Intro`, or suggested from a caption track by
+ * the library's provider. Saving replaces all of them.
  */
 export function VideoChaptersSection({
   organizationSlug,
@@ -84,6 +87,7 @@ export function VideoChaptersSection({
   const chapterErrors = form.formState.errors.chapters
   const isAtLimit = fields.length >= VIDEO_CHAPTER_LIMITS.MAX_PER_VIDEO
   const [isPasteOpen, setIsPasteOpen] = useState(false)
+  const [isSuggestOpen, setIsSuggestOpen] = useState(false)
   const storyboard = useStoryboard(
     buildVideoFileUrl(
       organizationSlug,
@@ -122,7 +126,8 @@ export function VideoChaptersSection({
     if (target !== index) move(index, target)
   }
 
-  const applyPastedChapters = (chapters: VideoChapter[]) => {
+  /** Pasted or suggested chapters replace the rows, to review before saving. */
+  const applyChapters = (chapters: VideoChapter[]) => {
     replace(toFormValues(chapters).chapters)
     void form.trigger("chapters")
   }
@@ -258,6 +263,15 @@ export function VideoChaptersSection({
             <ClipboardPasteIcon />
             {t("videos.chapters.paste")}
           </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => setIsSuggestOpen(true)}
+          >
+            <SparklesIcon />
+            {t("videos.chapters.suggest.trigger")}
+          </Button>
           {fields.length > 0 && (
             <Button
               type="button"
@@ -289,7 +303,16 @@ export function VideoChaptersSection({
         onOpenChange={setIsPasteOpen}
         replacesChapters={fields.length > 0}
         durationSeconds={durationSeconds}
-        onApply={applyPastedChapters}
+        onApply={applyChapters}
+      />
+      <VideoChaptersSuggestDialog
+        organizationSlug={organizationSlug}
+        libraryId={libraryId}
+        videoId={video.id}
+        open={isSuggestOpen}
+        onOpenChange={setIsSuggestOpen}
+        replacesChapters={fields.length > 0}
+        onApply={applyChapters}
       />
     </section>
   )

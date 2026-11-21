@@ -3,6 +3,8 @@ import { createAnalyticsModule } from "./analytics/analytics.module"
 import { createAuthModule } from "./auth/auth.module"
 import { createCaptionsModule } from "./captions/captions.module"
 import type { TranscriptionClient } from "./captions/types/captions.types"
+import { createChapterGenerationModule } from "./chapter-generation/chapter-generation.module"
+import type { ChapterGenerationClient } from "./chapter-generation/types/chapter-generation.types"
 import { createCtasModule } from "./ctas/ctas.module"
 import { createLoggingModule } from "./common/logging/logging.module"
 import type { LogSink } from "./common/logging/logging.types"
@@ -25,6 +27,7 @@ export type AppModuleOverrides = {
   logSink?: LogSink
   mediaToolkit?: MediaToolkit
   transcriptionClient?: TranscriptionClient
+  chapterGenerationClient?: ChapterGenerationClient
 }
 
 /**
@@ -106,6 +109,15 @@ export function createAppModule(
     mediaToolkit: media.mediaToolkit,
     transcriptionClient: overrides.transcriptionClient,
   })
+  const chapterGeneration = createChapterGenerationModule({
+    db: database.db,
+    config,
+    logger: logging.logger,
+    activityLogService: activity.activityLogService,
+    storageSecretCipherService: storage.storageSecretCipherService,
+    videoCaptionsService: captions.videoCaptionsService,
+    chapterGenerationClient: overrides.chapterGenerationClient,
+  })
   const organizations = createOrganizationsModule({
     db: database.db,
     config,
@@ -133,6 +145,7 @@ export function createAppModule(
     ...playlists,
     ...ctas,
     ...captions,
+    ...chapterGeneration,
     async close() {
       email.emailSenderService.close()
       await database.close()

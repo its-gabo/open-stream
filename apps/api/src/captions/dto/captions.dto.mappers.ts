@@ -63,6 +63,9 @@ export const toTranscriptionProviderDto = (
   baseUrl: provider.baseUrl ?? OPENAI_TRANSCRIPTION_DEFAULTS.BASE_URL,
   model: provider.model,
   apiKeyHint: provider.apiKeyHint,
+  monthlyMinuteLimit: provider.monthlyMinuteLimit,
+  usedMinutesThisMonth:
+    Math.round((provider.usedAudioSecondsThisMonth / 60) * 10) / 10,
   libraryCount: provider.libraryCount,
   createdAt: provider.createdAt.toISOString(),
   updatedAt: provider.updatedAt.toISOString(),

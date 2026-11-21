@@ -123,7 +123,15 @@
       "model": "Wpisz model, którego chcesz użyć.",
       "base_url": "Wpisz adres serwera zaczynający się od http:// lub https://.",
       "api_key": "Wpisz klucz API OpenAI.",
-      "auto_needs_provider": "Wybierz dostawcę, aby automatycznie transkrybować filmy."
+      "auto_needs_provider": "Wybierz dostawcę, aby automatycznie transkrybować filmy.",
+      "monthly_minute_limit": "Wpisz liczbę całkowitą minut albo zostaw puste, aby nie ustawiać limitu."
+    },
+    "chapter_generation_provider": {
+      "name": "Wpisz nazwę.",
+      "base_url": "Wpisz adres serwera zaczynający się od http:// lub https://.",
+      "api_key": "Wpisz klucz API OpenAI.",
+      "monthly_token_limit": "Wpisz liczbę całkowitą tokenów albo zostaw puste, aby nie ustawiać limitu.",
+      "model": "Wpisz model, którego chcesz użyć."
     }
   },
   "pages": {
@@ -274,7 +282,15 @@
       "transcription_provider.delete.success": "Usunięto dostawcę.",
       "transcription_provider.test.success": "Sprawdzono połączenie.",
       "library.transcription.get.success": "Pobrano ustawienia transkrypcji.",
-      "library.transcription.update.success": "Zapisano ustawienia transkrypcji."
+      "library.transcription.update.success": "Zapisano ustawienia transkrypcji.",
+      "chapter_generation_provider.list.success": "Pobrano dostawców.",
+      "chapter_generation_provider.create.success": "Połączono dostawcę.",
+      "chapter_generation_provider.update.success": "Zapisano dostawcę.",
+      "chapter_generation_provider.delete.success": "Usunięto dostawcę.",
+      "chapter_generation_provider.test.success": "Sprawdzono połączenie.",
+      "library.chapter_generation.get.success": "Pobrano ustawienia generowania rozdziałów.",
+      "library.chapter_generation.update.success": "Zapisano ustawienia generowania rozdziałów.",
+      "video.chapter_suggestions.success": "Zaproponowano rozdziały."
     },
     "error": {
       "fallback": "Ups, coś poszło nie tak..",
@@ -362,7 +378,20 @@
       "transcription_provider.endpoint_not_allowed": "Adres dostawcy musi być publicznym adresem HTTPS.",
       "transcription_provider.limit_reached": "Twoja organizacja ma już maksymalną liczbę dostawców.",
       "transcription_provider.in_use": "Biblioteki wciąż używają tego dostawcy. Najpierw wybierz dla nich innego.",
-      "transcription_provider.api_key_required": "OpenAI wymaga klucza API."
+      "transcription_provider.api_key_required": "OpenAI wymaga klucza API.",
+      "video.chapter_generation.not_configured": "Ta biblioteka nie ma dostawcy generowania rozdziałów. Poproś właściciela organizacji o wybranie go w ustawieniach biblioteki.",
+      "video.chapter_generation.no_speech": "Ta ścieżka napisów nie zawiera słów, z których można utworzyć rozdziały.",
+      "video.chapter_generation.provider_auth_failed": "Dostawca generowania rozdziałów odrzucił klucz API. Poproś właściciela organizacji o jego sprawdzenie.",
+      "video.chapter_generation.provider_rejected": "Dostawca generowania rozdziałów odrzucił żądanie. Sprawdź, czy udostępnia model dostawcy i obsługuje strukturalne odpowiedzi.",
+      "video.chapter_generation.provider_unavailable": "Nie udało się połączyć z dostawcą generowania rozdziałów albo odpowiadał zbyt długo. Spróbuj ponownie za chwilę.",
+      "video.chapter_generation.invalid_answer": "Dostawca nie odpowiedział poprawnymi rozdziałami. Spróbuj ponownie.",
+      "chapter_generation_provider.not_found": "Ten dostawca nie istnieje lub został usunięty.",
+      "chapter_generation_provider.endpoint_not_allowed": "Adres dostawcy musi być publicznym adresem HTTPS.",
+      "chapter_generation_provider.limit_reached": "Twoja organizacja ma już maksymalną liczbę dostawców.",
+      "chapter_generation_provider.in_use": "Biblioteki wciąż używają tego dostawcy. Najpierw wybierz dla nich innego.",
+      "chapter_generation_provider.api_key_required": "OpenAI wymaga klucza API.",
+      "video.transcription.usage_limit_reached": "Transkrypcja tego filmu przekroczyłaby miesięczny limit minut dostawcy. Poproś właściciela organizacji o jego podniesienie albo poczekaj do następnego miesiąca.",
+      "video.chapter_generation.usage_limit_reached": "Tworzenie rozdziałów dla tego filmu mogłoby przekroczyć miesięczny limit tokenów dostawcy. Poproś właściciela organizacji o jego podniesienie albo poczekaj do następnego miesiąca."
     }
   },
   "errors": {
@@ -385,7 +414,8 @@
     "libraries": "Biblioteki",
     "storages": "Magazyny",
     "activity": "Aktywność",
-    "transcription": "Transkrypcja"
+    "transcription": "Transkrypcja",
+    "chapter_generation": "Generowanie rozdziałów"
   },
   "organizations": {
     "roles": {
@@ -600,7 +630,8 @@
       "player": "Odtwarzacz",
       "webhooks": "Webhooki",
       "playlists": "Playlisty",
-      "transcription": "Transkrypcja"
+      "transcription": "Transkrypcja",
+      "chapter_generation": "Rozdziały"
     },
     "storage": {
       "current_title": "Gdzie przechowywane są filmy",
@@ -913,6 +944,19 @@
         "auto_transcribe": "Automatycznie transkrybuj nowe filmy",
         "auto_transcribe_hint": "Każdy film jest transkrybowany po przetworzeniu, chyba że ma już napisy. Dostawcy pobierają opłatę za każdą transkrypcję."
       }
+    },
+    "chapter_generation": {
+      "owner_only_title": "Tylko właściciel może zmieniać generowanie rozdziałów",
+      "owner_only_description": "Poproś właściciela organizacji o wybranie dostawcy generowania rozdziałów dla biblioteki.",
+      "title": "Generowanie rozdziałów",
+      "description": "Pozwól członkom tworzyć rozdziały filmów tej biblioteki na podstawie napisów za pomocą jednego z dostawców organizacji.",
+      "no_providers": "Twoja organizacja nie ma jeszcze dostawcy generowania rozdziałów.",
+      "add_provider": "Połącz dostawcę",
+      "save": "Zapisz",
+      "fields": {
+        "provider": "Dostawca",
+        "no_provider": "Brak"
+      }
     }
   },
   "videos": {
@@ -1103,6 +1147,16 @@
         "skipped_few": "{{count}} rozdziały zaczynają się mniej niż sekundę przed końcem filmu ({{duration}}) i zostaną pominięte.",
         "skipped_many": "{{count}} rozdziałów zaczyna się mniej niż sekundę przed końcem filmu ({{duration}}) i zostanie pominiętych.",
         "skipped_other": "{{count}} rozdziału zaczyna się mniej niż sekundę przed końcem filmu ({{duration}}) i zostanie pominięte."
+      },
+      "suggest": {
+        "trigger": "Zaproponuj z napisów",
+        "title": "Zaproponuj rozdziały",
+        "description": "Dostawca biblioteki czyta ścieżkę napisów i proponuje rozdziały. Przejrzyj je przed zapisaniem.",
+        "track": "Ścieżka napisów",
+        "no_captions": "Ten film nie ma jeszcze ścieżek napisów. Najpierw prześlij lub wygeneruj napisy.",
+        "replaces": "Propozycje zastąpią obecną listę rozdziałów. Nic nie zostanie zapisane, dopóki nie zapiszesz rozdziałów.",
+        "submit": "Zaproponuj rozdziały",
+        "pending": "Tworzenie rozdziałów…"
       }
     },
     "ctas": {
@@ -1232,7 +1286,8 @@
           "provider_removed": "Dostawca został usunięty przed transkrypcją filmu.",
           "no_audio": "Film nie ma dźwięku do transkrypcji.",
           "no_speech": "Dostawca nie usłyszał w filmie mowy.",
-          "transcription_failed": "Coś poszło nie tak podczas transkrypcji. Spróbuj ponownie."
+          "transcription_failed": "Coś poszło nie tak podczas transkrypcji. Spróbuj ponownie.",
+          "usage_limit_reached": "Przekroczony zostałby miesięczny limit minut dostawcy."
         }
       },
       "fields": {
@@ -1478,7 +1533,8 @@
       "account": "Konto",
       "playlist": "Playlista",
       "lead": "Lead",
-      "transcription_provider": "Dostawca transkrypcji"
+      "transcription_provider": "Dostawca transkrypcji",
+      "chapter_generation_provider": "Dostawca generowania rozdziałów"
     },
     "columns": {
       "action": "Co się stało",
@@ -1561,7 +1617,11 @@
       "transcription_provider_created": "Połączono dostawcę transkrypcji",
       "transcription_provider_updated": "Zmieniono dostawcę transkrypcji",
       "transcription_provider_deleted": "Usunięto dostawcę transkrypcji",
+      "chapter_generation_provider_created": "Połączono dostawcę generowania rozdziałów",
+      "chapter_generation_provider_updated": "Zmieniono dostawcę generowania rozdziałów",
+      "chapter_generation_provider_deleted": "Usunięto dostawcę generowania rozdziałów",
       "library_transcription_updated": "Zmieniono transkrypcję biblioteki",
+      "library_chapter_generation_updated": "Zmieniono generowanie rozdziałów w bibliotece",
       "video_caption_uploaded": "Przesłano ścieżkę napisów",
       "video_caption_updated": "Zmieniono ścieżkę napisów",
       "video_caption_deleted": "Usunięto ścieżkę napisów",
@@ -1687,7 +1747,8 @@
       "name": "Nazwa",
       "model": "Model",
       "libraries": "Biblioteki",
-      "actions": "Akcje"
+      "actions": "Akcje",
+      "usage": "W tym miesiącu"
     },
     "create": {
       "trigger": "Połącz dostawcę",
@@ -1731,12 +1792,93 @@
       "base_url": "Adres API",
       "model": "Model",
       "api_key": "Klucz API",
-      "api_key_keep": "Zostaw puste, aby zachować zapisany klucz"
+      "api_key_keep": "Zostaw puste, aby zachować zapisany klucz",
+      "monthly_minute_limit": "Miesięczny limit (minuty dźwięku)",
+      "no_limit": "Bez limitu"
     },
     "hints": {
       "openai": "Użyj whisper-1: zwraca czasy, których potrzebują napisy. Klucze są szyfrowane i nigdy więcej nie są pokazywane.",
       "openai_compatible": "Wpisz adres, pod którym jest /audio/transcriptions, zwykle zakończony na /v1. Klucz API jest opcjonalny.",
-      "address_changed": "Zmiana adresu usuwa zapisany klucz API. Wpisz go ponownie, jeśli nowy serwer go wymaga."
+      "address_changed": "Zmiana adresu usuwa zapisany klucz API. Wpisz go ponownie, jeśli nowy serwer go wymaga.",
+      "monthly_limit": "Ogranicza liczbę minut dźwięku wysyłanych do tego dostawcy w każdym miesiącu kalendarzowym. Film liczy się całą długością od chwili zlecenia transkrypcji; nieudane transkrypcje się nie liczą. Zlecenia, które przekroczyłyby limit, są odrzucane, a automatyczne transkrypcje oznaczane jako nieudane. Zostaw puste, aby nie ustawiać limitu."
+    },
+    "usage": {
+      "with_limit": "{{used}} / {{limit}} min",
+      "without_limit": "{{used}} min · bez limitu"
+    }
+  },
+  "chapter_generation": {
+    "owner_only_title": "Tylko właściciel może zarządzać dostawcami generowania rozdziałów",
+    "owner_only_description": "Dostawcy przechowują klucze API, więc widzi je i zmienia tylko właściciel organizacji.",
+    "title": "Dostawcy generowania rozdziałów",
+    "description": "Połącz OpenAI albo własny serwer modeli zgodny z API OpenAI i wybierz go w dowolnej bibliotece, aby tworzyć rozdziały z napisów.",
+    "key_hint": "klucz …{{hint}}",
+    "empty": {
+      "title": "Brak dostawców",
+      "description": "Połącz OpenAI kluczem API albo wskaż własny serwer modeli."
+    },
+    "columns": {
+      "name": "Nazwa",
+      "model": "Model",
+      "libraries": "Biblioteki",
+      "actions": "Akcje",
+      "usage": "W tym miesiącu"
+    },
+    "create": {
+      "trigger": "Połącz dostawcę",
+      "title": "Połącz dostawcę generowania rozdziałów",
+      "submit": "Połącz"
+    },
+    "edit": {
+      "trigger": "Edytuj",
+      "title": "Edytuj dostawcę generowania rozdziałów",
+      "submit": "Zapisz"
+    },
+    "delete": {
+      "trigger": "Usuń",
+      "title": "Usunąć tego dostawcę?",
+      "description": "{{name}} i jego klucz API zostaną trwale usunięte. Zaproponowane przez niego rozdziały zostaną.",
+      "confirm": "Usuń dostawcę",
+      "in_use": "Biblioteki wciąż używają tego dostawcy."
+    },
+    "connection": {
+      "test": "Sprawdź",
+      "working": "Dostawca odpowiedział i przyjął klucz.",
+      "unauthorized": "Dostawca odpowiedział, ale odrzucił klucz API.",
+      "unreachable": "Nie udało się połączyć z dostawcą."
+    },
+    "kinds": {
+      "openai": {
+        "label": "OpenAI",
+        "short": "OpenAI",
+        "description": "Twórz rozdziały za pomocą API OpenAI, rozliczanego na Twoim koncie OpenAI."
+      },
+      "openai_compatible": {
+        "label": "Własny serwer (zgodny z OpenAI)",
+        "short": "Własny",
+        "description": "Twórz rozdziały na własnym serwerze obsługującym API chat completions OpenAI ze strukturalnymi odpowiedziami, np. vLLM albo LiteLLM."
+      }
+    },
+    "fields": {
+      "kind": "Dostawca",
+      "name": "Nazwa",
+      "name_placeholder": "np. Nasz serwer modeli",
+      "base_url": "Adres API",
+      "model": "Model",
+      "api_key": "Klucz API",
+      "api_key_keep": "Zostaw puste, aby zachować zapisany klucz",
+      "monthly_token_limit": "Miesięczny limit (tokeny)",
+      "no_limit": "Bez limitu"
+    },
+    "hints": {
+      "openai": "Użyj modelu obsługującego strukturalne odpowiedzi, np. gpt-6-luna. Klucze są szyfrowane i nigdy więcej nie są pokazywane.",
+      "openai_compatible": "Wpisz adres, pod którym jest /chat/completions, zwykle zakończony na /v1. Model musi obsługiwać strukturalne odpowiedzi. Klucz API jest opcjonalny.",
+      "address_changed": "Zmiana adresu usuwa zapisany klucz API. Wpisz go ponownie, jeśli nowy serwer go wymaga.",
+      "monthly_limit": "Tokeny, których ten dostawca może użyć w miesiącu, licząc czytaną transkrypcję i pisane rozdziały. Godzinny film potrzebuje około 15 000 tokenów; zostaw puste, aby nie ustawiać limitu."
+    },
+    "usage": {
+      "with_limit": "{{used}} / {{limit}} tokenów",
+      "without_limit": "{{used}} tokenów · bez limitu"
     }
   }
 }

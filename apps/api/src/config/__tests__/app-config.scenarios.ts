@@ -42,6 +42,12 @@ export const REJECTED_ENVIRONMENTS = [
     error: "at least twice the heartbeat interval",
   },
   {
+    description:
+      "a chapter request timeout the idle connection would not outlast",
+    environment: { CHAPTER_GENERATION_REQUEST_TIMEOUT_MS: "180000" },
+    error: "CHAPTER_GENERATION_REQUEST_TIMEOUT_MS",
+  },
+  {
     description: "a short auth secret",
     environment: { AUTH_SECRET: "short" },
     error: "AUTH_SECRET",

@@ -7,6 +7,8 @@ import { z } from "zod"
 
 import { NO_TRANSCRIPTION_PROVIDER } from "./transcription.constants"
 
+import { parseUsageLimit } from "@/lib/usage-limit"
+
 import type { TranslationFunction } from "@/i18n/i18n.types"
 import type { TranscriptionProvider } from "@/api/generated-api"
 import type { FormFieldSelectOption } from "@workspace/ui/lib/form-field.types"
@@ -72,6 +74,24 @@ export const transcriptionProviderFormSchema = (
             ? t("transcription.fields.api_key_keep")
             : "sk-…",
           type: "password",
+          autoComplete: "off",
+        }),
+      monthlyMinuteLimit: z
+        .string()
+        .refine(
+          (value) =>
+            !Number.isNaN(
+              parseUsageLimit(
+                value,
+                TRANSCRIPTION_PROVIDER_LIMITS.MONTHLY_MINUTE_LIMIT_MAX
+              )
+            ),
+          t("validation.transcription_provider.monthly_minute_limit")
+        )
+        .meta({
+          label: t("transcription.fields.monthly_minute_limit"),
+          placeholder: t("transcription.fields.no_limit"),
+          type: "text",
           autoComplete: "off",
         }),
     })

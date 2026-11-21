@@ -109,6 +109,8 @@ export type LibraryTranscriptionSettings = {
 
 export type TranscriptionProviderSummary = TranscriptionProviderRecord & {
   libraryCount: number
+  /** Seconds of audio counted toward its limit this calendar month (UTC). */
+  usedAudioSecondsThisMonth: number
 }
 
 export type TranscriptionProviderEnv = OrganizationEnv & {

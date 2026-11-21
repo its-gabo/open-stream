@@ -1,5 +1,7 @@
 export * from "./activity-logs.schema"
 export * from "./auth-tokens.schema"
+export * from "./chapter-generation-providers.schema"
+export * from "./chapter-generation-usages.schema"
 export * from "./credentials.schema"
 export * from "./libraries.schema"
 export * from "./library-api-keys.schema"

@@ -2,6 +2,7 @@ import { standardSchemaResolver } from "@hookform/resolvers/standard-schema"
 import {
   OPENAI_TRANSCRIPTION_DEFAULTS,
   TRANSCRIPTION_PROVIDER_KINDS,
+  TRANSCRIPTION_PROVIDER_LIMITS,
 } from "@workspace/shared"
 import { Button } from "@workspace/ui/components/button"
 import {
@@ -26,6 +27,7 @@ import type { TranscriptionProviderSave } from "@/api/mutations/transcription/us
 
 import { useTranscriptionProviderSaveMutation } from "@/api/mutations/transcription/useTranscriptionProviderSaveMutation"
 import { getFormFields } from "@/lib/get-form-fields"
+import { parseUsageLimit, toUsageLimitInput } from "@/lib/usage-limit"
 
 type TranscriptionProviderFormDialogProps = {
   organizationSlug: string
@@ -83,6 +85,9 @@ function TranscriptionProviderForm({
           : "",
       model: provider?.model ?? OPENAI_TRANSCRIPTION_DEFAULTS.MODEL,
       apiKey: "",
+      monthlyMinuteLimit: toUsageLimitInput(
+        provider?.monthlyMinuteLimit ?? null
+      ),
     },
   })
   const kind = useWatch({ control: form.control, name: "kind" })
@@ -111,6 +116,10 @@ function TranscriptionProviderForm({
     values: TranscriptionProviderFormValues
   ): TranscriptionProviderSave => {
     const apiKey = values.apiKey || null
+    const monthlyMinuteLimit = parseUsageLimit(
+      values.monthlyMinuteLimit,
+      TRANSCRIPTION_PROVIDER_LIMITS.MONTHLY_MINUTE_LIMIT_MAX
+    )
 
     if (provider) {
       return {
@@ -123,6 +132,7 @@ function TranscriptionProviderForm({
               ? values.baseUrl
               : null,
           ...(apiKey && { apiKey }),
+          monthlyMinuteLimit,
         },
       }
     }
@@ -135,6 +145,7 @@ function TranscriptionProviderForm({
           name: values.name,
           model: values.model,
           apiKey: apiKey ?? "",
+          monthlyMinuteLimit,
         }))
         .with(TRANSCRIPTION_PROVIDER_KINDS.OPENAI_COMPATIBLE, (compatible) => ({
           kind: compatible,
@@ -142,6 +153,7 @@ function TranscriptionProviderForm({
           baseUrl: values.baseUrl,
           model: values.model,
           apiKey,
+          monthlyMinuteLimit,
         }))
         .exhaustive(),
     }
@@ -174,6 +186,9 @@ function TranscriptionProviderForm({
         {kind === TRANSCRIPTION_PROVIDER_KINDS.OPENAI
           ? t("transcription.hints.openai")
           : t("transcription.hints.openai_compatible")}
+      </p>
+      <p className="text-xs text-muted-foreground">
+        {t("transcription.hints.monthly_limit")}
       </p>
       {isSavedKeyDropped && (
         <p className="text-xs text-destructive">

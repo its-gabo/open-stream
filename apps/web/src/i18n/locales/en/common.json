@@ -119,7 +119,15 @@
       "model": "Enter the model to use.",
       "base_url": "Enter the server's address, starting with http:// or https://.",
       "api_key": "Enter your OpenAI API key.",
-      "auto_needs_provider": "Choose a provider to transcribe videos automatically."
+      "auto_needs_provider": "Choose a provider to transcribe videos automatically.",
+      "monthly_minute_limit": "Enter a whole number of minutes, or leave it empty for no limit."
+    },
+    "chapter_generation_provider": {
+      "name": "Enter a name.",
+      "base_url": "Enter the server's address, starting with http:// or https://.",
+      "api_key": "Enter your OpenAI API key.",
+      "monthly_token_limit": "Enter a whole number of tokens, or leave it empty for no limit.",
+      "model": "Enter the model to use."
     }
   },
   "pages": {
@@ -270,7 +278,15 @@
       "transcription_provider.delete.success": "Provider deleted.",
       "transcription_provider.test.success": "Connection tested.",
       "library.transcription.get.success": "Transcription settings fetched.",
-      "library.transcription.update.success": "Transcription settings saved."
+      "library.transcription.update.success": "Transcription settings saved.",
+      "chapter_generation_provider.list.success": "Providers fetched.",
+      "chapter_generation_provider.create.success": "Provider connected.",
+      "chapter_generation_provider.update.success": "Provider saved.",
+      "chapter_generation_provider.delete.success": "Provider deleted.",
+      "chapter_generation_provider.test.success": "Connection tested.",
+      "library.chapter_generation.get.success": "Chapter generation settings fetched.",
+      "library.chapter_generation.update.success": "Chapter generation settings saved.",
+      "video.chapter_suggestions.success": "Chapters suggested."
     },
     "error": {
       "fallback": "Oops something went wrong..",
@@ -358,7 +374,20 @@
       "transcription_provider.endpoint_not_allowed": "The provider's address must be a public HTTPS address.",
       "transcription_provider.limit_reached": "Your organization has as many providers as it can have.",
       "transcription_provider.in_use": "Libraries still use this provider. Choose another one for them first.",
-      "transcription_provider.api_key_required": "OpenAI needs an API key."
+      "transcription_provider.api_key_required": "OpenAI needs an API key.",
+      "video.chapter_generation.not_configured": "This library has no chapter generation provider. Ask your organization's owner to choose one in the library's settings.",
+      "video.chapter_generation.no_speech": "This caption track has no words to write chapters from.",
+      "video.chapter_generation.provider_auth_failed": "The chapter generation provider refused its API key. Ask your organization's owner to check it.",
+      "video.chapter_generation.provider_rejected": "The chapter generation provider refused the request. Check that it serves the provider's model and supports structured outputs.",
+      "video.chapter_generation.provider_unavailable": "The chapter generation provider couldn't be reached or took too long. Try again in a moment.",
+      "video.chapter_generation.invalid_answer": "The provider didn't answer with usable chapters. Try again.",
+      "chapter_generation_provider.not_found": "This provider doesn't exist or was deleted.",
+      "chapter_generation_provider.endpoint_not_allowed": "The provider's address must be a public HTTPS address.",
+      "chapter_generation_provider.limit_reached": "Your organization has as many providers as it can have.",
+      "chapter_generation_provider.in_use": "Libraries still use this provider. Choose another one for them first.",
+      "chapter_generation_provider.api_key_required": "OpenAI needs an API key.",
+      "video.transcription.usage_limit_reached": "Transcribing this video would take the provider past its monthly minute limit. Ask your organization's owner to raise it, or wait until next month.",
+      "video.chapter_generation.usage_limit_reached": "Writing chapters for this video could take the provider past its monthly token limit. Ask your organization's owner to raise it, or wait until next month."
     }
   },
   "errors": {
@@ -381,7 +410,8 @@
     "libraries": "Libraries",
     "storages": "Storages",
     "activity": "Activity",
-    "transcription": "Transcription"
+    "transcription": "Transcription",
+    "chapter_generation": "Chapter generation"
   },
   "organizations": {
     "roles": {
@@ -596,7 +626,8 @@
       "player": "Player",
       "webhooks": "Webhooks",
       "playlists": "Playlists",
-      "transcription": "Transcription"
+      "transcription": "Transcription",
+      "chapter_generation": "Chapters"
     },
     "storage": {
       "current_title": "Where videos are stored",
@@ -905,6 +936,19 @@
         "auto_transcribe": "Transcribe new videos automatically",
         "auto_transcribe_hint": "Each video is transcribed once it's processed, unless it already has captions. Providers charge for each transcription."
       }
+    },
+    "chapter_generation": {
+      "owner_only_title": "Only the owner can change chapter generation",
+      "owner_only_description": "Ask your organization's owner to choose the library's chapter generation provider.",
+      "title": "Chapter generation",
+      "description": "Let members write chapters for this library's videos from their captions with one of your organization's providers.",
+      "no_providers": "Your organization has no chapter generation provider yet.",
+      "add_provider": "Connect one",
+      "save": "Save",
+      "fields": {
+        "provider": "Provider",
+        "no_provider": "None"
+      }
     }
   },
   "videos": {
@@ -1087,6 +1131,16 @@
         "after_end": "too close to the end",
         "skipped_one": "{{count}} chapter starts less than a second before the video ends at {{duration}} and is left out.",
         "skipped_other": "{{count}} chapters start less than a second before the video ends at {{duration}} and are left out."
+      },
+      "suggest": {
+        "trigger": "Suggest from captions",
+        "title": "Suggest chapters",
+        "description": "The library's provider reads a caption track and proposes chapters. Review them before you save.",
+        "track": "Caption track",
+        "no_captions": "This video has no caption tracks yet. Upload or generate captions first.",
+        "replaces": "The suggestions replace the chapters listed now. Nothing is saved until you save the chapters.",
+        "submit": "Suggest chapters",
+        "pending": "Writing chapters…"
       }
     },
     "ctas": {
@@ -1212,7 +1266,8 @@
           "provider_removed": "The provider was deleted before the video was transcribed.",
           "no_audio": "The video has no sound to transcribe.",
           "no_speech": "The provider heard no speech in the video.",
-          "transcription_failed": "Something went wrong while transcribing. Try again."
+          "transcription_failed": "Something went wrong while transcribing. Try again.",
+          "usage_limit_reached": "The provider's monthly minute limit would have been passed."
         }
       },
       "fields": {
@@ -1448,7 +1503,8 @@
       "account": "Account",
       "playlist": "Playlist",
       "lead": "Lead",
-      "transcription_provider": "Transcription provider"
+      "transcription_provider": "Transcription provider",
+      "chapter_generation_provider": "Chapter generation provider"
     },
     "columns": {
       "action": "What happened",
@@ -1531,7 +1587,11 @@
       "transcription_provider_created": "Connected a transcription provider",
       "transcription_provider_updated": "Changed a transcription provider",
       "transcription_provider_deleted": "Deleted a transcription provider",
+      "chapter_generation_provider_created": "Connected a chapter generation provider",
+      "chapter_generation_provider_updated": "Changed a chapter generation provider",
+      "chapter_generation_provider_deleted": "Deleted a chapter generation provider",
       "library_transcription_updated": "Changed the library's transcription",
+      "library_chapter_generation_updated": "Changed the library's chapter generation",
       "video_caption_uploaded": "Uploaded a caption track",
       "video_caption_updated": "Changed a caption track",
       "video_caption_deleted": "Deleted a caption track",
@@ -1647,7 +1707,8 @@
       "name": "Name",
       "model": "Model",
       "libraries": "Libraries",
-      "actions": "Actions"
+      "actions": "Actions",
+      "usage": "This month"
     },
     "create": {
       "trigger": "Connect provider",
@@ -1691,12 +1752,93 @@
       "base_url": "API address",
       "model": "Model",
       "api_key": "API key",
-      "api_key_keep": "Leave empty to keep the saved key"
+      "api_key_keep": "Leave empty to keep the saved key",
+      "monthly_minute_limit": "Monthly limit (minutes of audio)",
+      "no_limit": "No limit"
     },
     "hints": {
       "openai": "Use whisper-1: it returns the timings captions need. Keys are stored encrypted and never shown again.",
       "openai_compatible": "Enter the address that /audio/transcriptions is below, usually ending in /v1. The API key is optional.",
-      "address_changed": "Changing the address removes the saved API key. Enter it again if the new server needs one."
+      "address_changed": "Changing the address removes the saved API key. Enter it again if the new server needs one.",
+      "monthly_limit": "Limits the minutes of audio sent to this provider each calendar month. A video counts with its full length as soon as its transcription is requested; failed transcriptions don't count. Requests that would pass the limit are refused, and automatic transcriptions are marked failed. Leave empty for no limit."
+    },
+    "usage": {
+      "with_limit": "{{used}} / {{limit}} min",
+      "without_limit": "{{used}} min · no limit"
+    }
+  },
+  "chapter_generation": {
+    "owner_only_title": "Only the owner can manage chapter generation providers",
+    "owner_only_description": "Providers hold API keys, so only your organization's owner can see and change them.",
+    "title": "Chapter generation providers",
+    "description": "Connect OpenAI, or a model server of your own that speaks OpenAI's API, and choose it in any library to write chapters from captions.",
+    "key_hint": "key …{{hint}}",
+    "empty": {
+      "title": "No providers yet",
+      "description": "Connect OpenAI with an API key, or point OpenStream at your own model server."
+    },
+    "columns": {
+      "name": "Name",
+      "model": "Model",
+      "libraries": "Libraries",
+      "actions": "Actions",
+      "usage": "This month"
+    },
+    "create": {
+      "trigger": "Connect provider",
+      "title": "Connect a chapter generation provider",
+      "submit": "Connect"
+    },
+    "edit": {
+      "trigger": "Edit",
+      "title": "Edit chapter generation provider",
+      "submit": "Save"
+    },
+    "delete": {
+      "trigger": "Delete",
+      "title": "Delete this provider?",
+      "description": "{{name}} and its API key are removed for good. Chapters it suggested stay.",
+      "confirm": "Delete provider",
+      "in_use": "Libraries still use this provider."
+    },
+    "connection": {
+      "test": "Test",
+      "working": "The provider answered and accepted the key.",
+      "unauthorized": "The provider answered but refused the API key.",
+      "unreachable": "The provider couldn't be reached."
+    },
+    "kinds": {
+      "openai": {
+        "label": "OpenAI",
+        "short": "OpenAI",
+        "description": "Write chapters with OpenAI's API, billed to your OpenAI account."
+      },
+      "openai_compatible": {
+        "label": "Your own server (OpenAI-compatible)",
+        "short": "Self-hosted",
+        "description": "Write chapters with a server you run that speaks OpenAI's chat completions API with structured outputs, e.g. vLLM or LiteLLM."
+      }
+    },
+    "fields": {
+      "kind": "Provider",
+      "name": "Name",
+      "name_placeholder": "e.g. Our model server",
+      "base_url": "API address",
+      "model": "Model",
+      "api_key": "API key",
+      "api_key_keep": "Leave empty to keep the saved key",
+      "monthly_token_limit": "Monthly limit (tokens)",
+      "no_limit": "No limit"
+    },
+    "hints": {
+      "openai": "Use a model that supports structured outputs, such as gpt-6-luna. Keys are stored encrypted and never shown again.",
+      "openai_compatible": "Enter the address that /chat/completions is below, usually ending in /v1. The model must support structured outputs. The API key is optional.",
+      "address_changed": "Changing the address removes the saved API key. Enter it again if the new server needs one.",
+      "monthly_limit": "Tokens this provider may use each month, counting the transcript it reads and the chapters it writes. A one-hour video needs about 15,000 tokens; leave empty for no limit."
+    },
+    "usage": {
+      "with_limit": "{{used}} / {{limit}} tokens",
+      "without_limit": "{{used}} tokens · no limit"
     }
   }
 }

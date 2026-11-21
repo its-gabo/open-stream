@@ -40,6 +40,7 @@ import type { AnalyticsModule } from "../../analytics/analytics.module"
 import type { WebhooksModule } from "../../webhooks/webhooks.module"
 import type { LibrariesModule } from "../libraries.module"
 import type { CaptionsModule } from "../../captions/captions.module"
+import type { ChapterGenerationModule } from "../../chapter-generation/chapter-generation.module"
 import type { CtasModule } from "../../ctas/ctas.module"
 import type { PlaylistsModule } from "../../playlists/playlists.module"
 
@@ -315,6 +316,10 @@ export type LibrariesRouterDependencies = LibrariesModule &
     | "videoCaptionsService"
     | "videoTranscriptionsService"
     | "libraryTranscriptionSettingsService"
+  > &
+  Pick<
+    ChapterGenerationModule,
+    "videoChapterSuggestionsService" | "libraryChapterGenerationSettingsService"
   > &
   OrganizationRouterDependencies & {
     organizationsService: OrganizationsService

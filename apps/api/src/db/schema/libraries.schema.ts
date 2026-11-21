@@ -19,6 +19,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core"
 import { checkNonEmptySubsetOf } from "../database.utils"
+import { chapterGenerationProviders } from "./chapter-generation-providers.schema"
 import { organizations } from "./organizations.schema"
 import { storages } from "./storages.schema"
 import { transcriptionProviders } from "./transcription-providers.schema"
@@ -66,6 +67,8 @@ export const libraries = pgTable(
     autoTranscribe: boolean("auto_transcribe").notNull().default(false),
     /** Sent to the provider with every transcription; null lets it detect the language. */
     transcriptionLanguage: text("transcription_language"),
+    /** Writes chapters for the library's videos from their captions; null when the library has none. */
+    chapterGenerationProviderId: uuid("chapter_generation_provider_id"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -100,6 +103,14 @@ export const libraries = pgTable(
         transcriptionProviders.organizationId,
       ],
     }),
+    foreignKey({
+      name: "libraries_chapter_generation_provider_organization_fk",
+      columns: [table.chapterGenerationProviderId, table.organizationId],
+      foreignColumns: [
+        chapterGenerationProviders.id,
+        chapterGenerationProviders.organizationId,
+      ],
+    }),
     check(
       "libraries_auto_transcribe_check",
       sql`not ${table.autoTranscribe} or ${table.transcriptionProviderId} is not null`
@@ -111,6 +122,9 @@ export const libraries = pgTable(
     index("libraries_storage_id_idx").on(table.storageId),
     index("libraries_transcription_provider_id_idx").on(
       table.transcriptionProviderId
+    ),
+    index("libraries_chapter_generation_provider_id_idx").on(
+      table.chapterGenerationProviderId
     ),
   ]
 )

@@ -10,6 +10,7 @@ export const VIDEO_CAPTION_ERROR_CODES = {
   TRANSCRIPTION_NOT_CONFIGURED: "video.transcription.not_configured",
   TRANSCRIPTION_IN_PROGRESS: "video.transcription.in_progress",
   NO_AUDIO: "video.transcription.no_audio",
+  USAGE_LIMIT_REACHED: "video.transcription.usage_limit_reached",
   PROVIDER_NOT_FOUND: "transcription_provider.not_found",
   PROVIDER_ENDPOINT_NOT_ALLOWED: "transcription_provider.endpoint_not_allowed",
   PROVIDER_LIMIT_REACHED: "transcription_provider.limit_reached",
@@ -66,6 +67,13 @@ export const VIDEO_CAPTION_ERRORS = {
     code: VIDEO_CAPTION_ERROR_CODES.NO_AUDIO,
     message: "The video has no sound to transcribe",
     reason: "video.transcription_no_audio",
+  },
+  USAGE_LIMIT_REACHED: {
+    kind: DOMAIN_ERROR_KINDS.CONFLICT,
+    code: VIDEO_CAPTION_ERROR_CODES.USAGE_LIMIT_REACHED,
+    message:
+      "Transcribing the video would take the provider past its monthly minute limit",
+    reason: "video.transcription_usage_limit_reached",
   },
   PROVIDER_NOT_FOUND: {
     kind: DOMAIN_ERROR_KINDS.NOT_FOUND,

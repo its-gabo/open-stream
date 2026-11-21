@@ -8,9 +8,10 @@ import type { ActivityLogService } from "../../activity/services/activity-log.se
 import type { ActivityActor } from "../../activity/types/activity.types"
 import { diffActivityValues } from "../../activity/utils/activity-changes.utils"
 import { DomainError } from "../../common/errors/domain-error"
+import { startOfUtcMonth } from "../../common/utils/date.utils"
 import { isAllowedServiceEndpoint } from "../../common/network/service-endpoint.utils"
 import type { AppConfig } from "../../config/app.config"
-import type { DatabaseExecutor } from "../../db/database.types"
+import type { DatabaseExecutor, Transaction } from "../../db/database.types"
 import type { TranscriptionProviderRecord } from "../../db/schema"
 import type { OrganizationAccess } from "../../organizations/types/organizations.types"
 import type { StorageSecretCipherService } from "../../storage/services/storage-secret-cipher.service"
@@ -59,13 +60,63 @@ export class TranscriptionProvidersService {
     )
   }
 
-  async listProviders(access: OrganizationAccess) {
-    const providers =
-      await this.transcriptionProvidersRepository.listProviderSummaries(
-        access.organization.id
+  /** Locks the provider for the rest of the transaction, e.g. so two requests cannot both take its last minutes. */
+  lockProvider(
+    organizationId: string,
+    providerId: string,
+    transaction: Transaction
+  ) {
+    return this.transcriptionProvidersRepository.lockProvider(
+      organizationId,
+      providerId,
+      transaction
+    )
+  }
+
+  /**
+   * Whether the provider may transcribe `audioSeconds` more this month
+   * without passing its limit. Hold its lock, so nothing is counted
+   * meanwhile.
+   */
+  async hasMinutesLeftFor(
+    provider: TranscriptionProviderRecord,
+    audioSeconds: number,
+    transaction: Transaction
+  ) {
+    if (provider.monthlyMinuteLimit === null) return true
+
+    const usedSeconds =
+      await this.transcriptionProvidersRepository.sumAudioSecondsSince(
+        provider.id,
+        startOfUtcMonth(),
+        transaction
       )
 
-    return { providers: providers.map(toTranscriptionProviderDto) }
+    return usedSeconds + audioSeconds <= provider.monthlyMinuteLimit * 60
+  }
+
+  async listProviders(access: OrganizationAccess) {
+    const [providers, usage] = await Promise.all([
+      this.transcriptionProvidersRepository.listProviderSummaries(
+        access.organization.id
+      ),
+      this.transcriptionProvidersRepository.sumAudioSecondsByProviderSince(
+        access.organization.id,
+        startOfUtcMonth()
+      ),
+    ])
+    const usedSeconds = new Map(
+      usage.map(({ providerId, seconds }) => [providerId, seconds])
+    )
+
+    return {
+      providers: providers.map((provider) =>
+        toTranscriptionProviderDto({
+          ...provider,
+          usedAudioSecondsThisMonth: usedSeconds.get(provider.id) ?? 0,
+        })
+      ),
+    }
   }
 
   async createProvider(
@@ -99,6 +150,7 @@ export class TranscriptionProvidersService {
               kind: input.kind,
               baseUrl,
               model: input.model,
+              monthlyMinuteLimit: input.monthlyMinuteLimit,
               ...this.encryptApiKey(input.apiKey),
             },
             transaction
@@ -120,7 +172,11 @@ export class TranscriptionProvidersService {
     )
 
     return {
-      provider: toTranscriptionProviderDto({ ...created, libraryCount: 0 }),
+      provider: toTranscriptionProviderDto({
+        ...created,
+        libraryCount: 0,
+        usedAudioSecondsThisMonth: 0,
+      }),
     }
   }
 
@@ -135,19 +191,10 @@ export class TranscriptionProvidersService {
     input: TranscriptionProviderUpdateBody
   ) {
     const isOpenAi = provider.kind === TRANSCRIPTION_PROVIDER_KINDS.OPENAI
-    const baseUrl = isOpenAi ? null : (input.baseUrl ?? provider.baseUrl)
 
     if (isOpenAi && input.apiKey === null) {
       throw new DomainError(VIDEO_CAPTION_ERRORS.PROVIDER_API_KEY_REQUIRED)
     }
-
-    const isAddressChanged = baseUrl !== provider.baseUrl
-
-    if (baseUrl && isAddressChanged) {
-      this.assertEndpointAllowed(baseUrl)
-    }
-
-    const apiKey = isAddressChanged ? (input.apiKey ?? null) : input.apiKey
 
     const updated = await this.transcriptionProvidersRepository.transaction(
       async (transaction) => {
@@ -160,6 +207,15 @@ export class TranscriptionProvidersService {
         if (!locked)
           throw new DomainError(VIDEO_CAPTION_ERRORS.PROVIDER_NOT_FOUND)
 
+        const baseUrl = isOpenAi ? null : (input.baseUrl ?? locked.baseUrl)
+        const isAddressChanged = baseUrl !== locked.baseUrl
+
+        if (baseUrl && isAddressChanged) {
+          this.assertEndpointAllowed(baseUrl)
+        }
+
+        const apiKey = isAddressChanged ? (input.apiKey ?? null) : input.apiKey
+
         const changed =
           await this.transcriptionProvidersRepository.updateProvider(
             provider.id,
@@ -167,6 +223,9 @@ export class TranscriptionProvidersService {
               name: input.name,
               baseUrl,
               model: input.model,
+              ...(input.monthlyMinuteLimit !== undefined && {
+                monthlyMinuteLimit: input.monthlyMinuteLimit,
+              }),
               ...(apiKey !== undefined && this.encryptApiKey(apiKey)),
             },
             transaction
@@ -275,16 +334,26 @@ export class TranscriptionProvidersService {
   }
 
   private async reloadProvider(organizationId: string, providerId: string) {
-    const provider =
-      await this.transcriptionProvidersRepository.findProviderSummary(
+    const [provider, usedSeconds] = await Promise.all([
+      this.transcriptionProvidersRepository.findProviderSummary(
         organizationId,
         providerId
-      )
+      ),
+      this.transcriptionProvidersRepository.sumAudioSecondsSince(
+        providerId,
+        startOfUtcMonth()
+      ),
+    ])
 
     if (!provider)
       throw new DomainError(VIDEO_CAPTION_ERRORS.PROVIDER_NOT_FOUND)
 
-    return { provider: toTranscriptionProviderDto(provider) }
+    return {
+      provider: toTranscriptionProviderDto({
+        ...provider,
+        usedAudioSecondsThisMonth: usedSeconds,
+      }),
+    }
   }
 
   private assertEndpointAllowed(baseUrl: string) {

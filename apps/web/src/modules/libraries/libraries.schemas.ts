@@ -12,6 +12,8 @@ import {
   VIDEO_CTA_LIMITS,
   VIDEO_CTA_PLACEMENTS,
   VIDEO_CTA_TIMINGS,
+  VIDEO_CAPTION_KINDS,
+  VIDEO_CAPTION_LIMITS,
   VIDEO_FIELD_LIMITS,
   videoCtaButtonUrlSchema,
   latestChapterStartSeconds,
@@ -20,7 +22,12 @@ import {
 } from "@workspace/shared"
 import { z } from "zod"
 
-import { formatChapterTime, parseChapterTime } from "./libraries.utils"
+import { DETECT_CAPTION_LANGUAGE } from "./libraries.constants"
+import {
+  formatChapterTime,
+  parseChapterTime,
+  toCaptionLanguageOptions,
+} from "./libraries.utils"
 
 import type { TranslationFunction } from "@/i18n/i18n.types"
 import type { VideoCtaBody } from "@/api/generated-api"
@@ -479,3 +486,73 @@ export const videoCtaFormSchema = (
         dismissible: values.dismissible,
       }
     })
+
+const captionLabelSchema = (t: TranslationFunction) =>
+  z
+    .string()
+    .trim()
+    .min(1, t("validation.caption_label.required"))
+    .max(
+      VIDEO_CAPTION_LIMITS.LABEL_MAX_LENGTH,
+      t("validation.caption_label.max_length", {
+        max: VIDEO_CAPTION_LIMITS.LABEL_MAX_LENGTH,
+      })
+    )
+    .meta({
+      label: t("videos.captions.fields.label"),
+      placeholder: t("videos.captions.fields.label_placeholder"),
+      type: "text",
+      autoComplete: "off",
+    })
+
+const captionKindSchema = (t: TranslationFunction) =>
+  z.enum(VIDEO_CAPTION_KINDS).meta({
+    label: t("videos.captions.fields.kind"),
+    type: "select",
+    options: Object.values(VIDEO_CAPTION_KINDS).map((kind) => ({
+      value: kind,
+      label: t(`videos.captions.kinds.${kind}`),
+    })),
+  })
+
+/** What an uploaded file is; the file itself is picked apart from the fields. */
+export const videoCaptionUploadFormSchema = (
+  t: TranslationFunction,
+  locale: string
+) =>
+  z.object({
+    language: z
+      .string()
+      .min(1, t("validation.caption_language.required"))
+      .meta({
+        label: t("videos.captions.fields.language"),
+        placeholder: t("videos.captions.fields.language_placeholder"),
+        type: "select",
+        options: toCaptionLanguageOptions(locale),
+      }),
+    label: captionLabelSchema(t),
+    kind: captionKindSchema(t),
+  })
+
+export const videoCaptionEditFormSchema = (t: TranslationFunction) =>
+  z.object({ label: captionLabelSchema(t) })
+
+/** The language to transcribe in, or `DETECT_CAPTION_LANGUAGE` to let the provider tell. */
+export const videoTranscriptionFormSchema = (
+  t: TranslationFunction,
+  locale: string
+) =>
+  z.object({
+    language: z.string().meta({
+      label: t("videos.captions.fields.spoken_language"),
+      type: "select",
+      options: [
+        {
+          value: DETECT_CAPTION_LANGUAGE,
+          label: t("videos.captions.fields.detect_language"),
+        },
+        ...toCaptionLanguageOptions(locale),
+      ],
+    }),
+    kind: captionKindSchema(t),
+  })

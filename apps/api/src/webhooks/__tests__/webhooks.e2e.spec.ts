@@ -52,6 +52,7 @@ const failingMediaToolkit: MediaToolkit = {
   },
   captureImage: async () => {},
   convertImage: async () => {},
+  extractAudioChunks: async () => [],
 }
 
 describe("Library webhooks (e2e)", () => {

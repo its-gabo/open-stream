@@ -50,6 +50,7 @@ const failingMediaToolkit: MediaToolkit = {
   },
   captureImage: async () => {},
   convertImage: async () => {},
+  extractAudioChunks: async () => [],
 }
 
 /**
@@ -94,6 +95,7 @@ const createGatedMediaToolkit = () => {
     convertImage: async ({ outputPath }) => {
       await Bun.write(outputPath, new Uint8Array([0xff, 0xd8]))
     },
+    extractAudioChunks: async () => [],
   }
 
   return {

@@ -1,11 +1,12 @@
 import { createAppModule, type AppModuleOverrides } from "./app.module"
+import { createVideoTranscriptionWorkerModule } from "./captions/video-transcription-worker.module"
 import type { AppConfig } from "./config/app.config"
 import { createVideoImportWorkerModule } from "./libraries/video-import-worker.module"
 import { createVideoProcessingWorkerModule } from "./libraries/video-processing-worker.module"
 import { createOutboxWorkerModule } from "./outbox/outbox-worker.module"
 import { createWebhookDeliveryWorkerModule } from "./webhooks/webhook-delivery-worker.module"
 
-/** Composition root of the background worker: the app module plus outbox processing, video imports and transcoding, and webhook delivery. */
+/** Composition root of the background worker: the app module plus outbox processing, video imports, transcoding and transcription, and webhook delivery. */
 export function createWorkerModule(
   config: AppConfig,
   overrides: AppModuleOverrides = {}
@@ -21,6 +22,11 @@ export function createWorkerModule(
     logger: appModule.logger,
     videoImportsService: appModule.videoImportsService,
   })
+  const videoTranscriptionWorker = createVideoTranscriptionWorkerModule({
+    config,
+    logger: appModule.logger,
+    videoTranscriptionsService: appModule.videoTranscriptionsService,
+  })
   const webhookDeliveryWorker = createWebhookDeliveryWorkerModule({
     config,
     logger: appModule.logger,
@@ -35,6 +41,7 @@ export function createWorkerModule(
       ...appModule.storageOutboxMessageHandlers,
       ...videoProcessingWorker.videoOutboxMessageHandlers,
       ...videoImportWorker.videoImportOutboxMessageHandlers,
+      ...videoTranscriptionWorker.videoTranscriptionOutboxMessageHandlers,
       ...webhookDeliveryWorker.webhookOutboxMessageHandlers,
     },
   })
@@ -44,6 +51,7 @@ export function createWorkerModule(
     ...outboxWorker,
     ...videoProcessingWorker,
     ...videoImportWorker,
+    ...videoTranscriptionWorker,
     ...webhookDeliveryWorker,
     /** Starts relaying the outbox, consuming every queue and sweeping organizations. */
     start() {
@@ -52,6 +60,7 @@ export function createWorkerModule(
       appModule.organizationSweeperService.startSweeping()
       videoProcessingWorker.videoProcessingConsumerService.startConsuming()
       videoImportWorker.videoImportConsumerService.startConsuming()
+      videoTranscriptionWorker.videoTranscriptionConsumerService.startConsuming()
       webhookDeliveryWorker.webhookDeliveryConsumerService.startConsuming()
     },
     async close() {
@@ -63,6 +72,8 @@ export function createWorkerModule(
       await videoProcessingWorker.videoProcessingQueue.close()
       await videoImportWorker.videoImportConsumerService.stopConsuming()
       await videoImportWorker.videoImportQueue.close()
+      await videoTranscriptionWorker.videoTranscriptionConsumerService.stopConsuming()
+      await videoTranscriptionWorker.videoTranscriptionQueue.close()
       await webhookDeliveryWorker.webhookDeliveryConsumerService.stopConsuming()
       await webhookDeliveryWorker.webhookDeliveryQueue.close()
       await appModule.close()

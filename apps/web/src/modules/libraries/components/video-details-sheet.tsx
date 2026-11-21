@@ -24,7 +24,12 @@ import { Suspense, lazy, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { VIDEO_DETAILS_TABS, VIDEO_PLAYER_PATHS } from "../libraries.constants"
-import { buildVideoFileUrl, buildVideoPosterUrl } from "../libraries.utils"
+import {
+  buildVideoCaptionUrl,
+  buildVideoFileUrl,
+  buildVideoPosterUrl,
+} from "../libraries.utils"
+import { VideoCaptionsSection } from "./video-captions-section"
 import { VideoChaptersSection } from "./video-chapters-section"
 import { VideoCtasSection } from "./video-ctas-section"
 import { VideoEditDialog } from "./video-edit-dialog"
@@ -33,6 +38,7 @@ import { VideoPosterSection } from "./video-poster-section"
 
 import type { Video } from "@/api/generated-api"
 import { useLibraryPlayerQuery } from "@/api/queries/libraries/useLibraryPlayerQuery"
+import { useVideoCaptionsQuery } from "@/api/queries/libraries/useVideoCaptionsQuery"
 import { useVideoCtasQuery } from "@/api/queries/libraries/useVideoCtasQuery"
 import { VideoAnalyticsSection } from "@/modules/analytics/components/video-analytics-section"
 import { VideoEmbedSection } from "@/modules/embed/components/video-embed-section"
@@ -95,6 +101,16 @@ function VideoDetails({
     video.id,
     { enabled: isPlayable }
   )
+  const { data: captionsData } = useVideoCaptionsQuery(
+    organizationSlug,
+    libraryId,
+    video.id,
+    { enabled: isPlayable }
+  )
+  const captions = (captionsData?.captions ?? []).map((caption) => ({
+    ...caption,
+    url: buildVideoCaptionUrl(organizationSlug, libraryId, video.id, caption),
+  }))
   // The library's player as its embeds show it; the stock one if its settings cannot be read.
   const playerSettings =
     showsDefaultPlayer || !libraryPlayer.data
@@ -158,6 +174,7 @@ function VideoDetails({
                   title={playerSettings.showTitle ? video.title : undefined}
                   chapters={video.chapters}
                   ctas={ctas}
+                  captions={captions}
                   controls={playerSettings}
                   onTimeUpdate={setPlayerSeconds}
                 />
@@ -222,6 +239,14 @@ function VideoDetails({
             )}
             {isPlayable && (
               <TabsTrigger
+                value={VIDEO_DETAILS_TABS.CAPTIONS}
+                className="h-8 flex-none px-0 group-data-horizontal/tabs:after:bottom-0"
+              >
+                {t("videos.captions.title")}
+              </TabsTrigger>
+            )}
+            {isPlayable && (
+              <TabsTrigger
                 value={VIDEO_DETAILS_TABS.ANALYTICS}
                 className="h-8 flex-none px-0 group-data-horizontal/tabs:after:bottom-0"
               >
@@ -270,6 +295,15 @@ function VideoDetails({
                 libraryId={libraryId}
                 video={video}
                 currentSeconds={playerSeconds}
+              />
+            </TabsContent>
+          )}
+          {isPlayable && (
+            <TabsContent value={VIDEO_DETAILS_TABS.CAPTIONS}>
+              <VideoCaptionsSection
+                organizationSlug={organizationSlug}
+                libraryId={libraryId}
+                video={video}
               />
             </TabsContent>
           )}

@@ -69,6 +69,23 @@ export type ImageConversionJob = {
   maxLongSide: number
 }
 
+/**
+ * The source's sound as small mono MP3 files of at most `chunkSeconds`
+ * each, for speech recognition services that limit the size of a file.
+ */
+export type AudioExtractionJob = {
+  /** A local path or a URL. */
+  source: string
+  outputDir: string
+  chunkSeconds: number
+}
+
+/** A piece of extracted audio and where it starts in the source. */
+export type AudioChunk = {
+  path: string
+  startSeconds: number
+}
+
 /** Reads and transcodes media files, from the local disk or a URL. */
 export type MediaToolkit = {
   /** Null when the file has no video stream. */
@@ -76,6 +93,8 @@ export type MediaToolkit = {
   transcodeToHls(job: HlsTranscodeJob): Promise<void>
   captureImage(job: ImageCaptureJob): Promise<void>
   convertImage(job: ImageConversionJob): Promise<void>
+  /** In order; the source must have sound. */
+  extractAudioChunks(job: AudioExtractionJob): Promise<AudioChunk[]>
 }
 
 export type MediaModuleDependencies = {

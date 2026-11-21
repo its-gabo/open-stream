@@ -6,7 +6,8 @@ import type { MediaToolkit } from "../../src/media/types/media.types"
 /**
  * Stands in for ffmpeg: probes every file as a 3-second 640×360 video and
  * writes a small but complete set of HLS files, a poster and a storyboard;
- * images it converts all become the same tiny JPEG.
+ * images it converts all become the same tiny JPEG, and the sound it
+ * extracts is two chunks of a few bytes.
  */
 export const fakeMediaToolkit: MediaToolkit = {
   probe: async () => ({
@@ -48,5 +49,19 @@ export const fakeMediaToolkit: MediaToolkit = {
   },
   convertImage: async ({ outputPath }) => {
     await Bun.write(outputPath, new Uint8Array([0xff, 0xd8]))
+  },
+  extractAudioChunks: async ({ outputDir, chunkSeconds }) => {
+    const chunks = [0, 1].map((index) => ({
+      path: join(outputDir, `chunk_00${index}.mp3`),
+      startSeconds: index * chunkSeconds,
+    }))
+
+    await mkdir(outputDir, { recursive: true })
+
+    for (const { path } of chunks) {
+      await Bun.write(path, new Uint8Array([0xff, 0xfb, 0x90, 0x00]))
+    }
+
+    return chunks
   },
 }

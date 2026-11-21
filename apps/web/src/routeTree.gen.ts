@@ -23,6 +23,7 @@ import { Route as GuestVerifyEmailRouteImport } from './routes/_guest/verify-ema
 import { Route as AuthenticatedOrganizationSlugIndexRouteImport } from './routes/_authenticated/$organizationSlug/index'
 import { Route as AuthenticatedOrganizationSlugActivityRouteImport } from './routes/_authenticated/$organizationSlug/activity'
 import { Route as AuthenticatedOrganizationSlugStoragesRouteImport } from './routes/_authenticated/$organizationSlug/storages'
+import { Route as AuthenticatedOrganizationSlugTranscriptionRouteImport } from './routes/_authenticated/$organizationSlug/transcription'
 import { Route as AuthenticatedAccountActivityRouteImport } from './routes/_authenticated/account/activity'
 import { Route as AuthenticatedOrganizationsNewRouteImport } from './routes/_authenticated/organizations/new'
 import { Route as EmbedLibraryIdVideoIdRouteImport } from './routes/embed.$libraryId.$videoId'
@@ -41,6 +42,7 @@ import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdPlayerRouteImpo
 import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdPlaylistsRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/playlists'
 import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdSecurityRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/security'
 import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/storage'
+import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdTranscriptionRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/transcription'
 import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdWebhooksRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/webhooks'
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -114,6 +116,12 @@ const AuthenticatedOrganizationSlugStoragesRoute =
   AuthenticatedOrganizationSlugStoragesRouteImport.update({
     id: '/storages',
     path: '/storages',
+    getParentRoute: () => AuthenticatedOrganizationSlugRoute,
+  } as any)
+const AuthenticatedOrganizationSlugTranscriptionRoute =
+  AuthenticatedOrganizationSlugTranscriptionRouteImport.update({
+    id: '/transcription',
+    path: '/transcription',
     getParentRoute: () => AuthenticatedOrganizationSlugRoute,
   } as any)
 const AuthenticatedAccountActivityRoute =
@@ -223,6 +231,15 @@ const AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRoute =
     path: '/storage',
     getParentRoute: () => AuthenticatedOrganizationSlugLibrariesLibraryIdRoute,
   } as any)
+const AuthenticatedOrganizationSlugLibrariesLibraryIdTranscriptionRoute =
+  AuthenticatedOrganizationSlugLibrariesLibraryIdTranscriptionRouteImport.update(
+    {
+      id: '/transcription',
+      path: '/transcription',
+      getParentRoute: () =>
+        AuthenticatedOrganizationSlugLibrariesLibraryIdRoute,
+    } as any,
+  )
 const AuthenticatedOrganizationSlugLibrariesLibraryIdWebhooksRoute =
   AuthenticatedOrganizationSlugLibrariesLibraryIdWebhooksRouteImport.update({
     id: '/webhooks',
@@ -242,6 +259,7 @@ export interface FileRoutesByFullPath {
   '/verify-email': typeof GuestVerifyEmailRoute
   '/$organizationSlug/activity': typeof AuthenticatedOrganizationSlugActivityRoute
   '/$organizationSlug/storages': typeof AuthenticatedOrganizationSlugStoragesRoute
+  '/$organizationSlug/transcription': typeof AuthenticatedOrganizationSlugTranscriptionRoute
   '/account/activity': typeof AuthenticatedAccountActivityRoute
   '/organizations/new': typeof AuthenticatedOrganizationsNewRoute
   '/embed/$libraryId/$videoId': typeof EmbedLibraryIdVideoIdRoute
@@ -260,6 +278,7 @@ export interface FileRoutesByFullPath {
   '/$organizationSlug/libraries/$libraryId/playlists': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdPlaylistsRoute
   '/$organizationSlug/libraries/$libraryId/security': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdSecurityRoute
   '/$organizationSlug/libraries/$libraryId/storage': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRoute
+  '/$organizationSlug/libraries/$libraryId/transcription': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdTranscriptionRoute
   '/$organizationSlug/libraries/$libraryId/webhooks': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdWebhooksRoute
   '/$organizationSlug/libraries/$libraryId/': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdIndexRoute
 }
@@ -274,6 +293,7 @@ export interface FileRoutesByTo {
   '/verify-email': typeof GuestVerifyEmailRoute
   '/$organizationSlug/activity': typeof AuthenticatedOrganizationSlugActivityRoute
   '/$organizationSlug/storages': typeof AuthenticatedOrganizationSlugStoragesRoute
+  '/$organizationSlug/transcription': typeof AuthenticatedOrganizationSlugTranscriptionRoute
   '/account/activity': typeof AuthenticatedAccountActivityRoute
   '/organizations/new': typeof AuthenticatedOrganizationsNewRoute
   '/embed/$libraryId/$videoId': typeof EmbedLibraryIdVideoIdRoute
@@ -291,6 +311,7 @@ export interface FileRoutesByTo {
   '/$organizationSlug/libraries/$libraryId/playlists': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdPlaylistsRoute
   '/$organizationSlug/libraries/$libraryId/security': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdSecurityRoute
   '/$organizationSlug/libraries/$libraryId/storage': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRoute
+  '/$organizationSlug/libraries/$libraryId/transcription': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdTranscriptionRoute
   '/$organizationSlug/libraries/$libraryId/webhooks': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdWebhooksRoute
   '/$organizationSlug/libraries/$libraryId': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdIndexRoute
 }
@@ -309,6 +330,7 @@ export interface FileRoutesById {
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/$organizationSlug/activity': typeof AuthenticatedOrganizationSlugActivityRoute
   '/_authenticated/$organizationSlug/storages': typeof AuthenticatedOrganizationSlugStoragesRoute
+  '/_authenticated/$organizationSlug/transcription': typeof AuthenticatedOrganizationSlugTranscriptionRoute
   '/_authenticated/account/activity': typeof AuthenticatedAccountActivityRoute
   '/_authenticated/organizations/new': typeof AuthenticatedOrganizationsNewRoute
   '/embed/$libraryId/$videoId': typeof EmbedLibraryIdVideoIdRoute
@@ -327,6 +349,7 @@ export interface FileRoutesById {
   '/_authenticated/$organizationSlug/libraries/$libraryId/playlists': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdPlaylistsRoute
   '/_authenticated/$organizationSlug/libraries/$libraryId/security': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdSecurityRoute
   '/_authenticated/$organizationSlug/libraries/$libraryId/storage': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRoute
+  '/_authenticated/$organizationSlug/libraries/$libraryId/transcription': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdTranscriptionRoute
   '/_authenticated/$organizationSlug/libraries/$libraryId/webhooks': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdWebhooksRoute
   '/_authenticated/$organizationSlug/libraries/$libraryId/': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdIndexRoute
 }
@@ -344,6 +367,7 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/$organizationSlug/activity'
     | '/$organizationSlug/storages'
+    | '/$organizationSlug/transcription'
     | '/account/activity'
     | '/organizations/new'
     | '/embed/$libraryId/$videoId'
@@ -362,6 +386,7 @@ export interface FileRouteTypes {
     | '/$organizationSlug/libraries/$libraryId/playlists'
     | '/$organizationSlug/libraries/$libraryId/security'
     | '/$organizationSlug/libraries/$libraryId/storage'
+    | '/$organizationSlug/libraries/$libraryId/transcription'
     | '/$organizationSlug/libraries/$libraryId/webhooks'
     | '/$organizationSlug/libraries/$libraryId/'
   fileRoutesByTo: FileRoutesByTo
@@ -376,6 +401,7 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/$organizationSlug/activity'
     | '/$organizationSlug/storages'
+    | '/$organizationSlug/transcription'
     | '/account/activity'
     | '/organizations/new'
     | '/embed/$libraryId/$videoId'
@@ -393,6 +419,7 @@ export interface FileRouteTypes {
     | '/$organizationSlug/libraries/$libraryId/playlists'
     | '/$organizationSlug/libraries/$libraryId/security'
     | '/$organizationSlug/libraries/$libraryId/storage'
+    | '/$organizationSlug/libraries/$libraryId/transcription'
     | '/$organizationSlug/libraries/$libraryId/webhooks'
     | '/$organizationSlug/libraries/$libraryId'
   id:
@@ -410,6 +437,7 @@ export interface FileRouteTypes {
     | '/_authenticated/'
     | '/_authenticated/$organizationSlug/activity'
     | '/_authenticated/$organizationSlug/storages'
+    | '/_authenticated/$organizationSlug/transcription'
     | '/_authenticated/account/activity'
     | '/_authenticated/organizations/new'
     | '/embed/$libraryId/$videoId'
@@ -428,6 +456,7 @@ export interface FileRouteTypes {
     | '/_authenticated/$organizationSlug/libraries/$libraryId/playlists'
     | '/_authenticated/$organizationSlug/libraries/$libraryId/security'
     | '/_authenticated/$organizationSlug/libraries/$libraryId/storage'
+    | '/_authenticated/$organizationSlug/libraries/$libraryId/transcription'
     | '/_authenticated/$organizationSlug/libraries/$libraryId/webhooks'
     | '/_authenticated/$organizationSlug/libraries/$libraryId/'
   fileRoutesById: FileRoutesById
@@ -537,6 +566,13 @@ declare module '@tanstack/react-router' {
       path: '/storages'
       fullPath: '/$organizationSlug/storages'
       preLoaderRoute: typeof AuthenticatedOrganizationSlugStoragesRouteImport
+      parentRoute: typeof AuthenticatedOrganizationSlugRoute
+    }
+    '/_authenticated/$organizationSlug/transcription': {
+      id: '/_authenticated/$organizationSlug/transcription'
+      path: '/transcription'
+      fullPath: '/$organizationSlug/transcription'
+      preLoaderRoute: typeof AuthenticatedOrganizationSlugTranscriptionRouteImport
       parentRoute: typeof AuthenticatedOrganizationSlugRoute
     }
     '/_authenticated/account/activity': {
@@ -665,6 +701,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRouteImport
       parentRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdRoute
     }
+    '/_authenticated/$organizationSlug/libraries/$libraryId/transcription': {
+      id: '/_authenticated/$organizationSlug/libraries/$libraryId/transcription'
+      path: '/transcription'
+      fullPath: '/$organizationSlug/libraries/$libraryId/transcription'
+      preLoaderRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdTranscriptionRouteImport
+      parentRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdRoute
+    }
     '/_authenticated/$organizationSlug/libraries/$libraryId/webhooks': {
       id: '/_authenticated/$organizationSlug/libraries/$libraryId/webhooks'
       path: '/webhooks'
@@ -684,6 +727,7 @@ interface AuthenticatedOrganizationSlugLibrariesLibraryIdRouteChildren {
   AuthenticatedOrganizationSlugLibrariesLibraryIdPlaylistsRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdPlaylistsRoute
   AuthenticatedOrganizationSlugLibrariesLibraryIdSecurityRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdSecurityRoute
   AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRoute
+  AuthenticatedOrganizationSlugLibrariesLibraryIdTranscriptionRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdTranscriptionRoute
   AuthenticatedOrganizationSlugLibrariesLibraryIdWebhooksRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdWebhooksRoute
   AuthenticatedOrganizationSlugLibrariesLibraryIdIndexRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdIndexRoute
 }
@@ -706,6 +750,8 @@ const AuthenticatedOrganizationSlugLibrariesLibraryIdRouteChildren: Authenticate
       AuthenticatedOrganizationSlugLibrariesLibraryIdSecurityRoute,
     AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRoute:
       AuthenticatedOrganizationSlugLibrariesLibraryIdStorageRoute,
+    AuthenticatedOrganizationSlugLibrariesLibraryIdTranscriptionRoute:
+      AuthenticatedOrganizationSlugLibrariesLibraryIdTranscriptionRoute,
     AuthenticatedOrganizationSlugLibrariesLibraryIdWebhooksRoute:
       AuthenticatedOrganizationSlugLibrariesLibraryIdWebhooksRoute,
     AuthenticatedOrganizationSlugLibrariesLibraryIdIndexRoute:
@@ -720,6 +766,7 @@ const AuthenticatedOrganizationSlugLibrariesLibraryIdRouteWithChildren =
 interface AuthenticatedOrganizationSlugRouteChildren {
   AuthenticatedOrganizationSlugActivityRoute: typeof AuthenticatedOrganizationSlugActivityRoute
   AuthenticatedOrganizationSlugStoragesRoute: typeof AuthenticatedOrganizationSlugStoragesRoute
+  AuthenticatedOrganizationSlugTranscriptionRoute: typeof AuthenticatedOrganizationSlugTranscriptionRoute
   AuthenticatedOrganizationSlugIndexRoute: typeof AuthenticatedOrganizationSlugIndexRoute
   AuthenticatedOrganizationSlugLibrariesLibraryIdRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdRouteWithChildren
   AuthenticatedOrganizationSlugSettingsOrganizationRoute: typeof AuthenticatedOrganizationSlugSettingsOrganizationRoute
@@ -734,6 +781,8 @@ const AuthenticatedOrganizationSlugRouteChildren: AuthenticatedOrganizationSlugR
       AuthenticatedOrganizationSlugActivityRoute,
     AuthenticatedOrganizationSlugStoragesRoute:
       AuthenticatedOrganizationSlugStoragesRoute,
+    AuthenticatedOrganizationSlugTranscriptionRoute:
+      AuthenticatedOrganizationSlugTranscriptionRoute,
     AuthenticatedOrganizationSlugIndexRoute:
       AuthenticatedOrganizationSlugIndexRoute,
     AuthenticatedOrganizationSlugLibrariesLibraryIdRoute:

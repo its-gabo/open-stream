@@ -1,4 +1,5 @@
 import {
+  AudioLinesIcon,
   DatabaseIcon,
   HistoryIcon,
   LayoutDashboardIcon,
@@ -6,7 +7,7 @@ import {
   SettingsIcon,
 } from "lucide-react"
 
-/** Sections of an organization; storages and activity are shown to its owner only. */
+/** Sections of an organization; storages, transcription and activity are shown to its owner only. */
 export const APP_NAVIGATION = [
   {
     to: "/$organizationSlug",
@@ -27,6 +28,13 @@ export const APP_NAVIGATION = [
     path: "storages",
     labelKey: "navigation.storages",
     icon: DatabaseIcon,
+    isOwnerOnly: true,
+  },
+  {
+    to: "/$organizationSlug/transcription",
+    path: "transcription",
+    labelKey: "navigation.transcription",
+    icon: AudioLinesIcon,
     isOwnerOnly: true,
   },
   {

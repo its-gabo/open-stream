@@ -23,6 +23,8 @@ export const VIDEO_DERIVED_FILES = {
   POSTER: "poster.jpg",
   /** An uploaded poster, outside `thumbnails/` so processing the video again keeps it. */
   POSTER_IMAGE: "poster-image.jpg",
+  /** Caption tracks, outside `hls/` and `thumbnails/` so processing the video again keeps them. */
+  CAPTIONS_FOLDER: "captions",
   STORYBOARD_IMAGE: "storyboard.jpg",
   STORYBOARD_VTT: "storyboard.vtt",
 } as const

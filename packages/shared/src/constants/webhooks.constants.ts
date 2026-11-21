@@ -15,6 +15,11 @@ export const WEBHOOK_EVENT_TYPES = {
   /** HLS renditions, poster and storyboard are ready to play. */
   VIDEO_PROCESSING_READY: "video.processing.ready",
   VIDEO_PROCESSING_FAILED: "video.processing.failed",
+  /** A caption track was added or replaced, by an upload or a transcription. */
+  VIDEO_CAPTION_READY: "video.caption.ready",
+  VIDEO_CAPTION_DELETED: "video.caption.deleted",
+  /** A transcription could not make a track; `failureReason` says why. */
+  VIDEO_TRANSCRIPTION_FAILED: "video.transcription.failed",
   /** A viewer left their email address in a call to action. */
   VIDEO_CTA_SUBMITTED: "video.cta.submitted",
   /** Sent on request from the library settings, to check the endpoint. */

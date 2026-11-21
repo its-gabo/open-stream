@@ -23,6 +23,12 @@ export const PLAYBACK_QUERY_KEYS = {
 /** Below a video's library API URL: the calls to action its player shows. */
 export const EMBED_CTAS_PATH = "embed/ctas"
 
+/** Below a video's library API URL: its caption tracks, each with the URL of its WebVTT. */
+export const EMBED_CAPTIONS_PATH = "embed/captions"
+
+/** Below a video's library API URL: the folder of its tracks' WebVTT files, named `<captionId>.vtt`. */
+export const CAPTION_FILES_PATH = "captions"
+
 /** Below a video's library API URL: its chapters as WebVTT, made from the video's chapters rather than stored. */
 export const CHAPTERS_TRACK_PATH = "chapters.vtt"
 

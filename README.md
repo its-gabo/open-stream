@@ -163,6 +163,7 @@ The API describes itself at `https://app.openstream.localhost/api/v1/openapi.jso
 - **Chapters.** Type chapters, add them at the player's position or paste a list like `0:00 Intro`. The player splits its seek bar at each one and lists them with storyboard thumbnails; other players can read them as a WebVTT chapters track.
 - **Playlists.** Group a library's videos into a playlist and embed it as one player. Viewers open an episodes menu with each video's description and how much of it they watched, skip to the next video, or let it start by itself after a countdown. Their progress stays in their own browser, and one signed URL covers every video in the playlist.
 - **Calls to action.** Show a button that opens a link, or a form that collects email addresses, over the video at chosen times or on its end screen. Email forms need a ticked consent checkbox, and each lead keeps the exact text the viewer agreed to. Leads can be searched, exported as CSV and deleted, and they stay when their call to action or video is deleted.
+- **Captions.** Upload WebVTT or SRT files, which are cleaned and stored as WebVTT, or transcribe videos with OpenAI or a speech-to-text server of your own that speaks OpenAI's API, such as a self-hosted Whisper. Libraries can transcribe every new video automatically. The player offers the tracks in a captions menu and remembers the viewer's language.
 
 </td>
   </tr>
@@ -189,7 +190,7 @@ The API describes itself at `https://app.openstream.localhost/api/v1/openapi.jso
 ### <img src="docs/assets/icons/plug.svg" width="20" height="20" align="absmiddle" alt="" /> API and webhooks
 
 - **Library API.** Up to 25 named keys per library, each limited to `videos:read`, `videos:upload`, `videos:manage`, `playback:sign`, `analytics:read` or `leads:read`.
-- **Webhooks.** `video.*` events for creation, uploads, every processing step and each email address left in a call to action, signed per [Standard Webhooks](https://www.standardwebhooks.com) and retried with backoff. Deliveries can be inspected, tested and resent.
+- **Webhooks.** `video.*` events for creation, uploads, every processing step, caption tracks and failed transcriptions, and each email address left in a call to action, signed per [Standard Webhooks](https://www.standardwebhooks.com) and retried with backoff. Deliveries can be inspected, tested and resent.
 - **Typed client.** The web app uses a client generated from the OpenAPI schema, and so can yours.
 
 </td>

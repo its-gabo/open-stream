@@ -5,6 +5,7 @@ import type { StoragesService } from "../../storage/services/storages.service"
 import type { StorageCleanupRequest } from "../../storage/types/storage.types"
 import type { VideosRepository } from "../repository/videos.repository"
 import {
+  captionsPrefixOf,
   hlsPrefixOf,
   posterImageKeyOf,
   thumbnailsPrefixOf,
@@ -14,7 +15,7 @@ import type { VideoFiles } from "../types/libraries.types"
 /**
  * Schedules the removal of videos' files from storage when their records are
  * deleted: the source, its HLS renditions and thumbnails, an uploaded
- * poster image, and an unfinished upload. The worker removes them, retrying while the storage is unreachable.
+ * poster image, caption tracks, and an unfinished upload. The worker removes them, retrying while the storage is unreachable.
  */
 export class VideoFilesCleanupService {
   constructor(
@@ -80,6 +81,7 @@ export class VideoFilesCleanupService {
           ? [
               hlsPrefixOf(video.sourceObjectKey),
               thumbnailsPrefixOf(video.sourceObjectKey),
+              captionsPrefixOf(video.sourceObjectKey),
             ]
           : [],
         multipartUploads: video.upload

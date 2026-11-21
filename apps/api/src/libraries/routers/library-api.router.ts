@@ -8,6 +8,9 @@ import {
   publicVideoUploadParamSchema,
 } from "../dto/libraries.schemas"
 import type { AnalyticsModule } from "../../analytics/analytics.module"
+import type { CaptionsModule } from "../../captions/captions.module"
+import { createLibraryApiCaptionsRouter } from "../../captions/routers/library-api-captions.router"
+import { createVideoCaptionPlaybackRouter } from "../../captions/routers/video-caption-playback.router"
 import type { CtasModule } from "../../ctas/ctas.module"
 import { createLibraryApiCtasRouter } from "../../ctas/routers/library-api-ctas.router"
 import { createVideoCtaPlaybackRouter } from "../../ctas/routers/video-cta-playback.router"
@@ -28,7 +31,11 @@ import { createVideoPlaybackRouter } from "./video-playback.router"
  * the API root.
  */
 export function createLibraryApiRouter(
-  module: LibrariesModule & AnalyticsModule & PlaylistsModule & CtasModule
+  module: LibrariesModule &
+    AnalyticsModule &
+    PlaylistsModule &
+    CtasModule &
+    CaptionsModule
 ) {
   return new Hono().route(
     LIBRARY_API_PATH,
@@ -68,9 +75,10 @@ export function createLibraryApiRouter(
       .route("/", createVideoPlaybackRouter(module.videoPlaybackService))
       .route("/", createPlaylistPlaybackRouter(module.playlistPlaybackService))
       .route("/", createVideoViewsRouter(module.videoViewsService))
+      .route("/", createVideoCtaPlaybackRouter(module.videoCtaPlaybackService))
       .route(
         "/",
-        createVideoCtaPlaybackRouter(module.videoCtaPlaybackService)
+        createVideoCaptionPlaybackRouter(module.videoCaptionPlaybackService)
       )
       .route(
         "/",
@@ -104,6 +112,14 @@ export function createLibraryApiRouter(
           module.libraryApiAccessService,
           module.videoCtasService,
           module.videoCtaLeadsService
+        )
+      )
+      .route(
+        "/",
+        createLibraryApiCaptionsRouter(
+          module.libraryApiAccessService,
+          module.videoCaptionsService,
+          module.videoTranscriptionsService
         )
       )
       .route(

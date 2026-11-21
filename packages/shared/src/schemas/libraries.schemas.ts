@@ -168,6 +168,8 @@ export const libraryPlayerSettingsSchema = z.object({
   showFullscreen: z.boolean(),
   /** A video's chapters on the seek bar and in a chapter menu, when it has any. */
   showChapters: z.boolean(),
+  /** The captions button and menu, when the video has tracks. */
+  showCaptions: z.boolean(),
   /** In a playlist, the next video starts by itself after a short countdown. */
   autoplayNext: z.boolean(),
 })

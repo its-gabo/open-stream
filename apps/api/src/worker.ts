@@ -1,3 +1,5 @@
+import { VIDEO_TRANSCRIPTION_QUEUE_NAME } from "./captions/constants/captions.constants"
+import { VIDEO_IMPORT_QUEUE_NAME } from "./libraries/constants/video-import.constants"
 import { VIDEO_PROCESSING_QUEUE_NAME } from "./libraries/constants/video-processing.constants"
 import { OUTBOX_QUEUE_NAME } from "./outbox/constants/outbox.constants"
 import { WEBHOOK_DELIVERY_QUEUE_NAME } from "./webhooks/constants/webhooks.constants"
@@ -12,6 +14,8 @@ workerModule.logger.info("Worker started", {
   queues: [
     OUTBOX_QUEUE_NAME,
     VIDEO_PROCESSING_QUEUE_NAME,
+    VIDEO_IMPORT_QUEUE_NAME,
+    VIDEO_TRANSCRIPTION_QUEUE_NAME,
     WEBHOOK_DELIVERY_QUEUE_NAME,
   ],
 })

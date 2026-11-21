@@ -110,6 +110,20 @@
     },
     "description": {
       "max_length": "Użyj maksymalnie {{max}} znaków."
+    },
+    "caption_label": {
+      "required": "Wpisz etykietę.",
+      "max_length": "Użyj maksymalnie {{max}} znaków."
+    },
+    "caption_language": {
+      "required": "Wybierz język."
+    },
+    "transcription_provider": {
+      "name": "Wpisz nazwę.",
+      "model": "Wpisz model, którego chcesz użyć.",
+      "base_url": "Wpisz adres serwera zaczynający się od http:// lub https://.",
+      "api_key": "Wpisz klucz API OpenAI.",
+      "auto_needs_provider": "Wybierz dostawcę, aby automatycznie transkrybować filmy."
     }
   },
   "pages": {
@@ -247,7 +261,20 @@
       "video.cta.event.report.success": "Zapisano.",
       "video.cta.lead.submit.success": "Otrzymano adres e-mail.",
       "video.cta.lead.list.success": "Pobrano leady.",
-      "video.cta.lead.delete.success": "Usunięto lead."
+      "video.cta.lead.delete.success": "Usunięto lead.",
+      "video.caption.list.success": "Pobrano napisy.",
+      "video.caption.upload.success": "Zapisano ścieżkę napisów.",
+      "video.caption.update.success": "Zapisano ścieżkę napisów.",
+      "video.caption.delete.success": "Usunięto ścieżkę napisów.",
+      "video.caption.embed.list.success": "Pobrano napisy.",
+      "video.transcription.request.success": "Rozpoczęto transkrypcję. Ścieżka pojawi się tutaj, gdy będzie gotowa.",
+      "transcription_provider.list.success": "Pobrano dostawców.",
+      "transcription_provider.create.success": "Połączono dostawcę.",
+      "transcription_provider.update.success": "Zapisano dostawcę.",
+      "transcription_provider.delete.success": "Usunięto dostawcę.",
+      "transcription_provider.test.success": "Sprawdzono połączenie.",
+      "library.transcription.get.success": "Pobrano ustawienia transkrypcji.",
+      "library.transcription.update.success": "Zapisano ustawienia transkrypcji."
     },
     "error": {
       "fallback": "Ups, coś poszło nie tak..",
@@ -322,7 +349,20 @@
       "video.cta.limit_reached": "Ten film ma już maksymalną liczbę wezwań do działania.",
       "video.cta.end_screen_taken": "Ten film ma już ekran końcowy.",
       "video.cta.not_an_email_form": "Adresy e-mail przyjmuje tylko formularz e-mail.",
-      "video.cta.lead.not_found": "Ten lead nie istnieje lub został usunięty."
+      "video.cta.lead.not_found": "Ten lead nie istnieje lub został usunięty.",
+      "video.caption.not_found": "Ta ścieżka napisów nie istnieje albo została usunięta.",
+      "video.caption.limit_reached": "Ten film ma już maksymalną liczbę ścieżek napisów.",
+      "video.caption.file_too_large": "Plik jest za duży. Pliki napisów mogą mieć do 2 MB.",
+      "video.caption.invalid_file": "To nie jest plik WebVTT ani SRT albo żadna z jego kwestii nie mieści się w filmie.",
+      "video.caption.too_many_cues": "Ten plik ma więcej kwestii, niż może mieć ścieżka.",
+      "video.transcription.not_configured": "Ta biblioteka nie ma dostawcy transkrypcji. Właściciel organizacji może go wybrać w ustawieniach Transkrypcja biblioteki.",
+      "video.transcription.in_progress": "Ten film jest już transkrybowany.",
+      "video.transcription.no_audio": "Ten film nie ma dźwięku do transkrypcji.",
+      "transcription_provider.not_found": "Ten dostawca nie istnieje albo został usunięty.",
+      "transcription_provider.endpoint_not_allowed": "Adres dostawcy musi być publicznym adresem HTTPS.",
+      "transcription_provider.limit_reached": "Twoja organizacja ma już maksymalną liczbę dostawców.",
+      "transcription_provider.in_use": "Biblioteki wciąż używają tego dostawcy. Najpierw wybierz dla nich innego.",
+      "transcription_provider.api_key_required": "OpenAI wymaga klucza API."
     }
   },
   "errors": {
@@ -344,7 +384,8 @@
     "settings": "Ustawienia",
     "libraries": "Biblioteki",
     "storages": "Magazyny",
-    "activity": "Aktywność"
+    "activity": "Aktywność",
+    "transcription": "Transkrypcja"
   },
   "organizations": {
     "roles": {
@@ -558,7 +599,8 @@
       "encoding": "Kodowanie",
       "player": "Odtwarzacz",
       "webhooks": "Webhooki",
-      "playlists": "Playlisty"
+      "playlists": "Playlisty",
+      "transcription": "Transkrypcja"
     },
     "storage": {
       "current_title": "Gdzie przechowywane są filmy",
@@ -744,6 +786,10 @@
         "autoplayNext": {
           "label": "Automatycznie odtwarzaj następny film",
           "hint": "W playlistach następny film startuje sam po krótkim odliczaniu."
+        },
+        "showCaptions": {
+          "label": "Napisy",
+          "hint": "Przycisk i menu napisów dla filmów, które mają ścieżki napisów."
         }
       },
       "hint": "Zmiany obejmą każde osadzenie tej biblioteki przy jego następnym wczytaniu.",
@@ -793,7 +839,10 @@
         "video_processing_ready": "HLS, miniatura i storyboard są gotowe do odtwarzania.",
         "video_processing_failed": "Transkodowanie nie powiodło się przy każdej próbie albo plik nie zawiera obrazu.",
         "video_cta_submitted": "Widz zostawił adres e-mail w wezwaniu do działania. Zawiera adres i zgodę, którą wyraził.",
-        "webhook_test": "Wysyłane po kliknięciu „Wyślij zdarzenie testowe” na tej stronie."
+        "webhook_test": "Wysyłane po kliknięciu „Wyślij zdarzenie testowe” na tej stronie.",
+        "video_caption_ready": "Dodano lub zastąpiono ścieżkę napisów, przez przesłanie pliku albo transkrypcję. Zawiera ścieżkę.",
+        "video_caption_deleted": "Usunięto ścieżkę napisów. Zawiera ścieżkę sprzed usunięcia.",
+        "video_transcription_failed": "Transkrypcja nie utworzyła ścieżki. Zawiera transkrypcję i powód niepowodzenia."
       },
       "secret_title": "Skopiuj teraz sekret podpisu",
       "secret_description": "Twój serwer sprawdza nim, czy żądania pochodzą z OpenStream. Jest pokazywany tylko raz; jeśli go zgubisz, nadaj webhookowi nowy sekret.",
@@ -827,7 +876,8 @@
         "uploads": "Przesyłanie",
         "processing": "Przetwarzanie",
         "leads": "Leady",
-        "testing": "Test"
+        "testing": "Test",
+        "captions": "Napisy"
       },
       "example_title": "Przykładowa treść żądania",
       "example_description": "Każde zdarzenie filmu zawiera w data status filmu, w tym samym kształcie co endpoint statusu. To jest zdarzenie video.processing.ready.",
@@ -845,6 +895,23 @@
         "create_title": "Dodaj webhook",
         "edit_title": "Zmień adres webhooka",
         "description": "OpenStream wysyła każde zdarzenie metodą POST na ten adres. W produkcji musi to być publiczny adres HTTPS."
+      }
+    },
+    "transcription": {
+      "owner_only_title": "Tylko właściciel może zmieniać transkrypcję",
+      "owner_only_description": "Poproś właściciela organizacji o wybranie dostawcy transkrypcji dla biblioteki.",
+      "title": "Transkrypcja",
+      "description": "Zamieniaj filmy tej biblioteki w ścieżki napisów za pomocą jednego z dostawców organizacji.",
+      "no_providers": "Twoja organizacja nie ma jeszcze dostawcy transkrypcji.",
+      "add_provider": "Połącz dostawcę",
+      "save": "Zapisz",
+      "fields": {
+        "provider": "Dostawca",
+        "no_provider": "Brak",
+        "language": "Język mówiony",
+        "language_hint": "Podanie języka zwiększa dokładność transkrypcji. Przy każdej transkrypcji można wybrać inny.",
+        "auto_transcribe": "Automatycznie transkrybuj nowe filmy",
+        "auto_transcribe_hint": "Każdy film jest transkrybowany po przetworzeniu, chyba że ma już napisy. Dostawcy pobierają opłatę za każdą transkrypcję."
       }
     }
   },
@@ -1001,7 +1068,10 @@
         "email_placeholder": "ty@example.com",
         "failed": "Nie udało się wysłać. Spróbuj ponownie za chwilę.",
         "preview": "Podgląd: adresy e-mail są zbierane tylko w osadzeniach."
-      }
+      },
+      "captions": "Napisy",
+      "captions_off": "Wyłączone",
+      "captions_track_cc": "{{label}} (CC)"
     },
     "chapters": {
       "title": "Rozdziały",
@@ -1121,6 +1191,80 @@
       "title": "Edytuj film",
       "description": "Widzowie widzą tytuł i opis, na przykład w menu odcinków playlisty.",
       "submit": "Zapisz zmiany"
+    },
+    "captions": {
+      "title": "Napisy",
+      "description": "Napisy, które odtwarzacze oferują w menu. Prześlij plik WebVTT lub SRT albo transkrybuj film dostawcą biblioteki. Nowa ścieżka w języku i rodzaju, które film już ma, zastępuje tamtą.",
+      "empty": "Brak ścieżek napisów.",
+      "default": "Domyślna",
+      "cue_count_one": "{{count}} kwestia",
+      "cue_count_few": "{{count}} kwestie",
+      "cue_count_many": "{{count}} kwestii",
+      "cue_count_other": "{{count}} kwestii",
+      "kinds": {
+        "subtitles": "Napisy",
+        "captions": "Napisy dla niesłyszących (CC)"
+      },
+      "sources": {
+        "upload": "Przesłane",
+        "transcription": "Z transkrypcji"
+      },
+      "set_default": "Włączaj {{label}} domyślnie",
+      "unset_default": "Nie włączaj {{label}} domyślnie",
+      "download": "Pobierz {{label}}",
+      "rename": "Zmień nazwę {{label}}",
+      "delete": "Usuń {{label}}",
+      "delete_title": "Usunąć tę ścieżkę napisów?",
+      "delete_description": "{{label}} zostanie usunięta z filmu razem z plikiem.",
+      "delete_confirm": "Usuń ścieżkę",
+      "too_many": "Film może mieć maksymalnie {{max}} ścieżek napisów.",
+      "edit_hint": "Aby poprawić ścieżkę, pobierz ją, popraw w dowolnym edytorze napisów i prześlij ponownie w tym samym języku.",
+      "transcribing": {
+        "title": "Trwa transkrypcja…",
+        "description": "Dostawca słucha filmu. Ścieżka pojawi się tutaj, gdy będzie gotowa, zwykle w ciągu kilku minut."
+      },
+      "failed": {
+        "title": "Ostatnia transkrypcja się nie powiodła",
+        "reasons": {
+          "provider_auth": "Dostawca odrzucił klucz API. Właściciel organizacji może go zmienić w sekcji Transkrypcja.",
+          "provider_rejected": "Dostawca odrzucił żądanie, np. nie zna modelu.",
+          "provider_unreachable": "Nie udało się połączyć z dostawcą. Spróbuj ponownie później.",
+          "provider_removed": "Dostawca został usunięty przed transkrypcją filmu.",
+          "no_audio": "Film nie ma dźwięku do transkrypcji.",
+          "no_speech": "Dostawca nie usłyszał w filmie mowy.",
+          "transcription_failed": "Coś poszło nie tak podczas transkrypcji. Spróbuj ponownie."
+        }
+      },
+      "fields": {
+        "label": "Etykieta",
+        "label_placeholder": "np. Polski",
+        "kind": "Rodzaj",
+        "language": "Język",
+        "language_placeholder": "Wybierz język",
+        "spoken_language": "Język mówiony",
+        "detect_language": "Wykryj automatycznie"
+      },
+      "upload": {
+        "trigger": "Prześlij plik",
+        "title": "Prześlij plik napisów",
+        "description": "Plik WebVTT (.vtt) lub SRT (.srt). Czasy zostają zachowane, a z tekstu usuwane jest wszystko poza pogrubieniem, kursywą i podkreśleniem.",
+        "dropzone_title": "Upuść tutaj plik .vtt lub .srt albo kliknij, aby go wybrać",
+        "dropzone_description": "Do {{size}}",
+        "remove_file": "Usuń plik",
+        "too_large": "Plik jest większy niż {{size}}.",
+        "submit": "Prześlij"
+      },
+      "transcribe": {
+        "trigger": "Transkrybuj",
+        "title": "Transkrybuj ten film",
+        "description": "Dostawca biblioteki zamienia mowę z filmu w ścieżkę napisów. Dostawcy pobierają opłatę za każdą transkrypcję.",
+        "submit": "Transkrybuj"
+      },
+      "edit": {
+        "title": "Zmień nazwę ścieżki napisów",
+        "description": "Odtwarzacze pokazują ścieżkę pod tą etykietą.",
+        "submit": "Zapisz"
+      }
     }
   },
   "embed": {
@@ -1333,7 +1477,8 @@
       "video": "Film",
       "account": "Konto",
       "playlist": "Playlista",
-      "lead": "Lead"
+      "lead": "Lead",
+      "transcription_provider": "Dostawca transkrypcji"
     },
     "columns": {
       "action": "Co się stało",
@@ -1412,7 +1557,15 @@
       "video_cta_updated": "Zmieniono wezwanie do działania",
       "video_cta_deleted": "Usunięto wezwanie do działania",
       "lead_deleted": "Usunięto lead",
-      "library_leads_exported": "Wyeksportowano leady"
+      "library_leads_exported": "Wyeksportowano leady",
+      "transcription_provider_created": "Połączono dostawcę transkrypcji",
+      "transcription_provider_updated": "Zmieniono dostawcę transkrypcji",
+      "transcription_provider_deleted": "Usunięto dostawcę transkrypcji",
+      "library_transcription_updated": "Zmieniono transkrypcję biblioteki",
+      "video_caption_uploaded": "Przesłano ścieżkę napisów",
+      "video_caption_updated": "Zmieniono ścieżkę napisów",
+      "video_caption_deleted": "Usunięto ścieżkę napisów",
+      "video_transcription_requested": "Zlecono transkrypcję"
     }
   },
   "account_activity": {
@@ -1518,6 +1671,72 @@
       "title": "Usunąć ten lead?",
       "description": "{{email}} zostanie trwale usunięty, np. gdy widz poprosi o usunięcie danych. Dziennik aktywności nie zachowuje kopii adresu.",
       "confirm": "Usuń lead"
+    }
+  },
+  "transcription": {
+    "owner_only_title": "Tylko właściciel może zarządzać dostawcami transkrypcji",
+    "owner_only_description": "Dostawcy przechowują klucze API, więc widzi je i zmienia tylko właściciel organizacji.",
+    "title": "Dostawcy transkrypcji",
+    "description": "Połącz OpenAI albo własny serwer zamiany mowy na tekst zgodny z API OpenAI i wybierz go w dowolnej bibliotece, aby zamieniać filmy w napisy.",
+    "key_hint": "klucz …{{hint}}",
+    "empty": {
+      "title": "Brak dostawców",
+      "description": "Połącz OpenAI kluczem API albo wskaż własny serwer Whisper."
+    },
+    "columns": {
+      "name": "Nazwa",
+      "model": "Model",
+      "libraries": "Biblioteki",
+      "actions": "Akcje"
+    },
+    "create": {
+      "trigger": "Połącz dostawcę",
+      "title": "Połącz dostawcę transkrypcji",
+      "submit": "Połącz"
+    },
+    "edit": {
+      "trigger": "Edytuj",
+      "title": "Edytuj dostawcę transkrypcji",
+      "submit": "Zapisz"
+    },
+    "delete": {
+      "trigger": "Usuń",
+      "title": "Usunąć tego dostawcę?",
+      "description": "{{name}} i jego klucz API zostaną trwale usunięte. Utworzone przez niego ścieżki napisów zostaną.",
+      "confirm": "Usuń dostawcę",
+      "in_use": "Biblioteki wciąż używają tego dostawcy."
+    },
+    "connection": {
+      "test": "Sprawdź",
+      "working": "Dostawca odpowiedział i przyjął klucz.",
+      "unauthorized": "Dostawca odpowiedział, ale odrzucił klucz API.",
+      "unreachable": "Nie udało się połączyć z dostawcą."
+    },
+    "kinds": {
+      "openai": {
+        "label": "OpenAI",
+        "short": "OpenAI",
+        "description": "Transkrybuj za pomocą API zamiany mowy na tekst OpenAI, rozliczanego na Twoim koncie OpenAI."
+      },
+      "openai_compatible": {
+        "label": "Własny serwer (zgodny z OpenAI)",
+        "short": "Własny",
+        "description": "Transkrybuj na własnym serwerze obsługującym API transkrypcji OpenAI, np. Speaches, faster-whisper-server albo LocalAI."
+      }
+    },
+    "fields": {
+      "kind": "Dostawca",
+      "name": "Nazwa",
+      "name_placeholder": "np. Whisper na naszym serwerze GPU",
+      "base_url": "Adres API",
+      "model": "Model",
+      "api_key": "Klucz API",
+      "api_key_keep": "Zostaw puste, aby zachować zapisany klucz"
+    },
+    "hints": {
+      "openai": "Użyj whisper-1: zwraca czasy, których potrzebują napisy. Klucze są szyfrowane i nigdy więcej nie są pokazywane.",
+      "openai_compatible": "Wpisz adres, pod którym jest /audio/transcriptions, zwykle zakończony na /v1. Klucz API jest opcjonalny.",
+      "address_changed": "Zmiana adresu usuwa zapisany klucz API. Wpisz go ponownie, jeśli nowy serwer go wymaga."
     }
   }
 }

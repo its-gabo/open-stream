@@ -21,6 +21,7 @@ import {
 import { checkNonEmptySubsetOf } from "../database.utils"
 import { organizations } from "./organizations.schema"
 import { storages } from "./storages.schema"
+import { transcriptionProviders } from "./transcription-providers.schema"
 
 export const libraries = pgTable(
   "libraries",
@@ -59,6 +60,12 @@ export const libraries = pgTable(
       .$type<Partial<LibraryPlayerSettings>>()
       .notNull()
       .default(DEFAULT_LIBRARY_PLAYER_SETTINGS),
+    /** Transcribes the library's videos; null when the library has none. */
+    transcriptionProviderId: uuid("transcription_provider_id"),
+    /** Each video is transcribed by itself once it is processed. */
+    autoTranscribe: boolean("auto_transcribe").notNull().default(false),
+    /** Sent to the provider with every transcription; null lets it detect the language. */
+    transcriptionLanguage: text("transcription_language"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -85,11 +92,26 @@ export const libraries = pgTable(
       columns: [table.storageId, table.organizationId],
       foreignColumns: [storages.id, storages.organizationId],
     }),
+    foreignKey({
+      name: "libraries_transcription_provider_organization_fk",
+      columns: [table.transcriptionProviderId, table.organizationId],
+      foreignColumns: [
+        transcriptionProviders.id,
+        transcriptionProviders.organizationId,
+      ],
+    }),
+    check(
+      "libraries_auto_transcribe_check",
+      sql`not ${table.autoTranscribe} or ${table.transcriptionProviderId} is not null`
+    ),
     index("libraries_organization_id_name_idx").on(
       table.organizationId,
       table.name
     ),
     index("libraries_storage_id_idx").on(table.storageId),
+    index("libraries_transcription_provider_id_idx").on(
+      table.transcriptionProviderId
+    ),
   ]
 )
 

@@ -62,6 +62,9 @@ export type ActivityAction =
   | "video.updated"
   | "video.poster_updated"
   | "video.chapters_updated"
+  | "video.cta_created"
+  | "video.cta_updated"
+  | "video.cta_deleted"
   | "video.deleted"
   | "video.uploaded"
   | "video.upload_canceled"
@@ -71,6 +74,8 @@ export type ActivityAction =
   | "playlist.updated"
   | "playlist.videos_updated"
   | "playlist.deleted"
+  | "lead.deleted"
+  | "library.leads_exported"
 
 export type ActivityActorKind = "user" | "api_key" | "anonymous" | "system"
 
@@ -124,6 +129,7 @@ export type ActivityResourceType =
   | "webhook"
   | "video"
   | "playlist"
+  | "lead"
 
 export interface AnalyticsDay {
   /**
@@ -396,6 +402,19 @@ export interface CreateLibraryApiPlaylistPlaybackUrlParams {
   playlistId: string
 }
 
+export interface CreateLibraryApiVideoCtaParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+}
+
 export interface CreateLibraryApiVideoParams {
   /**
    * @format uuid
@@ -421,6 +440,20 @@ export interface CreateStorageParams {
   organizationSlug: string
 }
 
+export interface CreateVideoCtaParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  organizationSlug: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+}
+
 export interface CreateVideoParams {
   /**
    * @format uuid
@@ -430,12 +463,57 @@ export interface CreateVideoParams {
   organizationSlug: string
 }
 
+export interface CtaAnalytics {
+  /**
+   * @min 0
+   * @max 9007199254740991
+   */
+  clickedViews: number
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  ctaId: string
+  /**
+   * @min 0
+   * @max 9007199254740991
+   */
+  dismissedViews: number
+  heading: string
+  kind: "button" | "email"
+  placement: "overlay" | "end_screen"
+  /**
+   * @min 0
+   * @max 9007199254740991
+   */
+  shownViews: number
+  /**
+   * @min 0
+   * @max 9007199254740991
+   */
+  submittedViews: number
+}
+
 export interface DeclineOrganizationInvitationParams {
   /**
    * @format uuid
    * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
    */
   invitationId: string
+}
+
+export interface DeleteLeadParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  leadId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  organizationSlug: string
 }
 
 export interface DeleteLibraryApiKeyParams {
@@ -463,6 +541,24 @@ export interface DeleteLibraryApiPlaylistParams {
    * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
    */
   playlistId: string
+}
+
+export interface DeleteLibraryApiVideoCtaParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  ctaId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
 }
 
 export interface DeleteLibraryApiVideoParams {
@@ -510,6 +606,25 @@ export interface DeleteStorageParams {
   storageId: string
 }
 
+export interface DeleteVideoCtaParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  ctaId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  organizationSlug: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+}
+
 export interface DeleteVideoParams {
   /**
    * @format uuid
@@ -522,6 +637,20 @@ export interface DeleteVideoParams {
    * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
    */
   videoId: string
+}
+
+export interface ExportLeadsParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  organizationSlug: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId?: string
 }
 
 export interface GetLibraryAnalyticsParams {
@@ -591,6 +720,22 @@ export interface GetLibraryApiVideoAnalyticsParams {
    * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
    */
   libraryId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+}
+
+export interface GetLibraryApiVideoEmbedCtasParams {
+  expires?: string
+  key?: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  token?: string
   /**
    * @format uuid
    * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
@@ -927,6 +1072,7 @@ export interface LibraryApiKeyCreateBody {
     | "videos:manage"
     | "playback:sign"
     | "analytics:read"
+    | "leads:read"
   )[]
 }
 
@@ -936,6 +1082,7 @@ export type LibraryApiKeyScope =
   | "videos:manage"
   | "playback:sign"
   | "analytics:read"
+  | "leads:read"
 
 export interface LibraryApiKeySecretSuccessResponse {
   code: string
@@ -967,6 +1114,7 @@ export interface LibraryApiKeyUpdateBody {
     | "videos:manage"
     | "playback:sign"
     | "analytics:read"
+    | "leads:read"
   )[]
 }
 
@@ -1143,6 +1291,34 @@ export interface ListAccountActivityParams {
   search?: string
 }
 
+export interface ListLeadsParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  organizationSlug: string
+  /**
+   * @min 1
+   * @max 9007199254740991
+   * @default 1
+   */
+  page?: number
+  /**
+   * @min 1
+   * @max 100
+   * @default 20
+   */
+  pageSize?: number
+  /** @maxLength 100 */
+  search?: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId?: string
+}
+
 export interface ListLibrariesParams {
   organizationSlug: string
   /**
@@ -1161,12 +1337,52 @@ export interface ListLibrariesParams {
   search?: string
 }
 
+export interface ListLibraryApiLeadsParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  /**
+   * @min 1
+   * @max 9007199254740991
+   * @default 1
+   */
+  page?: number
+  /**
+   * @min 1
+   * @max 100
+   * @default 20
+   */
+  pageSize?: number
+  /** @maxLength 100 */
+  search?: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId?: string
+}
+
 export interface ListLibraryApiPlaylistsParams {
   /**
    * @format uuid
    * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
    */
   libraryId: string
+}
+
+export interface ListLibraryApiVideoCtasParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
 }
 
 export interface ListLibraryApiVideosParams {
@@ -1264,6 +1480,20 @@ export interface ListStoragesParams {
   pageSize?: number
   /** @maxLength 100 */
   search?: string
+}
+
+export interface ListVideoCtasParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  organizationSlug: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
 }
 
 export interface ListVideosParams {
@@ -1660,6 +1890,8 @@ export interface PlaylistEmbedSuccessResponse {
 
 export interface PlaylistEmbedVideo {
   chapters: VideoChapter[]
+  /** @format uri */
+  ctasUrl: string
   description: string | null
   /** @min 0 */
   durationSeconds: number
@@ -1828,6 +2060,29 @@ export interface RemoveOrganizationMemberParams {
    */
   membershipId: string
   organizationSlug: string
+}
+
+export interface ReportVideoCtaEventParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  ctaId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  viewId: string
 }
 
 export interface ReportVideoViewProgressParams {
@@ -2139,6 +2394,29 @@ export interface StreamLibraryApiVideoParams {
   videoId: string
 }
 
+export interface SubmitVideoCtaLeadParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  ctaId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  viewId: string
+}
+
 export interface SuggestOrganizationSlugParams {
   /**
    * @minLength 1
@@ -2205,6 +2483,24 @@ export interface UpdateLibraryApiPlaylistVideosParams {
 }
 
 export interface UpdateLibraryApiVideoChaptersParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+}
+
+export interface UpdateLibraryApiVideoCtaParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  ctaId: string
   /**
    * @format uuid
    * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
@@ -2343,6 +2639,25 @@ export interface UpdateVideoChaptersParams {
   videoId: string
 }
 
+export interface UpdateVideoCtaParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  ctaId: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  organizationSlug: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+}
+
 export interface UpdateVideoParams {
   /**
    * @format uuid
@@ -2446,6 +2761,7 @@ export interface Video {
 
 export interface VideoAnalytics {
   chapters: ChapterAnalytics[]
+  ctas: CtaAnalytics[]
   daily: AnalyticsDay[]
   devices: AnalyticsDevice[]
   embeddingHosts: AnalyticsEmbeddingHost[]
@@ -2499,9 +2815,136 @@ export interface VideoCreateBody {
   title?: string
 }
 
+export interface VideoCta {
+  body: string | null
+  buttonLabel: string
+  buttonUrl: string | null
+  consentText: string | null
+  /**
+   * @format date-time
+   * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+   */
+  createdAt: string
+  dismissible: boolean
+  durationSeconds: number | null
+  endSeconds: number | null
+  heading: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  id: string
+  kind: VideoCtaKind
+  placement: VideoCtaPlacement
+  startSeconds: number | null
+  timing: VideoCtaTiming
+  /**
+   * @format date-time
+   * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+   */
+  updatedAt: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+}
+
+export interface VideoCtaBody {
+  body: string | null
+  /**
+   * @minLength 1
+   * @maxLength 30
+   */
+  buttonLabel: string
+  buttonUrl: string | null
+  consentText: string | null
+  dismissible: boolean
+  durationSeconds?: number | null
+  endSeconds: number | null
+  /**
+   * @minLength 1
+   * @maxLength 80
+   */
+  heading: string
+  kind: "button" | "email"
+  placement: "overlay" | "end_screen"
+  startSeconds: number | null
+  /** @default "fixed" */
+  timing?: "fixed" | "random"
+}
+
+export interface VideoCtaEventBody {
+  type: "shown" | "clicked" | "dismissed"
+}
+
+export type VideoCtaKind = "button" | "email"
+
+export interface VideoCtaLead {
+  consentText: string
+  /**
+   * @format date-time
+   * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+   */
+  consentedAt: string
+  ctaHeading: string
+  ctaId: string | null
+  email: string
+  embeddingHost: string | null
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  id: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  videoId: string | null
+  videoTitle: string
+}
+
+export interface VideoCtaLeadBody {
+  consent: true
+  /** @maxLength 254 */
+  email: string
+}
+
+export interface VideoCtaLeadPageSuccessResponse {
+  code: string
+  data: {
+    leads: VideoCtaLead[]
+    pagination: Pagination
+  }
+  message: string
+}
+
+export interface VideoCtaListSuccessResponse {
+  code: string
+  data: {
+    ctas: VideoCta[]
+  }
+  message: string
+}
+
+export type VideoCtaPlacement = "overlay" | "end_screen"
+
+export interface VideoCtaSuccessResponse {
+  code: string
+  data: {
+    cta: VideoCta
+  }
+  message: string
+}
+
+export type VideoCtaTiming = "fixed" | "random"
+
 export interface VideoEmbed {
   allowedPlaybackHosts: string[]
   chapters: VideoChapter[]
+  /** @format uri */
+  ctasUrl: string
   description: string | null
   /** @min 0 */
   durationSeconds: number
@@ -2530,6 +2973,34 @@ export interface VideoEmbed {
    * @max 9007199254740991
    */
   width: number
+}
+
+export interface VideoEmbedCta {
+  body: string | null
+  buttonLabel: string
+  buttonUrl: string | null
+  consentText: string | null
+  dismissible: boolean
+  durationSeconds: number | null
+  endSeconds: number | null
+  heading: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  id: string
+  kind: VideoCtaKind
+  placement: VideoCtaPlacement
+  startSeconds: number | null
+  timing: VideoCtaTiming
+}
+
+export interface VideoEmbedCtaListSuccessResponse {
+  code: string
+  data: {
+    ctas: VideoEmbedCta[]
+  }
+  message: string
 }
 
 export interface VideoEmbedSuccessResponse {
@@ -2773,7 +3244,7 @@ export interface WebhookEmptySuccessResponse {
 }
 
 export interface WebhookEvent {
-  data: VideoStatusDetails | WebhookTestEventData
+  data: VideoStatusDetails | VideoCtaLead | WebhookTestEventData
   /**
    * @format uuid
    * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
@@ -2797,6 +3268,7 @@ export type WebhookEventType =
   | "video.processing.started"
   | "video.processing.ready"
   | "video.processing.failed"
+  | "video.cta.submitted"
   | "webhook.test"
 
 export interface WebhookTestEventData {
@@ -4588,6 +5060,146 @@ export class OpenStreamApi<
         format: "json",
         ...params,
       }),
+
+    /**
+     * No description
+     *
+     * @tags Libraries
+     * @name ListVideoCtas
+     * @summary List a video's calls to action: overlays by when they appear, then the end screen
+     * @request GET:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/videos/{videoId}/ctas
+     */
+    listVideoCtas: (
+      { organizationSlug, libraryId, videoId }: ListVideoCtasParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<VideoCtaListSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/videos/${videoId}/ctas`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Libraries
+     * @name CreateVideoCta
+     * @summary Add a call to action to a processed video: a button or an email form, as an overlay or the end screen
+     * @request POST:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/videos/{videoId}/ctas
+     */
+    createVideoCta: (
+      { organizationSlug, libraryId, videoId }: CreateVideoCtaParams,
+      data: VideoCtaBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<VideoCtaSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/videos/${videoId}/ctas`,
+        method: "POST",
+        body: data,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Libraries
+     * @name UpdateVideoCta
+     * @summary Replace a call to action's fields; its view counts and leads stay with it
+     * @request PUT:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/videos/{videoId}/ctas/{ctaId}
+     */
+    updateVideoCta: (
+      { organizationSlug, libraryId, videoId, ctaId }: UpdateVideoCtaParams,
+      data: VideoCtaBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<VideoCtaSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/videos/${videoId}/ctas/${ctaId}`,
+        method: "PUT",
+        body: data,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Libraries
+     * @name DeleteVideoCta
+     * @summary Delete a call to action and its view counts; leads left in it stay
+     * @request DELETE:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/videos/{videoId}/ctas/{ctaId}
+     */
+    deleteVideoCta: (
+      { organizationSlug, libraryId, videoId, ctaId }: DeleteVideoCtaParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<LibraryEmptySuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/videos/${videoId}/ctas/${ctaId}`,
+        method: "DELETE",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Libraries
+     * @name ListLeads
+     * @summary List the email addresses viewers left in the library's calls to action, newest first
+     * @request GET:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/leads
+     */
+    listLeads: (
+      { organizationSlug, libraryId, ...query }: ListLeadsParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<VideoCtaLeadPageSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/leads`,
+        method: "GET",
+        query: query,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Libraries
+     * @name ExportLeads
+     * @summary Download the library's leads, or one video's, as a CSV file; the export is recorded in the activity log
+     * @request GET:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/leads/export
+     */
+    exportLeads: (
+      { organizationSlug, libraryId, ...query }: ExportLeadsParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<File, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/leads/export`,
+        method: "GET",
+        query: query,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Libraries
+     * @name DeleteLead
+     * @summary Delete a lead for good; the activity log keeps no email address
+     * @request DELETE:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/leads/{leadId}
+     */
+    deleteLead: (
+      { organizationSlug, libraryId, leadId }: DeleteLeadParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<LibraryEmptySuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/leads/${leadId}`,
+        method: "DELETE",
+        format: "json",
+        ...params,
+      }),
   }
   analytics = {
     /**
@@ -4819,6 +5431,70 @@ export class OpenStreamApi<
         path: `/api/v1/libraries/${libraryId}/playlists/${playlistId}/embed`,
         method: "GET",
         query: query,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Library API
+     * @name GetLibraryApiVideoEmbedCtas
+     * @summary Read the calls to action the player shows; signed libraries need `key`, `expires` and `token`
+     * @request GET:/api/v1/libraries/{libraryId}/videos/{videoId}/embed/ctas
+     */
+    getLibraryApiVideoEmbedCtas: (
+      { libraryId, videoId, ...query }: GetLibraryApiVideoEmbedCtasParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<VideoEmbedCtaListSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/videos/${videoId}/embed/ctas`,
+        method: "GET",
+        query: query,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Library API
+     * @name ReportVideoCtaEvent
+     * @summary Report that the view showed, clicked or dismissed a call to action; each counts once per view
+     * @request POST:/api/v1/libraries/{libraryId}/videos/{videoId}/views/{viewId}/ctas/{ctaId}/events
+     */
+    reportVideoCtaEvent: (
+      { libraryId, videoId, viewId, ctaId }: ReportVideoCtaEventParams,
+      data: VideoCtaEventBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<LibraryEmptySuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/videos/${videoId}/views/${viewId}/ctas/${ctaId}/events`,
+        method: "POST",
+        body: data,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Library API
+     * @name SubmitVideoCtaLead
+     * @summary Leave an email address in an email form, with the consent checkbox ticked; once per view
+     * @request POST:/api/v1/libraries/{libraryId}/videos/{videoId}/views/{viewId}/ctas/{ctaId}/leads
+     */
+    submitVideoCtaLead: (
+      { libraryId, videoId, viewId, ctaId }: SubmitVideoCtaLeadParams,
+      data: VideoCtaLeadBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<LibraryEmptySuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/videos/${videoId}/views/${viewId}/ctas/${ctaId}/leads`,
+        method: "POST",
+        body: data,
+        type: "application/json",
         format: "json",
         ...params,
       }),
@@ -5296,6 +5972,118 @@ export class OpenStreamApi<
         body: data,
         secure: true,
         type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Needs the `videos:read` scope.
+     *
+     * @tags Library API
+     * @name ListLibraryApiVideoCtas
+     * @summary List a video's calls to action: overlays by when they appear, then the end screen
+     * @request GET:/api/v1/libraries/{libraryId}/videos/{videoId}/ctas
+     * @secure
+     */
+    listLibraryApiVideoCtas: (
+      { libraryId, videoId }: ListLibraryApiVideoCtasParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<VideoCtaListSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/videos/${videoId}/ctas`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Needs the `videos:manage` scope.
+     *
+     * @tags Library API
+     * @name CreateLibraryApiVideoCta
+     * @summary Add a call to action to a processed video: a button or an email form, as an overlay or the end screen
+     * @request POST:/api/v1/libraries/{libraryId}/videos/{videoId}/ctas
+     * @secure
+     */
+    createLibraryApiVideoCta: (
+      { libraryId, videoId }: CreateLibraryApiVideoCtaParams,
+      data: VideoCtaBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<VideoCtaSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/videos/${videoId}/ctas`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Needs the `videos:manage` scope.
+     *
+     * @tags Library API
+     * @name UpdateLibraryApiVideoCta
+     * @summary Replace a call to action's fields; its view counts and leads stay with it
+     * @request PUT:/api/v1/libraries/{libraryId}/videos/{videoId}/ctas/{ctaId}
+     * @secure
+     */
+    updateLibraryApiVideoCta: (
+      { libraryId, videoId, ctaId }: UpdateLibraryApiVideoCtaParams,
+      data: VideoCtaBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<VideoCtaSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/videos/${videoId}/ctas/${ctaId}`,
+        method: "PUT",
+        body: data,
+        secure: true,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Needs the `videos:manage` scope.
+     *
+     * @tags Library API
+     * @name DeleteLibraryApiVideoCta
+     * @summary Delete a call to action and its view counts; leads left in it stay
+     * @request DELETE:/api/v1/libraries/{libraryId}/videos/{videoId}/ctas/{ctaId}
+     * @secure
+     */
+    deleteLibraryApiVideoCta: (
+      { libraryId, videoId, ctaId }: DeleteLibraryApiVideoCtaParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<LibraryEmptySuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/videos/${videoId}/ctas/${ctaId}`,
+        method: "DELETE",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Needs the `leads:read` scope.
+     *
+     * @tags Library API
+     * @name ListLibraryApiLeads
+     * @summary List the email addresses viewers left in the library's calls to action, newest first
+     * @request GET:/api/v1/libraries/{libraryId}/leads
+     * @secure
+     */
+    listLibraryApiLeads: (
+      { libraryId, ...query }: ListLibraryApiLeadsParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<VideoCtaLeadPageSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/libraries/${libraryId}/leads`,
+        method: "GET",
+        query: query,
+        secure: true,
         format: "json",
         ...params,
       }),

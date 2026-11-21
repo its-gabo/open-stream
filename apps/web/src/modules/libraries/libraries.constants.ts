@@ -51,6 +51,11 @@ export const LIBRARY_TABS = [
     isOwnerOnly: false,
   },
   {
+    suffix: "leads",
+    labelKey: "libraries.tabs.leads",
+    isOwnerOnly: false,
+  },
+  {
     suffix: "storage",
     labelKey: "libraries.tabs.storage",
     isOwnerOnly: true,
@@ -86,6 +91,7 @@ export const LIBRARY_API_KEY_SCOPE_TRANSLATION_KEYS = {
   [LIBRARY_API_KEY_SCOPES.VIDEOS_MANAGE]: "videos_manage",
   [LIBRARY_API_KEY_SCOPES.PLAYBACK_SIGN]: "playback_sign",
   [LIBRARY_API_KEY_SCOPES.ANALYTICS_READ]: "analytics_read",
+  [LIBRARY_API_KEY_SCOPES.LEADS_READ]: "leads_read",
 } as const satisfies Record<LibraryApiKeyScope, string>
 
 /** Common scope sets offered when creating a key. */
@@ -108,6 +114,7 @@ export const WEBHOOK_EVENT_TYPE_TRANSLATION_KEYS = {
   [WEBHOOK_EVENT_TYPES.VIDEO_PROCESSING_STARTED]: "video_processing_started",
   [WEBHOOK_EVENT_TYPES.VIDEO_PROCESSING_READY]: "video_processing_ready",
   [WEBHOOK_EVENT_TYPES.VIDEO_PROCESSING_FAILED]: "video_processing_failed",
+  [WEBHOOK_EVENT_TYPES.VIDEO_CTA_SUBMITTED]: "video_cta_submitted",
   [WEBHOOK_EVENT_TYPES.WEBHOOK_TEST]: "webhook_test",
 } as const satisfies Record<WebhookEventType, string>
 
@@ -137,6 +144,7 @@ export const WEBHOOK_EVENT_GROUPS = [
       WEBHOOK_EVENT_TYPES.VIDEO_PROCESSING_FAILED,
     ],
   },
+  { key: "leads", events: [WEBHOOK_EVENT_TYPES.VIDEO_CTA_SUBMITTED] },
   { key: "testing", events: [WEBHOOK_EVENT_TYPES.WEBHOOK_TEST] },
 ] as const satisfies ReadonlyArray<{
   key: string
@@ -215,6 +223,7 @@ export const VIDEO_DETAILS_TABS = {
   DETAILS: "details",
   THUMBNAIL: "thumbnail",
   CHAPTERS: "chapters",
+  CTAS: "ctas",
   ANALYTICS: "analytics",
   EMBED: "embed",
 } as const
@@ -237,6 +246,17 @@ export const PLAYER_VOLUME_STEP = 0.1
 
 /** Seconds the player counts down at the end of a playlist video before the next one starts. */
 export const PLAYER_UP_NEXT_COUNTDOWN_SECONDS = 5
+
+/** How long a new random call to action shows, until its author picks otherwise. */
+export const DEFAULT_RANDOM_CTA_SECONDS = 10
+
+/** Where an email form over the player is with the address the viewer typed. */
+export const PLAYER_CTA_FORM_STATES = {
+  IDLE: "idle",
+  SENDING: "sending",
+  SENT: "sent",
+  FAILED: "failed",
+} as const
 
 /** The controls hide after this long without the pointer moving while the video plays. */
 export const PLAYER_CONTROLS_HIDE_DELAY_MS = 2500

@@ -131,16 +131,18 @@ export const PLAYBACK_URL_TTL_SECONDS = {
 
 /** What a library API key may do; each key holds any combination. */
 export const LIBRARY_API_KEY_SCOPES = {
-  /** List and read videos and playlists. */
+  /** List and read videos, their calls to action, and playlists. */
   VIDEOS_READ: "videos:read",
   /** Create videos and upload their files with tus. */
   VIDEOS_UPLOAD: "videos:upload",
-  /** Rename and delete videos, change their posters and chapters, and manage playlists. */
+  /** Rename and delete videos, change their posters, chapters and calls to action, and manage playlists. */
   VIDEOS_MANAGE: "videos:manage",
   /** Sign playback URLs. */
   PLAYBACK_SIGN: "playback:sign",
   /** Read view counts and watch time. */
   ANALYTICS_READ: "analytics:read",
+  /** Read the email addresses viewers left in calls to action. */
+  LEADS_READ: "leads:read",
 } as const
 
 export const LIBRARY_API_KEY_LIMITS = {

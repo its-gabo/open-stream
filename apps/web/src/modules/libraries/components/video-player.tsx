@@ -18,8 +18,10 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { P, match } from "ts-pattern"
 
+import { useCtaReporting } from "../hooks/use-cta-reporting"
 import { useHlsPlayback } from "../hooks/use-hls-playback"
 import { useMediaState } from "../hooks/use-media-state"
+import { usePlayerCtas } from "../hooks/use-player-ctas"
 import { useStoryboard } from "../hooks/use-storyboard"
 import { useViewReporting } from "../hooks/use-view-reporting"
 import {
@@ -35,6 +37,7 @@ import {
 } from "../libraries.utils"
 import { PlayerButton } from "./player-button"
 import { PlayerChaptersMenu } from "./player-chapters-menu"
+import { PlayerCtaCard } from "./player-cta-card"
 import { PlayerEpisodesMenu } from "./player-episodes-menu"
 import { PlayerNextEpisodeButton } from "./player-next-episode-button"
 import { PlayerSettingsMenu } from "./player-settings-menu"
@@ -42,8 +45,9 @@ import { PlayerSlider } from "./player-slider"
 import { PlayerUpNext } from "./player-up-next"
 import { StoryboardTile } from "./storyboard-tile"
 
-import type { VideoChapter } from "@workspace/shared"
+import { VIDEO_CTA_EVENT_TYPES, type VideoChapter } from "@workspace/shared"
 import type { CSSProperties } from "react"
+import type { VideoEmbedCta } from "@/api/generated-api"
 import type { PlayerControlsSettings, PlayerPlaylist } from "../libraries.types"
 
 type VideoPlayerProps = {
@@ -69,6 +73,8 @@ type VideoPlayerProps = {
   viewsUrl?: string
   /** Shown on the seek bar and in a chapter menu, unless the controls turn them off. */
   chapters?: VideoChapter[]
+  /** Shown over the video at their times; with `viewsUrl`, what viewers do with them is reported. */
+  ctas?: VideoEmbedCta[]
   /** The library's accent color and controls; the stock player when left out. */
   controls?: PlayerControlsSettings
   /** Told where playback is whenever it moves, e.g. to pick the frame shown. */
@@ -97,6 +103,7 @@ export function VideoPlayer({
   autoFocus = true,
   viewsUrl,
   chapters = [],
+  ctas = [],
   controls = DEFAULT_LIBRARY_PLAYER_SETTINGS,
   onTimeUpdate,
   playlist,
@@ -110,7 +117,8 @@ export function VideoPlayer({
     autoPlay,
   })
   const media = useMediaState(videoRef)
-  useViewReporting(videoRef, viewsUrl)
+  const viewId = useViewReporting(videoRef, viewsUrl)
+  const { reportCtaEvent, submitLead } = useCtaReporting(viewsUrl, viewId)
   const storyboard = useStoryboard(storyboardUrl, { sendsCredentials })
   const [usesOwnControls] = useState(() => Hls.isSupported())
   const [isSupported] = useState(
@@ -138,6 +146,19 @@ export function VideoPlayer({
   const nextEpisode =
     nextEpisodeIndex !== null ? playlist?.episodes[nextEpisodeIndex] : undefined
   const currentTime = media?.currentTime ?? 0
+  const reportCtaShown = useCallback(
+    (ctaId: string) =>
+      reportCtaEvent({ ctaId, type: VIDEO_CTA_EVENT_TYPES.SHOWN }),
+    [reportCtaEvent]
+  )
+  const playerCtas = usePlayerCtas({
+    src,
+    ctas,
+    currentSeconds: currentTime,
+    hasStarted: media?.hasStarted ?? false,
+    isEnded: media?.isEnded ?? false,
+    onShown: reportCtaShown,
+  })
 
   useEffect(() => {
     onTimeUpdate?.(currentTime)
@@ -372,15 +393,43 @@ export function VideoPlayer({
         </button>
       )}
 
-      {nextEpisode && media?.isEnded && upNextDismissedSrc !== src && (
-        <PlayerUpNext
-          key={src}
-          episode={nextEpisode}
-          autoplay={playlist?.autoplayNext ?? false}
-          onPlay={playNextEpisode}
-          onDismiss={() => setUpNextDismissedSrc(src)}
-        />
+      {[playerCtas.overlay, playerCtas.endScreen].map(
+        (cta) =>
+          cta && (
+            <PlayerCtaCard
+              key={cta.id}
+              cta={cta}
+              onSubmitLead={submitLead && ((body) => submitLead(cta.id, body))}
+              onClickButton={() =>
+                reportCtaEvent({
+                  ctaId: cta.id,
+                  type: VIDEO_CTA_EVENT_TYPES.CLICKED,
+                })
+              }
+              onDismiss={() =>
+                reportCtaEvent({
+                  ctaId: cta.id,
+                  type: VIDEO_CTA_EVENT_TYPES.DISMISSED,
+                })
+              }
+              onClose={() => playerCtas.close(cta.id)}
+            />
+          )
       )}
+
+      {/* An end screen holds the next episode back until the viewer closes it. */}
+      {nextEpisode &&
+        media?.isEnded &&
+        !playerCtas.endScreen &&
+        upNextDismissedSrc !== src && (
+          <PlayerUpNext
+            key={src}
+            episode={nextEpisode}
+            autoplay={playlist?.autoplayNext ?? false}
+            onPlay={playNextEpisode}
+            onDismiss={() => setUpNextDismissedSrc(src)}
+          />
+        )}
 
       <div
         className={cn(

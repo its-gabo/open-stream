@@ -1,8 +1,12 @@
 import {
   LIBRARY_API_KEY_SCOPES,
   VIEWER_DEVICE_TYPES,
+  VIDEO_CTA_KINDS,
+  VIDEO_CTA_PLACEMENTS,
+  VIDEO_CTA_TIMINGS,
   type LibraryPlayerSettings,
   type VideoChapter,
+  type VideoCtaInput,
 } from "@workspace/shared"
 
 /** Every seeded account signs in with this password. */
@@ -32,6 +36,8 @@ export type SeedVideo = {
   /** Views spread over the last `SEED_VIEW_DAYS` days, if it plays. */
   viewCount: number
   chapters?: VideoChapter[]
+  /** Shown to the seeded views that got far enough, some of which answered or closed them. */
+  ctas?: VideoCtaInput[]
 }
 
 /**
@@ -76,6 +82,37 @@ export const SEED_LIBRARIES: SeedLibrary[] = [
           { title: "Introduction", startSeconds: 0 },
           { title: "Your libraries", startSeconds: 5 },
           { title: "Analytics", startSeconds: 12 },
+        ],
+        ctas: [
+          {
+            kind: VIDEO_CTA_KINDS.BUTTON,
+            placement: VIDEO_CTA_PLACEMENTS.OVERLAY,
+            startSeconds: 12,
+            endSeconds: 19,
+            timing: VIDEO_CTA_TIMINGS.FIXED,
+            durationSeconds: null,
+            heading: "Try OpenStream free",
+            body: "Host your first videos in minutes. No card needed.",
+            buttonLabel: "Start free trial",
+            buttonUrl: "https://example.com/signup",
+            consentText: null,
+            dismissible: true,
+          },
+          {
+            kind: VIDEO_CTA_KINDS.EMAIL,
+            placement: VIDEO_CTA_PLACEMENTS.END_SCREEN,
+            startSeconds: null,
+            endSeconds: null,
+            timing: VIDEO_CTA_TIMINGS.FIXED,
+            durationSeconds: null,
+            heading: "Get product updates",
+            body: "One email a month about what's new in OpenStream.",
+            buttonLabel: "Keep me posted",
+            buttonUrl: null,
+            consentText:
+              "I agree to receive product emails from Acme Media. I can unsubscribe at any time.",
+            dismissible: true,
+          },
         ],
       },
       {
@@ -150,6 +187,23 @@ export const SEED_LIBRARIES: SeedLibrary[] = [
           { title: "Your first upload", startSeconds: 18 },
           { title: "Wrap-up", startSeconds: 25 },
         ],
+        ctas: [
+          {
+            kind: VIDEO_CTA_KINDS.EMAIL,
+            placement: VIDEO_CTA_PLACEMENTS.END_SCREEN,
+            startSeconds: null,
+            endSeconds: null,
+            timing: VIDEO_CTA_TIMINGS.FIXED,
+            durationSeconds: null,
+            heading: "Get the next lesson by email",
+            body: null,
+            buttonLabel: "Send it to me",
+            buttonUrl: null,
+            consentText:
+              "I agree to receive course emails from Acme Media. I can unsubscribe at any time.",
+            dismissible: true,
+          },
+        ],
       },
       {
         title: "Lesson 2: Uploading videos",
@@ -179,6 +233,10 @@ export const SEED_API_KEY = {
 }
 
 export const SEED_VIEW_DAYS = 30
+
+/** Of the seeded views that showed a call to action, the shares that answered it and that closed it. */
+export const SEED_CTA_ANSWER_SHARE = 0.15
+export const SEED_CTA_DISMISS_SHARE = 0.3
 
 /** Desktop views are the most common, as in most libraries. */
 export const SEED_DEVICE_TYPES = [

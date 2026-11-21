@@ -20,6 +20,9 @@ export const PLAYBACK_QUERY_KEYS = {
   TOKEN: "token",
 } as const
 
+/** Below a video's library API URL: the calls to action its player shows. */
+export const EMBED_CTAS_PATH = "embed/ctas"
+
 /** Below a video's library API URL: its chapters as WebVTT, made from the video's chapters rather than stored. */
 export const CHAPTERS_TRACK_PATH = "chapters.vtt"
 

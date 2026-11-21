@@ -98,6 +98,7 @@ describe("Video embeds (e2e)", () => {
       posterUrl: `${filesUrl}/thumbnails/poster.jpg`,
       storyboardUrl: `${filesUrl}/thumbnails/storyboard.vtt`,
       viewsUrl: `${filesUrl}/views`,
+      ctasUrl: `${filesUrl}/embed/ctas`,
       chapters: [],
       allowedPlaybackHosts: [],
       player: DEFAULT_LIBRARY_PLAYER_SETTINGS,

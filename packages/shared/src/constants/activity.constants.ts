@@ -22,6 +22,7 @@ export const ACTIVITY_RESOURCE_TYPES = {
   WEBHOOK: "webhook",
   VIDEO: "video",
   PLAYLIST: "playlist",
+  LEAD: "lead",
 } as const
 
 /** Everything recorded in an organization's activity log, as `<resource>.<what happened>`. */
@@ -69,6 +70,9 @@ export const ACTIVITY_ACTIONS = {
   VIDEO_UPDATED: "video.updated",
   VIDEO_POSTER_UPDATED: "video.poster_updated",
   VIDEO_CHAPTERS_UPDATED: "video.chapters_updated",
+  VIDEO_CTA_CREATED: "video.cta_created",
+  VIDEO_CTA_UPDATED: "video.cta_updated",
+  VIDEO_CTA_DELETED: "video.cta_deleted",
   VIDEO_DELETED: "video.deleted",
   VIDEO_UPLOADED: "video.uploaded",
   VIDEO_UPLOAD_CANCELED: "video.upload_canceled",
@@ -78,6 +82,9 @@ export const ACTIVITY_ACTIONS = {
   PLAYLIST_UPDATED: "playlist.updated",
   PLAYLIST_VIDEOS_UPDATED: "playlist.videos_updated",
   PLAYLIST_DELETED: "playlist.deleted",
+  /** The lead's email address is not recorded, so deleting it leaves none behind. */
+  LEAD_DELETED: "lead.deleted",
+  LIBRARY_LEADS_EXPORTED: "library.leads_exported",
 } as const
 
 export const ACTIVITY_LIMITS = {

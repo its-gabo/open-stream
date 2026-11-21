@@ -13,6 +13,8 @@ export const VIDEO_EMBED_QUERY_KEYS = {
   START: "t",
   /** `0` hides the video's title over the player. */
   TITLE: "title",
+  /** `0` hides the video's calls to action. */
+  CTAS: "ctas",
   /** In a playlist embed, the id of the video to start with. */
   VIDEO: "v",
 } as const

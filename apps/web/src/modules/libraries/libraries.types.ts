@@ -3,6 +3,7 @@ import type { z } from "zod"
 
 import type {
   LOCAL_UPLOAD_STATUSES,
+  PLAYER_CTA_FORM_STATES,
   PLAYLIST_VIDEO_STATES,
   PLAYER_SETTINGS_VIEWS,
   VIDEO_SOURCES,
@@ -17,6 +18,7 @@ import type {
   playlistFormSchema,
   videoChaptersFormSchema,
   videoCreateFormSchema,
+  videoCtaFormSchema,
   videoDetailsFormSchema,
 } from "./libraries.schemas"
 
@@ -44,12 +46,18 @@ export type VideoDetailsFormValues = z.infer<
 >
 export type PlaylistFormValues = z.infer<ReturnType<typeof playlistFormSchema>>
 
+export type VideoCtaFormInput = z.input<ReturnType<typeof videoCtaFormSchema>>
+export type VideoCtaFormValues = z.output<ReturnType<typeof videoCtaFormSchema>>
+
 export type VideoChaptersFormInput = z.input<
   ReturnType<typeof videoChaptersFormSchema>
 >
 export type VideoChaptersFormValues = z.output<
   ReturnType<typeof videoChaptersFormSchema>
 >
+
+export type PlayerCtaFormState =
+  (typeof PLAYER_CTA_FORM_STATES)[keyof typeof PLAYER_CTA_FORM_STATES]
 
 export type VideoSource = (typeof VIDEO_SOURCES)[keyof typeof VIDEO_SOURCES]
 

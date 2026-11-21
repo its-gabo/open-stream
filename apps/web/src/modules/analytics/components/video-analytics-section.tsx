@@ -7,6 +7,7 @@ import { AnalyticsCard } from "./analytics-card"
 import { AnalyticsPeriodTabs } from "./analytics-period-tabs"
 import { AnalyticsStatTiles } from "./analytics-stat-tiles"
 import { ChapterBreakdown } from "./chapter-breakdown"
+import { CtaBreakdown } from "./cta-breakdown"
 import { RetentionChart } from "./retention-chart"
 
 import type { AnalyticsPeriodDays } from "@workspace/shared"
@@ -59,6 +60,9 @@ export function VideoAnalyticsSection({
                   chapters={analytics.chapters}
                   startedViews={analytics.retention[0]?.views ?? 0}
                 />
+              )}
+              {analytics.ctas.length > 0 && (
+                <CtaBreakdown ctas={analytics.ctas} />
               )}
             </>
           ) : (

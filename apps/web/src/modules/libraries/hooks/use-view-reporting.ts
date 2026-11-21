@@ -1,7 +1,8 @@
 import { PLAYBACK_HOST_PATTERN } from "@workspace/shared"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 
 import { VIEW_REPORT_MAX_STEP_SECONDS } from "../libraries.constants"
+import { postViewReport, toViewUrl } from "../libraries.utils"
 
 import type { RefObject } from "react"
 import type { VideoView, VideoViewProgressBody } from "@/api/generated-api"
@@ -14,26 +15,6 @@ function readEmbeddingHost() {
 
   return host && PLAYBACK_HOST_PATTERN.test(host) ? host : null
 }
-
-const toProgressUrl = (viewsUrl: string, viewId: string) => {
-  const url = new URL(viewsUrl)
-
-  url.pathname = `${url.pathname}/${viewId}/progress`
-  url.search = ""
-
-  return url.toString()
-}
-
-/** `keepalive` lets a request out while the page unloads; views are anonymous, so no cookies. */
-const postJson = (url: string, body: unknown, signal?: AbortSignal) =>
-  fetch(url, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(body),
-    keepalive: true,
-    credentials: "omit",
-    signal,
-  })
 
 /**
  * Follows what a viewer actually played: the seconds played and the furthest
@@ -86,7 +67,8 @@ function createPlaybackTracker(video: HTMLVideoElement) {
 /** One view on the API: started when playback starts, then reported to until it finishes. */
 function createViewSession(
   viewsUrl: string,
-  tracker: ReturnType<typeof createPlaybackTracker>
+  tracker: ReturnType<typeof createPlaybackTracker>,
+  onStarted: (viewId: string) => void
 ) {
   let view: VideoView | null = null
   let starting: AbortController | null = null
@@ -97,7 +79,10 @@ function createViewSession(
 
     if (!view || !progress) return
 
-    void postJson(toProgressUrl(viewsUrl, view.id), progress).catch(() => {})
+    void postViewReport(
+      toViewUrl(viewsUrl, view.id, "progress"),
+      progress
+    ).catch(() => {})
   }
 
   const start = async () => {
@@ -108,7 +93,7 @@ function createViewSession(
     starting = controller
 
     try {
-      const response = await postJson(
+      const response = await postViewReport(
         viewsUrl,
         { embeddingHost: readEmbeddingHost() },
         controller.signal
@@ -117,6 +102,7 @@ function createViewSession(
       if (!response.ok) return
 
       view = (await response.json()).data.view as VideoView
+      onStarted(view.id)
       reportTimer = setInterval(report, view.reportIntervalSeconds * 1000)
     } catch {
       // Counting is best effort, and a view finished while starting is aborted.
@@ -143,18 +129,28 @@ function createViewSession(
  * then its progress is reported regularly, when playback pauses and when the
  * page is hidden or left. A view finishes at the end of the video, so a
  * replay counts again. Does nothing without `viewsUrl`.
+ *
+ * Returns the id of the latest view, which stays after it finishes, e.g. for
+ * what the viewer does on the end screen; null until one starts.
  */
 export function useViewReporting(
   videoRef: RefObject<HTMLVideoElement | null>,
   viewsUrl: string | undefined
 ) {
+  const [latestView, setLatestView] = useState<{
+    viewsUrl: string
+    id: string
+  } | null>(null)
+
   useEffect(() => {
     const video = videoRef.current
 
     if (!video || !viewsUrl) return
 
     const tracker = createPlaybackTracker(video)
-    const session = createViewSession(viewsUrl, tracker)
+    const session = createViewSession(viewsUrl, tracker, (id) =>
+      setLatestView({ viewsUrl, id })
+    )
     const finishAtEnd = () => {
       tracker.reachEnd()
       session.finish()
@@ -185,4 +181,7 @@ export function useViewReporting(
       window.removeEventListener("pagehide", session.report)
     }
   }, [videoRef, viewsUrl])
+
+  // A view of another video, e.g. the previous one of a playlist, is not this one's.
+  return latestView && latestView.viewsUrl === viewsUrl ? latestView.id : null
 }

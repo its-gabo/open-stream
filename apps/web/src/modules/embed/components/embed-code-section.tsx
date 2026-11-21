@@ -4,6 +4,7 @@ import { Label } from "@workspace/ui/components/label"
 import { Switch } from "@workspace/ui/components/switch"
 import { useId, useState } from "react"
 import { useTranslation } from "react-i18next"
+import { match } from "ts-pattern"
 
 import { EMBED_OPTION_KEYS } from "../embed.constants"
 import { buildEmbedCode, buildEmbedUrl } from "../embed.utils"
@@ -31,6 +32,7 @@ const DEFAULT_OPTIONS: EmbedCodeOptions = {
   loop: false,
   startSeconds: 0,
   showTitle: null,
+  showCtas: true,
 }
 
 /** The iframe code for putting a video or playlist on another site, with the player's options. */
@@ -69,12 +71,21 @@ export function EmbedCodeSection({
       // Its starting state is the library's, so it waits for that.
       isDisabled: libraryShowsTitle === undefined,
     },
+    {
+      key: VIDEO_EMBED_QUERY_KEYS.CTAS,
+      checked: options.showCtas,
+      isDisabled: false,
+    },
   ]
   const updateOption = (key: (typeof switches)[number]["key"], on: boolean) =>
     setOptions((current) =>
-      key === VIDEO_EMBED_QUERY_KEYS.TITLE
-        ? { ...current, showTitle: on }
-        : { ...current, [key]: on }
+      match(key)
+        .with(VIDEO_EMBED_QUERY_KEYS.TITLE, () => ({
+          ...current,
+          showTitle: on,
+        }))
+        .with(VIDEO_EMBED_QUERY_KEYS.CTAS, () => ({ ...current, showCtas: on }))
+        .otherwise(() => ({ ...current, [key]: on }))
     )
 
   return (

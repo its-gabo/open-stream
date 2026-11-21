@@ -412,3 +412,38 @@ export const toPlaylistVideoState = (
       () => PLAYLIST_VIDEO_STATES.FAILED
     )
     .otherwise(() => PLAYLIST_VIDEO_STATES.WAITING)
+
+/** A URL below one view of `viewsUrl`, e.g. `progress`; the view's id is all it needs, so the signature is left off. */
+export const toViewUrl = (viewsUrl: string, viewId: string, path: string) => {
+  const url = new URL(viewsUrl)
+
+  url.pathname = `${url.pathname}/${viewId}/${path}`
+  url.search = ""
+
+  return url.toString()
+}
+
+/** `keepalive` lets a request out while the page unloads; views are anonymous, so no cookies. */
+export const postViewReport = (
+  url: string,
+  body: unknown,
+  signal?: AbortSignal
+) =>
+  fetch(url, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body),
+    keepalive: true,
+    credentials: "omit",
+    signal,
+  })
+
+/** Downloads the library's leads as CSV; a plain link sends the session cookie, which the export needs. */
+export const buildLeadsExportUrl = (
+  organizationSlug: string,
+  libraryId: string
+) =>
+  new URL(
+    `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/leads/export`,
+    API_URL || window.location.origin
+  ).toString()

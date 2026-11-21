@@ -27,7 +27,14 @@ export const toEmbedUnavailableReason = (error: unknown) =>
 export function buildEmbedUrl(
   origin: string,
   embedPath: string,
-  { autoplay, muted, loop, startSeconds, showTitle }: EmbedCodeOptions,
+  {
+    autoplay,
+    muted,
+    loop,
+    startSeconds,
+    showTitle,
+    showCtas,
+  }: EmbedCodeOptions,
   libraryShowsTitle: boolean | undefined
 ) {
   const url = new URL(embedPath, origin)
@@ -52,6 +59,8 @@ export function buildEmbedUrl(
   ) {
     url.searchParams.set(VIDEO_EMBED_QUERY_KEYS.TITLE, showTitle ? "1" : "0")
   }
+
+  if (!showCtas) url.searchParams.set(VIDEO_EMBED_QUERY_KEYS.CTAS, "0")
 
   return url.toString()
 }

@@ -1,6 +1,7 @@
 import { createActivityModule } from "./activity/activity.module"
 import { createAnalyticsModule } from "./analytics/analytics.module"
 import { createAuthModule } from "./auth/auth.module"
+import { createCtasModule } from "./ctas/ctas.module"
 import { createLoggingModule } from "./common/logging/logging.module"
 import type { LogSink } from "./common/logging/logging.types"
 import type { AppConfig } from "./config/app.config"
@@ -82,6 +83,12 @@ export function createAppModule(
     activityLogService: activity.activityLogService,
     videoPlaybackService: libraries.videoPlaybackService,
   })
+  const ctas = createCtasModule({
+    db: database.db,
+    activityLogService: activity.activityLogService,
+    videoPlaybackService: libraries.videoPlaybackService,
+    webhookEventsService: webhooks.webhookEventsService,
+  })
   const organizations = createOrganizationsModule({
     db: database.db,
     config,
@@ -107,6 +114,7 @@ export function createAppModule(
     ...libraries,
     ...analytics,
     ...playlists,
+    ...ctas,
     async close() {
       email.emailSenderService.close()
       await database.close()

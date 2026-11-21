@@ -26,4 +26,5 @@ export type EmbedCodeOptions = {
   startSeconds: number
   /** Null follows the library's own title setting. */
   showTitle: boolean | null
+  showCtas: boolean
 }

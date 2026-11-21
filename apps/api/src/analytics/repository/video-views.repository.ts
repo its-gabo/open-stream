@@ -1,8 +1,12 @@
 import { and, count, desc, eq, gt, isNotNull, sql } from "drizzle-orm"
+import type { AnyPgColumn } from "drizzle-orm/pg-core"
+import { videoCtaPlaybackOrder } from "../../ctas/utils/cta-query.utils"
 import type { Database } from "../../db/database.types"
 import {
   type NewVideoViewRecord,
   libraries,
+  videoCtas,
+  videoViewCtas,
   videoViews,
   videos,
 } from "../../db/schema"
@@ -164,6 +168,38 @@ export class VideoViewsRepository {
       .groupBy(videoViews.embeddingHost)
       .orderBy(desc(viewCount), videoViews.embeddingHost)
       .limit(limit)
+  }
+
+  /**
+   * For each of the video's calls to action, in playback order, how many
+   * views showed, clicked, dismissed and answered it.
+   */
+  countCtaViews(filter: VideoViewFilter & { videoId: string }) {
+    const viewsWith = (moment: AnyPgColumn) =>
+      sql<number>`count(*) filter (where ${videoViews.id} is not null and ${moment} is not null)`.mapWith(
+        Number
+      )
+
+    return this.db
+      .select({
+        ctaId: videoCtas.id,
+        heading: videoCtas.heading,
+        kind: videoCtas.kind,
+        placement: videoCtas.placement,
+        shownViews: viewsWith(videoViewCtas.shownAt),
+        clickedViews: viewsWith(videoViewCtas.clickedAt),
+        submittedViews: viewsWith(videoViewCtas.submittedAt),
+        dismissedViews: viewsWith(videoViewCtas.dismissedAt),
+      })
+      .from(videoCtas)
+      .leftJoin(videoViewCtas, eq(videoViewCtas.ctaId, videoCtas.id))
+      .leftJoin(
+        videoViews,
+        and(eq(videoViews.id, videoViewCtas.viewId), videoViewCondition(filter))
+      )
+      .where(eq(videoCtas.videoId, filter.videoId))
+      .groupBy(videoCtas.id)
+      .orderBy(...videoCtaPlaybackOrder)
   }
 
   /** For each position, how many views got at least that far. */

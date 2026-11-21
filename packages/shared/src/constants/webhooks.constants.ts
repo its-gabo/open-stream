@@ -15,6 +15,8 @@ export const WEBHOOK_EVENT_TYPES = {
   /** HLS renditions, poster and storyboard are ready to play. */
   VIDEO_PROCESSING_READY: "video.processing.ready",
   VIDEO_PROCESSING_FAILED: "video.processing.failed",
+  /** A viewer left their email address in a call to action. */
+  VIDEO_CTA_SUBMITTED: "video.cta.submitted",
   /** Sent on request from the library settings, to check the endpoint. */
   WEBHOOK_TEST: "webhook.test",
 } as const

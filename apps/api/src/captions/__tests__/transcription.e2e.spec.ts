@@ -214,6 +214,8 @@ describe("Transcription (e2e)", () => {
         baseUrl: "https://api.openai.com/v1",
         model: "whisper-1",
         apiKeyHint: "abcd",
+        monthlyMinuteLimit: null,
+        usedMinutesThisMonth: 0,
         libraryCount: 0,
         createdAt: expect.any(String),
         updatedAt: expect.any(String),
@@ -557,6 +559,99 @@ describe("Transcription (e2e)", () => {
       expect((await second.json()).code).toBe("video.transcription.in_progress")
     })
 
+    /** Makes a provider with a monthly limit the library's. */
+    const useLimitedProvider = async (monthlyMinuteLimit: number) => {
+      const provider = await createProvider({ monthlyMinuteLimit })
+
+      await ownerClient.put(`${libraryPath}/transcription`, {
+        providerId: provider.id,
+        autoTranscribe: false,
+        language: null,
+      })
+
+      return provider
+    }
+
+    it("refuses a transcription that would pass the provider's monthly minute limit", async () => {
+      const provider = await useLimitedProvider(15)
+      const firstVideoId = await createVideo()
+      const secondVideoId = await createVideo()
+
+      const first = await requestTranscription(firstVideoId)
+      await runTranscriptions()
+      const second = await requestTranscription(secondVideoId)
+      const [listed] = (await (await ownerClient.get(providersPath)).json())
+        .data.providers as TranscriptionProviderDto[]
+
+      await ownerClient.put(`${providersPath}/${provider.id}`, {
+        name: provider.name,
+        baseUrl: provider.baseUrl,
+        model: provider.model,
+        monthlyMinuteLimit: 30,
+      })
+
+      const afterRaise = await requestTranscription(secondVideoId)
+
+      expect(first.status).toBe(202)
+      expect(second.status).toBe(409)
+      expect((await second.json()).code).toBe(
+        "video.transcription.usage_limit_reached"
+      )
+      expect(listed).toMatchObject({
+        monthlyMinuteLimit: 15,
+        usedMinutesThisMonth: 10.5,
+      })
+      expect(afterRaise.status).toBe(202)
+    })
+
+    it("counts only the audio the provider answered for when a transcription fails", async () => {
+      const provider = await useLimitedProvider(15)
+      const refusedVideoId = await createVideo()
+      const halfVideoId = await createVideo()
+      const lastVideoId = await createVideo()
+      const transcriptOfChunk = {
+        status: 200,
+        body: transcriptAnswer("english", [
+          { start: 0, end: 1.5, text: " Hello there." },
+        ]),
+      }
+      const keyRefused = {
+        status: 401,
+        body: { error: { message: "bad key" } },
+      }
+      const usedMinutes = async () =>
+        (
+          (await (await ownerClient.get(providersPath)).json()).data
+            .providers as TranscriptionProviderDto[]
+        ).find(({ id }) => id === provider.id)!.usedMinutesThisMonth
+
+      transcriptionServer.answers = [keyRefused]
+      await requestTranscription(refusedVideoId)
+      await runTranscriptions()
+      const afterRefusal = await usedMinutes()
+
+      // The first chunk is answered, then the key is refused for the second.
+      transcriptionServer.answers = [transcriptOfChunk, keyRefused]
+      transcriptionServer.received.length = 0
+      await requestTranscription(halfVideoId)
+      await testApp.appModule.videoTranscriptionsService.transcribeVideo(
+        {
+          transcriptionId: (
+            await outboxPayloads<TranscribeVideoPayload>(
+              OUTBOX_MESSAGE_TYPES.TRANSCRIBE_VIDEO
+            )
+          ).at(-1)!.transcriptionId,
+        },
+        { isFinalAttempt: true }
+      )
+      const afterHalf = await usedMinutes()
+      const last = await requestTranscription(lastVideoId)
+
+      expect(afterRefusal).toBe(0)
+      expect(afterHalf).toBe(TRANSCRIPTION_AUDIO_CHUNK_SECONDS / 60)
+      expect(last.status).toBe(409)
+    })
+
     it("needs a provider and a video with sound", async () => {
       const videoId = await createVideo()
       const withoutProvider = await requestTranscription(videoId)
@@ -792,6 +887,31 @@ describe("Transcription (e2e)", () => {
         expect.objectContaining({ language: "en", source: "transcription" }),
       ])
       expect(transcriptions).toHaveLength(1)
+    })
+
+    it("records a failed transcription when the provider's monthly limit would be passed", async () => {
+      const provider = await createProvider({ monthlyMinuteLimit: 5 })
+      await ownerClient.put(`${libraryPath}/transcription`, {
+        providerId: provider.id,
+        autoTranscribe: true,
+        language: null,
+      })
+      const videoId = await createVideo()
+
+      await runAutoTranscription()
+      const { transcriptions } = await listVideoCaptions(videoId)
+
+      expect(transcriptions).toEqual([
+        expect.objectContaining({
+          status: "failed",
+          failureReason: "usage_limit_reached",
+        }),
+      ])
+      expect(
+        await outboxPayloads<TranscribeVideoPayload>(
+          OUTBOX_MESSAGE_TYPES.TRANSCRIBE_VIDEO
+        )
+      ).toEqual([])
     })
 
     it("leaves videos alone in libraries that do not ask for it, and silent ones", async () => {

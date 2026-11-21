@@ -143,6 +143,10 @@ export const transcriptionProviderDtoSchema = z
     model: z.string(),
     /** Last characters of the API key; null when it has none. */
     apiKeyHint: z.string().nullable(),
+    /** Minutes of audio it may transcribe each calendar month (UTC); null for no limit. */
+    monthlyMinuteLimit: z.int().positive().nullable(),
+    /** Minutes of audio counted this calendar month (UTC), to a tenth; failed transcriptions do not count. */
+    usedMinutesThisMonth: z.number().nonnegative(),
     /** Libraries transcribing with it; it can be deleted only once none do. */
     libraryCount: z.int().nonnegative(),
     createdAt: z.iso.datetime(),

@@ -45,6 +45,9 @@ export type ActivityAction =
   | "transcription_provider.created"
   | "transcription_provider.updated"
   | "transcription_provider.deleted"
+  | "chapter_generation_provider.created"
+  | "chapter_generation_provider.updated"
+  | "chapter_generation_provider.deleted"
   | "library.created"
   | "library.updated"
   | "library.storage_changed"
@@ -52,6 +55,7 @@ export type ActivityAction =
   | "library.security_updated"
   | "library.player_updated"
   | "library.transcription_updated"
+  | "library.chapter_generation_updated"
   | "api_key.created"
   | "api_key.updated"
   | "api_key.rolled"
@@ -133,6 +137,7 @@ export type ActivityResourceType =
   | "membership"
   | "storage"
   | "transcription_provider"
+  | "chapter_generation_provider"
   | "library"
   | "api_key"
   | "webhook"
@@ -368,6 +373,117 @@ export interface ChapterAnalytics {
   views: number
 }
 
+export interface ChapterGenerationConnectionTest {
+  isAuthorized: boolean
+  isReachable: boolean
+}
+
+export interface ChapterGenerationConnectionTestSuccessResponse {
+  code: string
+  data: {
+    connection: ChapterGenerationConnectionTest
+  }
+  message: string
+}
+
+export interface ChapterGenerationProvider {
+  apiKeyHint: string | null
+  /** @format uri */
+  baseUrl: string
+  /**
+   * @format date-time
+   * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+   */
+  createdAt: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  id: string
+  kind: ChapterGenerationProviderKind
+  /**
+   * @min 0
+   * @max 9007199254740991
+   */
+  libraryCount: number
+  model: string
+  monthlyTokenLimit: number | null
+  name: string
+  /**
+   * @min 0
+   * @max 9007199254740991
+   */
+  tokensUsedThisMonth: number
+  /**
+   * @format date-time
+   * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+   */
+  updatedAt: string
+}
+
+export type ChapterGenerationProviderCreateBody =
+  | {
+      /**
+       * @minLength 1
+       * @maxLength 512
+       */
+      apiKey: string
+      kind: "openai"
+      /** @default null */
+      monthlyTokenLimit?: number | null
+      /**
+       * @minLength 1
+       * @maxLength 80
+       */
+      name: string
+    }
+  | {
+      apiKey: string | null
+      /** @maxLength 2048 */
+      baseUrl: string
+      kind: "openai_compatible"
+      /** @default null */
+      monthlyTokenLimit?: number | null
+      /**
+       * @minLength 1
+       * @maxLength 80
+       */
+      name: string
+    }
+
+export type ChapterGenerationProviderKind = "openai" | "openai_compatible"
+
+export interface ChapterGenerationProviderListSuccessResponse {
+  code: string
+  data: {
+    providers: ChapterGenerationProvider[]
+  }
+  message: string
+}
+
+export interface ChapterGenerationProviderSuccessResponse {
+  code: string
+  data: {
+    provider: ChapterGenerationProvider
+  }
+  message: string
+}
+
+export interface ChapterGenerationProviderUpdateBody {
+  apiKey?: string | null
+  baseUrl?: string | null
+  monthlyTokenLimit?: number | null
+  /**
+   * @minLength 1
+   * @maxLength 80
+   */
+  name: string
+}
+
+export interface CreateChapterGenerationProviderParams {
+  organizationSlug: string
+}
+
 export interface CreateLibraryApiKeyParams {
   /**
    * @format uuid
@@ -513,6 +629,15 @@ export interface DeclineOrganizationInvitationParams {
    * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
    */
   invitationId: string
+}
+
+export interface DeleteChapterGenerationProviderParams {
+  organizationSlug: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  providerId: string
 }
 
 export interface DeleteLeadParams {
@@ -858,6 +983,15 @@ export interface GetLibraryApiVideoStatusParams {
    * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
    */
   videoId: string
+}
+
+export interface GetLibraryChapterGenerationSettingsParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  organizationSlug: string
 }
 
 export interface GetLibraryEncodingParams {
@@ -1221,6 +1355,22 @@ export interface LibraryApiKeyUpdateBody {
   )[]
 }
 
+export interface LibraryChapterGenerationSettings {
+  providerId: string | null
+}
+
+export interface LibraryChapterGenerationSettingsSuccessResponse {
+  code: string
+  data: {
+    chapterGeneration: LibraryChapterGenerationSettings
+  }
+  message: string
+}
+
+export interface LibraryChapterGenerationUpdateBody {
+  providerId: string | null
+}
+
 export interface LibraryCreateBody {
   /**
    * @minLength 1
@@ -1414,6 +1564,10 @@ export interface ListAccountActivityParams {
   pageSize?: number
   /** @maxLength 100 */
   search?: string
+}
+
+export interface ListChapterGenerationProvidersParams {
+  organizationSlug: string
 }
 
 export interface ListLeadsParams {
@@ -2630,6 +2784,29 @@ export interface SuggestOrganizationSlugParams {
   name: string
 }
 
+export interface SuggestVideoChaptersParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  organizationSlug: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  videoId: string
+}
+
+export interface TestChapterGenerationProviderParams {
+  organizationSlug: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  providerId: string
+}
+
 export interface TestSavedStorageConnectionParams {
   organizationSlug: string
   /**
@@ -2686,12 +2863,15 @@ export interface TranscriptionProvider {
    */
   libraryCount: number
   model: string
+  monthlyMinuteLimit: number | null
   name: string
   /**
    * @format date-time
    * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
    */
   updatedAt: string
+  /** @min 0 */
+  usedMinutesThisMonth: number
 }
 
 export type TranscriptionProviderCreateBody =
@@ -2707,6 +2887,8 @@ export type TranscriptionProviderCreateBody =
        * @maxLength 120
        */
       model: string
+      /** @default null */
+      monthlyMinuteLimit?: number | null
       /**
        * @minLength 1
        * @maxLength 80
@@ -2723,6 +2905,8 @@ export type TranscriptionProviderCreateBody =
        * @maxLength 120
        */
       model: string
+      /** @default null */
+      monthlyMinuteLimit?: number | null
       /**
        * @minLength 1
        * @maxLength 80
@@ -2756,6 +2940,7 @@ export interface TranscriptionProviderUpdateBody {
    * @maxLength 120
    */
   model: string
+  monthlyMinuteLimit?: number | null
   /**
    * @minLength 1
    * @maxLength 80
@@ -2765,6 +2950,15 @@ export interface TranscriptionProviderUpdateBody {
 
 export interface TransferOrganizationOwnershipParams {
   organizationSlug: string
+}
+
+export interface UpdateChapterGenerationProviderParams {
+  organizationSlug: string
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  providerId: string
 }
 
 export interface UpdateLibraryApiKeyParams {
@@ -2880,6 +3074,15 @@ export interface UpdateLibraryApiVideoPosterParams {
    * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
    */
   videoId: string
+}
+
+export interface UpdateLibraryChapterGenerationSettingsParams {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  libraryId: string
+  organizationSlug: string
 }
 
 export interface UpdateLibraryEncodingParams {
@@ -3276,6 +3479,22 @@ export interface VideoChapter {
   /** @min 0 */
   startSeconds: number
   title: string
+}
+
+export interface VideoChapterSuggestionRequestBody {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+   */
+  captionId: string
+}
+
+export interface VideoChapterSuggestionsSuccessResponse {
+  code: string
+  data: {
+    chapters: VideoChapter[]
+  }
+  message: string
 }
 
 export interface VideoChaptersUpdateBody {
@@ -3680,6 +3899,7 @@ export type VideoTranscriptionFailureReason =
   | "provider_removed"
   | "no_audio"
   | "no_speech"
+  | "usage_limit_reached"
   | "transcription_failed"
 
 export interface VideoTranscriptionRequestBody {
@@ -4873,6 +5093,114 @@ export class OpenStreamApi<
         ...params,
       }),
   }
+  chapterGenerationProviders = {
+    /**
+     * No description
+     *
+     * @tags Chapter generation providers
+     * @name ListChapterGenerationProviders
+     * @summary List the organization's chapter generation providers by name
+     * @request GET:/api/v1/organizations/{organizationSlug}/chapter-generation-providers
+     */
+    listChapterGenerationProviders: (
+      { organizationSlug }: ListChapterGenerationProvidersParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<
+        ChapterGenerationProviderListSuccessResponse,
+        ApiErrorResponse
+      >({
+        path: `/api/v1/organizations/${organizationSlug}/chapter-generation-providers`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Chapter generation providers
+     * @name CreateChapterGenerationProvider
+     * @summary Connect OpenAI, or a server of your own speaking OpenAI's chat completions API, to write chapters with gpt-6-luna
+     * @request POST:/api/v1/organizations/{organizationSlug}/chapter-generation-providers
+     */
+    createChapterGenerationProvider: (
+      { organizationSlug }: CreateChapterGenerationProviderParams,
+      data: ChapterGenerationProviderCreateBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<ChapterGenerationProviderSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/chapter-generation-providers`,
+        method: "POST",
+        body: data,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Chapter generation providers
+     * @name UpdateChapterGenerationProvider
+     * @summary Change a provider's name, address or API key; its kind and model stay
+     * @request PUT:/api/v1/organizations/{organizationSlug}/chapter-generation-providers/{providerId}
+     */
+    updateChapterGenerationProvider: (
+      { organizationSlug, providerId }: UpdateChapterGenerationProviderParams,
+      data: ChapterGenerationProviderUpdateBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<ChapterGenerationProviderSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/chapter-generation-providers/${providerId}`,
+        method: "PUT",
+        body: data,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Chapter generation providers
+     * @name DeleteChapterGenerationProvider
+     * @summary Delete a provider no library uses
+     * @request DELETE:/api/v1/organizations/{organizationSlug}/chapter-generation-providers/{providerId}
+     */
+    deleteChapterGenerationProvider: (
+      { organizationSlug, providerId }: DeleteChapterGenerationProviderParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<LibraryEmptySuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/chapter-generation-providers/${providerId}`,
+        method: "DELETE",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Chapter generation providers
+     * @name TestChapterGenerationProvider
+     * @summary Check a saved provider answers and takes its API key, without generating anything
+     * @request POST:/api/v1/organizations/{organizationSlug}/chapter-generation-providers/{providerId}/connection-tests
+     */
+    testChapterGenerationProvider: (
+      { organizationSlug, providerId }: TestChapterGenerationProviderParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<
+        ChapterGenerationConnectionTestSuccessResponse,
+        ApiErrorResponse
+      >({
+        path: `/api/v1/organizations/${organizationSlug}/chapter-generation-providers/${providerId}/connection-tests`,
+        method: "POST",
+        format: "json",
+        ...params,
+      }),
+  }
   libraries = {
     /**
      * No description
@@ -6057,6 +6385,81 @@ export class OpenStreamApi<
         ApiErrorResponse
       >({
         path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/transcription`,
+        method: "PUT",
+        body: data,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Libraries
+     * @name SuggestVideoChapters
+     * @summary Propose a processed video's chapters from one of its caption tracks with the library's provider; nothing is saved
+     * @request POST:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/videos/{videoId}/chapter-suggestions
+     */
+    suggestVideoChapters: (
+      { organizationSlug, libraryId, videoId }: SuggestVideoChaptersParams,
+      data: VideoChapterSuggestionRequestBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<VideoChapterSuggestionsSuccessResponse, ApiErrorResponse>({
+        path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/videos/${videoId}/chapter-suggestions`,
+        method: "POST",
+        body: data,
+        type: "application/json",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Libraries
+     * @name GetLibraryChapterGenerationSettings
+     * @summary Read which provider writes chapters for the library's videos
+     * @request GET:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/chapter-generation
+     */
+    getLibraryChapterGenerationSettings: (
+      {
+        organizationSlug,
+        libraryId,
+      }: GetLibraryChapterGenerationSettingsParams,
+      params: RequestParams = {}
+    ) =>
+      this.request<
+        LibraryChapterGenerationSettingsSuccessResponse,
+        ApiErrorResponse
+      >({
+        path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/chapter-generation`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Libraries
+     * @name UpdateLibraryChapterGenerationSettings
+     * @summary Choose the organization's provider that writes chapters for the library's videos, or none
+     * @request PUT:/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/chapter-generation
+     */
+    updateLibraryChapterGenerationSettings: (
+      {
+        organizationSlug,
+        libraryId,
+      }: UpdateLibraryChapterGenerationSettingsParams,
+      data: LibraryChapterGenerationUpdateBody,
+      params: RequestParams = {}
+    ) =>
+      this.request<
+        LibraryChapterGenerationSettingsSuccessResponse,
+        ApiErrorResponse
+      >({
+        path: `/api/v1/organizations/${organizationSlug}/libraries/${libraryId}/chapter-generation`,
         method: "PUT",
         body: data,
         type: "application/json",

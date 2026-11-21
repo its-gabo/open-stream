@@ -143,6 +143,17 @@ export const libraryTranscriptionQueryKey = (
     libraryId,
   ] as const
 
+export const libraryChapterGenerationQueryKey = (
+  organizationSlug: string,
+  libraryId: string
+) =>
+  [
+    ...LIBRARIES_QUERY_KEY,
+    "chapter-generation",
+    organizationSlug,
+    libraryId,
+  ] as const
+
 /** A track's cues never change for a URL: changing the track changes the URL. */
 export const videoCaptionCuesQueryKey = (vttUrl: string) =>
   [...LIBRARIES_QUERY_KEY, "caption-cues", vttUrl] as const

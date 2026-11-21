@@ -6,6 +6,7 @@ import {
   ACTIVITY_ACTIONS,
   VIDEO_CAPTION_KINDS,
   VIDEO_TRANSCRIPTION_FAILURE_REASONS,
+  VIDEO_TRANSCRIPTION_STATUSES,
   WEBHOOK_EVENT_TYPES,
   type VideoTranscriptionFailureReason,
 } from "@workspace/shared"
@@ -101,15 +102,7 @@ export class VideoTranscriptionsService {
             transaction
           )
 
-        const provider = settings?.providerId
-          ? await this.transcriptionProvidersService.findProvider(
-              library.organizationId,
-              settings.providerId,
-              transaction
-            )
-          : null
-
-        if (!provider) {
+        if (!settings?.providerId) {
           throw new DomainError(
             VIDEO_CAPTION_ERRORS.TRANSCRIPTION_NOT_CONFIGURED
           )
@@ -126,7 +119,19 @@ export class VideoTranscriptionsService {
 
         if (!video) throw new DomainError(LIBRARY_ERRORS.VIDEO_NOT_FOUND)
 
-        assertTranscribable(video)
+        const provider = await this.transcriptionProvidersService.lockProvider(
+          library.organizationId,
+          settings.providerId,
+          transaction
+        )
+
+        if (!provider) {
+          throw new DomainError(
+            VIDEO_CAPTION_ERRORS.TRANSCRIPTION_NOT_CONFIGURED
+          )
+        }
+
+        const { durationSeconds } = assertTranscribable(video)
 
         if (
           await this.videoCaptionsRepository.findActiveTranscription(
@@ -137,6 +142,16 @@ export class VideoTranscriptionsService {
           throw new DomainError(VIDEO_CAPTION_ERRORS.TRANSCRIPTION_IN_PROGRESS)
         }
 
+        if (
+          !(await this.transcriptionProvidersService.hasMinutesLeftFor(
+            provider,
+            durationSeconds,
+            transaction
+          ))
+        ) {
+          throw new DomainError(VIDEO_CAPTION_ERRORS.USAGE_LIMIT_REACHED)
+        }
+
         const transcription = await this.queueTranscription(
           video,
           {
@@ -145,6 +160,7 @@ export class VideoTranscriptionsService {
             language: input.language ?? settings?.language ?? null,
             kind: input.kind,
             createdById: actor.userId,
+            audioSeconds: durationSeconds,
           },
           transaction
         )
@@ -202,7 +218,7 @@ export class VideoTranscriptionsService {
 
       if (!settings?.autoTranscribe || !settings.providerId) return
 
-      const provider = await this.transcriptionProvidersService.findProvider(
+      const provider = await this.transcriptionProvidersService.lockProvider(
         video.organizationId,
         settings.providerId,
         transaction
@@ -218,17 +234,47 @@ export class VideoTranscriptionsService {
         return
       }
 
-      await this.queueTranscription(
-        video,
-        {
-          providerId: provider.id,
-          model: provider.model,
-          language: settings.language,
-          kind: VIDEO_CAPTION_KINDS.SUBTITLES,
-          createdById: null,
-        },
-        transaction
-      )
+      const request = {
+        providerId: provider.id,
+        model: provider.model,
+        language: settings.language,
+        kind: VIDEO_CAPTION_KINDS.SUBTITLES,
+        createdById: null,
+        audioSeconds: video.durationSeconds ?? 0,
+      }
+
+      if (
+        !(await this.transcriptionProvidersService.hasMinutesLeftFor(
+          provider,
+          request.audioSeconds,
+          transaction
+        ))
+      ) {
+        // Recorded as failed, so the video's captions say why it has none.
+        const refused = await this.videoCaptionsRepository.insertTranscription(
+          {
+            organizationId: video.organizationId,
+            libraryId: video.libraryId,
+            videoId: video.id,
+            ...request,
+            status: VIDEO_TRANSCRIPTION_STATUSES.FAILED,
+            failureReason:
+              VIDEO_TRANSCRIPTION_FAILURE_REASONS.USAGE_LIMIT_REACHED,
+            finishedAt: new Date(),
+          },
+          transaction
+        )
+
+        await this.publishFailure(refused, transaction)
+        this.logger.warn(
+          "Automatic transcription skipped: the provider's monthly minute limit would be passed",
+          { videoId, providerId: provider.id }
+        )
+
+        return
+      }
+
+      await this.queueTranscription(video, request, transaction)
       this.logger.info("Automatic transcription queued", { videoId })
     })
   }
@@ -340,6 +386,7 @@ export class VideoTranscriptionsService {
       language: string | null
       kind: VideoTranscriptionRecord["kind"]
       createdById: string | null
+      audioSeconds: number
     },
     transaction: Transaction
   ) {
@@ -412,11 +459,19 @@ export class VideoTranscriptionsService {
     const segments: TranscriptSegment[] = []
     let reportedLanguage: string | null = null
 
-    for (const chunk of chunks) {
+    for (const [index, chunk] of chunks.entries()) {
       const transcript = await this.transcriptionClient.transcribeAudio(
         endpoint,
         { path: chunk.path, fileName: basename(chunk.path) },
         { language }
+      )
+
+      // The provider bills each chunk it answers, even if a later one fails.
+      await this.videoCaptionsRepository.addTranscribedAudioSeconds(
+        transcription.id,
+        runId,
+        (chunks[index + 1]?.startSeconds ?? durationSeconds) -
+          chunk.startSeconds
       )
 
       reportedLanguage ??= transcript.language

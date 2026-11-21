@@ -77,6 +77,11 @@ export const LIBRARY_TABS = [
     isOwnerOnly: true,
   },
   {
+    suffix: "chapter-generation",
+    labelKey: "libraries.tabs.chapter_generation",
+    isOwnerOnly: true,
+  },
+  {
     suffix: "security",
     labelKey: "libraries.tabs.security",
     isOwnerOnly: true,

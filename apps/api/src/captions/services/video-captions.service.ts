@@ -353,6 +353,35 @@ export class VideoCaptionsService {
     }
   }
 
+  /** A track's cues and the processed video's duration, e.g. to write chapters from what is said. */
+  async readCaptionCues(
+    library: LibraryProfile,
+    { videoId, captionId }: { videoId: string; captionId: string }
+  ) {
+    const scope = this.toVideoScope(library, videoId)
+    const video = await this.videoCaptionsRepository.findVideo(scope)
+
+    if (!video) throw new DomainError(LIBRARY_ERRORS.VIDEO_NOT_FOUND)
+
+    const { durationSeconds } = assertProcessed(video)
+    const caption = await this.videoCaptionsRepository.findCaption({
+      ...scope,
+      captionId,
+    })
+
+    if (!caption) throw new DomainError(VIDEO_CAPTION_ERRORS.NOT_FOUND)
+
+    const file = await this.readCaptionFile(library.id, caption)
+
+    return {
+      durationSeconds,
+      cues: parseCaptionFile(
+        await new Response(file.body).text(),
+        durationSeconds
+      ),
+    }
+  }
+
   /** A track's WebVTT as stored; it is never rewritten, unlike playlists. */
   async readCaptionFile(
     libraryId: string,

@@ -6,6 +6,7 @@ import { sql } from "drizzle-orm"
 import {
   check,
   index,
+  integer,
   jsonb,
   pgTable,
   text,
@@ -41,6 +42,8 @@ export const transcriptionProviders = pgTable(
     apiKeyHint: text("api_key_hint"),
     /** Null when the server asks for no key. */
     apiKey: jsonb("api_key").$type<EncryptedSecret>(),
+    /** Minutes of audio it may transcribe each calendar month (UTC); null for no limit. */
+    monthlyMinuteLimit: integer("monthly_minute_limit"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -66,6 +69,10 @@ export const transcriptionProviders = pgTable(
     check(
       "transcription_providers_api_key_check",
       sql`(${table.apiKeyHint} is null) = (${table.apiKey} is null) and (${table.kind} <> 'openai' or ${table.apiKey} is not null)`
+    ),
+    check(
+      "transcription_providers_monthly_minute_limit_check",
+      sql`${table.monthlyMinuteLimit} is null or ${table.monthlyMinuteLimit} > 0`
     ),
     // Target of the libraries foreign key that keeps a library's provider in its organization.
     unique("transcription_providers_id_organization_unique").on(

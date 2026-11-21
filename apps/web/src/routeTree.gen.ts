@@ -22,6 +22,7 @@ import { Route as GuestSignUpRouteImport } from './routes/_guest/sign-up'
 import { Route as GuestVerifyEmailRouteImport } from './routes/_guest/verify-email'
 import { Route as AuthenticatedOrganizationSlugIndexRouteImport } from './routes/_authenticated/$organizationSlug/index'
 import { Route as AuthenticatedOrganizationSlugActivityRouteImport } from './routes/_authenticated/$organizationSlug/activity'
+import { Route as AuthenticatedOrganizationSlugChapterGenerationRouteImport } from './routes/_authenticated/$organizationSlug/chapter-generation'
 import { Route as AuthenticatedOrganizationSlugStoragesRouteImport } from './routes/_authenticated/$organizationSlug/storages'
 import { Route as AuthenticatedOrganizationSlugTranscriptionRouteImport } from './routes/_authenticated/$organizationSlug/transcription'
 import { Route as AuthenticatedAccountActivityRouteImport } from './routes/_authenticated/account/activity'
@@ -36,6 +37,7 @@ import { Route as EmbedLibraryIdPlaylistsPlaylistIdRouteImport } from './routes/
 import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdIndexRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/index'
 import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdAnalyticsRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/analytics'
 import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdApiRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/api'
+import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdChapterGenerationRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/chapter-generation'
 import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/encoding'
 import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdLeadsRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/leads'
 import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdPlayerRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/player'
@@ -110,6 +112,12 @@ const AuthenticatedOrganizationSlugActivityRoute =
   AuthenticatedOrganizationSlugActivityRouteImport.update({
     id: '/activity',
     path: '/activity',
+    getParentRoute: () => AuthenticatedOrganizationSlugRoute,
+  } as any)
+const AuthenticatedOrganizationSlugChapterGenerationRoute =
+  AuthenticatedOrganizationSlugChapterGenerationRouteImport.update({
+    id: '/chapter-generation',
+    path: '/chapter-generation',
     getParentRoute: () => AuthenticatedOrganizationSlugRoute,
   } as any)
 const AuthenticatedOrganizationSlugStoragesRoute =
@@ -195,6 +203,15 @@ const AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute =
     path: '/api',
     getParentRoute: () => AuthenticatedOrganizationSlugLibrariesLibraryIdRoute,
   } as any)
+const AuthenticatedOrganizationSlugLibrariesLibraryIdChapterGenerationRoute =
+  AuthenticatedOrganizationSlugLibrariesLibraryIdChapterGenerationRouteImport.update(
+    {
+      id: '/chapter-generation',
+      path: '/chapter-generation',
+      getParentRoute: () =>
+        AuthenticatedOrganizationSlugLibrariesLibraryIdRoute,
+    } as any,
+  )
 const AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute =
   AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRouteImport.update({
     id: '/encoding',
@@ -258,6 +275,7 @@ export interface FileRoutesByFullPath {
   '/sign-up': typeof GuestSignUpRoute
   '/verify-email': typeof GuestVerifyEmailRoute
   '/$organizationSlug/activity': typeof AuthenticatedOrganizationSlugActivityRoute
+  '/$organizationSlug/chapter-generation': typeof AuthenticatedOrganizationSlugChapterGenerationRoute
   '/$organizationSlug/storages': typeof AuthenticatedOrganizationSlugStoragesRoute
   '/$organizationSlug/transcription': typeof AuthenticatedOrganizationSlugTranscriptionRoute
   '/account/activity': typeof AuthenticatedAccountActivityRoute
@@ -272,6 +290,7 @@ export interface FileRoutesByFullPath {
   '/$organizationSlug/settings/': typeof AuthenticatedOrganizationSlugSettingsIndexRoute
   '/$organizationSlug/libraries/$libraryId/analytics': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdAnalyticsRoute
   '/$organizationSlug/libraries/$libraryId/api': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute
+  '/$organizationSlug/libraries/$libraryId/chapter-generation': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdChapterGenerationRoute
   '/$organizationSlug/libraries/$libraryId/encoding': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute
   '/$organizationSlug/libraries/$libraryId/leads': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdLeadsRoute
   '/$organizationSlug/libraries/$libraryId/player': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdPlayerRoute
@@ -292,6 +311,7 @@ export interface FileRoutesByTo {
   '/sign-up': typeof GuestSignUpRoute
   '/verify-email': typeof GuestVerifyEmailRoute
   '/$organizationSlug/activity': typeof AuthenticatedOrganizationSlugActivityRoute
+  '/$organizationSlug/chapter-generation': typeof AuthenticatedOrganizationSlugChapterGenerationRoute
   '/$organizationSlug/storages': typeof AuthenticatedOrganizationSlugStoragesRoute
   '/$organizationSlug/transcription': typeof AuthenticatedOrganizationSlugTranscriptionRoute
   '/account/activity': typeof AuthenticatedAccountActivityRoute
@@ -305,6 +325,7 @@ export interface FileRoutesByTo {
   '/$organizationSlug/settings': typeof AuthenticatedOrganizationSlugSettingsIndexRoute
   '/$organizationSlug/libraries/$libraryId/analytics': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdAnalyticsRoute
   '/$organizationSlug/libraries/$libraryId/api': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute
+  '/$organizationSlug/libraries/$libraryId/chapter-generation': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdChapterGenerationRoute
   '/$organizationSlug/libraries/$libraryId/encoding': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute
   '/$organizationSlug/libraries/$libraryId/leads': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdLeadsRoute
   '/$organizationSlug/libraries/$libraryId/player': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdPlayerRoute
@@ -329,6 +350,7 @@ export interface FileRoutesById {
   '/_guest/verify-email': typeof GuestVerifyEmailRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/$organizationSlug/activity': typeof AuthenticatedOrganizationSlugActivityRoute
+  '/_authenticated/$organizationSlug/chapter-generation': typeof AuthenticatedOrganizationSlugChapterGenerationRoute
   '/_authenticated/$organizationSlug/storages': typeof AuthenticatedOrganizationSlugStoragesRoute
   '/_authenticated/$organizationSlug/transcription': typeof AuthenticatedOrganizationSlugTranscriptionRoute
   '/_authenticated/account/activity': typeof AuthenticatedAccountActivityRoute
@@ -343,6 +365,7 @@ export interface FileRoutesById {
   '/_authenticated/$organizationSlug/settings/': typeof AuthenticatedOrganizationSlugSettingsIndexRoute
   '/_authenticated/$organizationSlug/libraries/$libraryId/analytics': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdAnalyticsRoute
   '/_authenticated/$organizationSlug/libraries/$libraryId/api': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute
+  '/_authenticated/$organizationSlug/libraries/$libraryId/chapter-generation': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdChapterGenerationRoute
   '/_authenticated/$organizationSlug/libraries/$libraryId/encoding': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute
   '/_authenticated/$organizationSlug/libraries/$libraryId/leads': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdLeadsRoute
   '/_authenticated/$organizationSlug/libraries/$libraryId/player': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdPlayerRoute
@@ -366,6 +389,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/verify-email'
     | '/$organizationSlug/activity'
+    | '/$organizationSlug/chapter-generation'
     | '/$organizationSlug/storages'
     | '/$organizationSlug/transcription'
     | '/account/activity'
@@ -380,6 +404,7 @@ export interface FileRouteTypes {
     | '/$organizationSlug/settings/'
     | '/$organizationSlug/libraries/$libraryId/analytics'
     | '/$organizationSlug/libraries/$libraryId/api'
+    | '/$organizationSlug/libraries/$libraryId/chapter-generation'
     | '/$organizationSlug/libraries/$libraryId/encoding'
     | '/$organizationSlug/libraries/$libraryId/leads'
     | '/$organizationSlug/libraries/$libraryId/player'
@@ -400,6 +425,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/verify-email'
     | '/$organizationSlug/activity'
+    | '/$organizationSlug/chapter-generation'
     | '/$organizationSlug/storages'
     | '/$organizationSlug/transcription'
     | '/account/activity'
@@ -413,6 +439,7 @@ export interface FileRouteTypes {
     | '/$organizationSlug/settings'
     | '/$organizationSlug/libraries/$libraryId/analytics'
     | '/$organizationSlug/libraries/$libraryId/api'
+    | '/$organizationSlug/libraries/$libraryId/chapter-generation'
     | '/$organizationSlug/libraries/$libraryId/encoding'
     | '/$organizationSlug/libraries/$libraryId/leads'
     | '/$organizationSlug/libraries/$libraryId/player'
@@ -436,6 +463,7 @@ export interface FileRouteTypes {
     | '/_guest/verify-email'
     | '/_authenticated/'
     | '/_authenticated/$organizationSlug/activity'
+    | '/_authenticated/$organizationSlug/chapter-generation'
     | '/_authenticated/$organizationSlug/storages'
     | '/_authenticated/$organizationSlug/transcription'
     | '/_authenticated/account/activity'
@@ -450,6 +478,7 @@ export interface FileRouteTypes {
     | '/_authenticated/$organizationSlug/settings/'
     | '/_authenticated/$organizationSlug/libraries/$libraryId/analytics'
     | '/_authenticated/$organizationSlug/libraries/$libraryId/api'
+    | '/_authenticated/$organizationSlug/libraries/$libraryId/chapter-generation'
     | '/_authenticated/$organizationSlug/libraries/$libraryId/encoding'
     | '/_authenticated/$organizationSlug/libraries/$libraryId/leads'
     | '/_authenticated/$organizationSlug/libraries/$libraryId/player'
@@ -561,6 +590,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOrganizationSlugActivityRouteImport
       parentRoute: typeof AuthenticatedOrganizationSlugRoute
     }
+    '/_authenticated/$organizationSlug/chapter-generation': {
+      id: '/_authenticated/$organizationSlug/chapter-generation'
+      path: '/chapter-generation'
+      fullPath: '/$organizationSlug/chapter-generation'
+      preLoaderRoute: typeof AuthenticatedOrganizationSlugChapterGenerationRouteImport
+      parentRoute: typeof AuthenticatedOrganizationSlugRoute
+    }
     '/_authenticated/$organizationSlug/storages': {
       id: '/_authenticated/$organizationSlug/storages'
       path: '/storages'
@@ -659,6 +695,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdApiRouteImport
       parentRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdRoute
     }
+    '/_authenticated/$organizationSlug/libraries/$libraryId/chapter-generation': {
+      id: '/_authenticated/$organizationSlug/libraries/$libraryId/chapter-generation'
+      path: '/chapter-generation'
+      fullPath: '/$organizationSlug/libraries/$libraryId/chapter-generation'
+      preLoaderRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdChapterGenerationRouteImport
+      parentRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdRoute
+    }
     '/_authenticated/$organizationSlug/libraries/$libraryId/encoding': {
       id: '/_authenticated/$organizationSlug/libraries/$libraryId/encoding'
       path: '/encoding'
@@ -721,6 +764,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedOrganizationSlugLibrariesLibraryIdRouteChildren {
   AuthenticatedOrganizationSlugLibrariesLibraryIdAnalyticsRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdAnalyticsRoute
   AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute
+  AuthenticatedOrganizationSlugLibrariesLibraryIdChapterGenerationRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdChapterGenerationRoute
   AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute
   AuthenticatedOrganizationSlugLibrariesLibraryIdLeadsRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdLeadsRoute
   AuthenticatedOrganizationSlugLibrariesLibraryIdPlayerRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdPlayerRoute
@@ -738,6 +782,8 @@ const AuthenticatedOrganizationSlugLibrariesLibraryIdRouteChildren: Authenticate
       AuthenticatedOrganizationSlugLibrariesLibraryIdAnalyticsRoute,
     AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute:
       AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute,
+    AuthenticatedOrganizationSlugLibrariesLibraryIdChapterGenerationRoute:
+      AuthenticatedOrganizationSlugLibrariesLibraryIdChapterGenerationRoute,
     AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute:
       AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute,
     AuthenticatedOrganizationSlugLibrariesLibraryIdLeadsRoute:
@@ -765,6 +811,7 @@ const AuthenticatedOrganizationSlugLibrariesLibraryIdRouteWithChildren =
 
 interface AuthenticatedOrganizationSlugRouteChildren {
   AuthenticatedOrganizationSlugActivityRoute: typeof AuthenticatedOrganizationSlugActivityRoute
+  AuthenticatedOrganizationSlugChapterGenerationRoute: typeof AuthenticatedOrganizationSlugChapterGenerationRoute
   AuthenticatedOrganizationSlugStoragesRoute: typeof AuthenticatedOrganizationSlugStoragesRoute
   AuthenticatedOrganizationSlugTranscriptionRoute: typeof AuthenticatedOrganizationSlugTranscriptionRoute
   AuthenticatedOrganizationSlugIndexRoute: typeof AuthenticatedOrganizationSlugIndexRoute
@@ -779,6 +826,8 @@ const AuthenticatedOrganizationSlugRouteChildren: AuthenticatedOrganizationSlugR
   {
     AuthenticatedOrganizationSlugActivityRoute:
       AuthenticatedOrganizationSlugActivityRoute,
+    AuthenticatedOrganizationSlugChapterGenerationRoute:
+      AuthenticatedOrganizationSlugChapterGenerationRoute,
     AuthenticatedOrganizationSlugStoragesRoute:
       AuthenticatedOrganizationSlugStoragesRoute,
     AuthenticatedOrganizationSlugTranscriptionRoute:

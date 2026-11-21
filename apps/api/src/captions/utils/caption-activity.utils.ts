@@ -27,7 +27,7 @@ export const transcriptionProviderActivityResource = (
 export const toTranscriptionProviderActivityValues = (
   provider: Pick<
     TranscriptionProviderRecord,
-    "name" | "kind" | "baseUrl" | "model" | "apiKeyHint"
+    "name" | "kind" | "baseUrl" | "model" | "apiKeyHint" | "monthlyMinuteLimit"
   >
 ) => ({
   name: provider.name,
@@ -35,6 +35,7 @@ export const toTranscriptionProviderActivityValues = (
   baseUrl: provider.baseUrl,
   model: provider.model,
   apiKeyHint: provider.apiKeyHint,
+  monthlyMinuteLimit: provider.monthlyMinuteLimit,
 })
 
 export const toLibraryTranscriptionActivityValues = (

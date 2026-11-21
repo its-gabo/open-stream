@@ -5,6 +5,7 @@ import {
 } from "../constants/app-config.constants"
 import { LOG_FORMATS } from "../../common/logging/logging.constants"
 import { authConfigSchema } from "./auth-config.schema"
+import { chapterGenerationConfigSchema } from "./chapter-generation-config.schema"
 import { databaseConfigSchema } from "./database-config.schema"
 import { emailConfigSchema } from "./email-config.schema"
 import { loggingConfigSchema } from "./logging-config.schema"
@@ -29,6 +30,7 @@ const environmentSchema = z.object({
   ...videoProcessingConfigSchema.shape,
   ...videoImportConfigSchema.shape,
   ...transcriptionConfigSchema.shape,
+  ...chapterGenerationConfigSchema.shape,
   ...webhooksConfigSchema.shape,
 })
 
@@ -59,6 +61,9 @@ export const appConfigSchema = environmentSchema
       environment.NODE_ENV !== APP_ENVIRONMENTS.PRODUCTION,
     TRANSCRIPTION_ALLOW_PRIVATE_ENDPOINTS:
       environment.TRANSCRIPTION_ALLOW_PRIVATE_ENDPOINTS ??
+      environment.NODE_ENV !== APP_ENVIRONMENTS.PRODUCTION,
+    CHAPTER_GENERATION_ALLOW_PRIVATE_ENDPOINTS:
+      environment.CHAPTER_GENERATION_ALLOW_PRIVATE_ENDPOINTS ??
       environment.NODE_ENV !== APP_ENVIRONMENTS.PRODUCTION,
   }))
   .refine(

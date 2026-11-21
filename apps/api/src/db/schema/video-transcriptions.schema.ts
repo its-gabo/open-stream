@@ -9,6 +9,7 @@ import {
 import { sql } from "drizzle-orm"
 import {
   check,
+  doublePrecision,
   foreignKey,
   index,
   pgTable,
@@ -70,9 +71,16 @@ export const videoTranscriptions = pgTable(
         VIDEO_TRANSCRIPTION_FAILURE_REASONS.PROVIDER_REMOVED,
         VIDEO_TRANSCRIPTION_FAILURE_REASONS.NO_AUDIO,
         VIDEO_TRANSCRIPTION_FAILURE_REASONS.NO_SPEECH,
+        VIDEO_TRANSCRIPTION_FAILURE_REASONS.USAGE_LIMIT_REACHED,
         VIDEO_TRANSCRIPTION_FAILURE_REASONS.TRANSCRIPTION_FAILED,
       ],
     }).$type<VideoTranscriptionFailureReason>(),
+    /** Length of the video's audio when it was requested; held against the provider's monthly minutes until it finishes. */
+    audioSeconds: doublePrecision("audio_seconds").notNull().default(0),
+    /** Seconds of audio the provider answered for, over every attempt; what a failed transcription counts toward the monthly minutes. */
+    transcribedAudioSeconds: doublePrecision("transcribed_audio_seconds")
+      .notNull()
+      .default(0),
     /** The worker run that holds a processing transcription. */
     runId: uuid("run_id"),
     /** Renewed by the holding run; a stale one means the run died. */
@@ -130,6 +138,15 @@ export const videoTranscriptions = pgTable(
     index("video_transcriptions_video_id_created_at_idx").on(
       table.videoId,
       table.createdAt
+    ),
+    // Sums a provider's minutes this month against its limit.
+    index("video_transcriptions_provider_id_created_at_idx").on(
+      table.providerId,
+      table.createdAt
+    ),
+    check(
+      "video_transcriptions_audio_seconds_check",
+      sql`${table.audioSeconds} >= 0 and ${table.transcribedAudioSeconds} >= 0`
     ),
     index("video_transcriptions_active_idx")
       .on(table.status)

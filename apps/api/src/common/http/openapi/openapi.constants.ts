@@ -8,6 +8,7 @@ export const OPENAPI_TAGS = {
   LIBRARIES: "Libraries",
   STORAGES: "Storages",
   TRANSCRIPTION_PROVIDERS: "Transcription providers",
+  CHAPTER_GENERATION_PROVIDERS: "Chapter generation providers",
   LIBRARY_API: "Library API",
   ACTIVITY: "Activity",
   ANALYTICS: "Analytics",
@@ -45,6 +46,11 @@ export const OPENAPI_DOCUMENTATION: GenerateSpecOptions["documentation"] = {
       name: OPENAPI_TAGS.TRANSCRIPTION_PROVIDERS,
       description:
         "Speech-to-text services libraries transcribe videos into captions with",
+    },
+    {
+      name: OPENAPI_TAGS.CHAPTER_GENERATION_PROVIDERS,
+      description:
+        "Language model services libraries write chapters from captions with",
     },
     {
       name: OPENAPI_TAGS.LIBRARY_API,

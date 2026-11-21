@@ -71,8 +71,10 @@ export const Route = createFileRoute(
 })
 
 function OrganizationTranscriptionRoute() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { organizationSlug } = Route.useParams()
+  const formatNumber = (value: number) =>
+    value.toLocaleString(i18n.language, { maximumFractionDigits: 1 })
   const { data: organizationData } = useOrganizationQuery(organizationSlug)
   const isOwner = organizationData?.membership.role === ORGANIZATION_ROLES.OWNER
   const { data: providers, isPending } = useTranscriptionProvidersQuery(
@@ -168,6 +170,9 @@ function OrganizationTranscriptionRoute() {
                                 {t("transcription.columns.model")}
                               </TableHead>
                               <TableHead>
+                                {t("transcription.columns.usage")}
+                              </TableHead>
+                              <TableHead>
                                 {t("transcription.columns.libraries")}
                               </TableHead>
                               <TableHead className="pr-4 text-right sm:pr-5">
@@ -197,6 +202,22 @@ function OrganizationTranscriptionRoute() {
                                   <code className="text-xs">
                                     {provider.model}
                                   </code>
+                                </TableCell>
+                                <TableCell className="text-xs whitespace-nowrap">
+                                  {provider.monthlyMinuteLimit === null
+                                    ? t("transcription.usage.without_limit", {
+                                        used: formatNumber(
+                                          provider.usedMinutesThisMonth
+                                        ),
+                                      })
+                                    : t("transcription.usage.with_limit", {
+                                        used: formatNumber(
+                                          provider.usedMinutesThisMonth
+                                        ),
+                                        limit: formatNumber(
+                                          provider.monthlyMinuteLimit
+                                        ),
+                                      })}
                                 </TableCell>
                                 <TableCell>
                                   <Badge variant="secondary">

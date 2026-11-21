@@ -21,7 +21,7 @@ const CAPTION_CONFLICT =
 const CAPTION_INVALID =
   "Validation failed, or the file is not WebVTT or SRT with cues within the video"
 const TRANSCRIPTION_CONFLICT =
-  "The video is not processed yet, has no sound, is already being transcribed, or the library has no provider"
+  "The video is not processed yet, has no sound, is already being transcribed, the library has no provider, or the provider's monthly minute limit would be passed"
 const STORAGE_UNAVAILABLE = "The library's storage could not be reached"
 
 export const VIDEO_CAPTION_ROUTE_ERROR_DESCRIPTIONS = {

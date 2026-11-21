@@ -1,4 +1,5 @@
-import { and, asc, eq, getTableColumns } from "drizzle-orm"
+import { VIDEO_TRANSCRIPTION_STATUSES } from "@workspace/shared"
+import { and, asc, eq, getTableColumns, gte, sql, sum } from "drizzle-orm"
 import type {
   Database,
   DatabaseExecutor,
@@ -7,8 +8,16 @@ import type {
 import {
   libraries,
   transcriptionProviders,
+  videoTranscriptions,
   type NewTranscriptionProviderRecord,
 } from "../../db/schema"
+
+/**
+ * Seconds a transcription counts toward its provider's minutes: what the
+ * provider answered for when it failed, otherwise the video's length, or
+ * more when retries sent some of it again.
+ */
+const countedAudioSeconds = sql<number>`case when ${videoTranscriptions.status} = ${VIDEO_TRANSCRIPTION_STATUSES.FAILED} then ${videoTranscriptions.transcribedAudioSeconds} else greatest(${videoTranscriptions.audioSeconds}, ${videoTranscriptions.transcribedAudioSeconds}) end`
 
 export class TranscriptionProvidersRepository {
   constructor(private readonly db: Database) {}
@@ -117,6 +126,44 @@ export class TranscriptionProvidersRepository {
     await transaction
       .delete(transcriptionProviders)
       .where(eq(transcriptionProviders.id, providerId))
+  }
+
+  /** Seconds of audio counted toward the provider's minutes since `since`, see `countedAudioSeconds`. */
+  async sumAudioSecondsSince(
+    providerId: string,
+    since: Date,
+    executor: DatabaseExecutor = this.db
+  ) {
+    const [usage] = await executor
+      .select({
+        seconds: sum(countedAudioSeconds).mapWith(Number),
+      })
+      .from(videoTranscriptions)
+      .where(
+        and(
+          eq(videoTranscriptions.providerId, providerId),
+          gte(videoTranscriptions.createdAt, since)
+        )
+      )
+
+    return usage?.seconds ?? 0
+  }
+
+  /** The same, for each of the organization's providers that transcribed anything. */
+  sumAudioSecondsByProviderSince(organizationId: string, since: Date) {
+    return this.db
+      .select({
+        providerId: videoTranscriptions.providerId,
+        seconds: sum(countedAudioSeconds).mapWith(Number),
+      })
+      .from(videoTranscriptions)
+      .where(
+        and(
+          eq(videoTranscriptions.organizationId, organizationId),
+          gte(videoTranscriptions.createdAt, since)
+        )
+      )
+      .groupBy(videoTranscriptions.providerId)
   }
 
   private selectProviderSummaries() {

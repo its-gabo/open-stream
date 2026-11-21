@@ -59,6 +59,8 @@ export const VIDEO_TRANSCRIPTION_FAILURE_REASONS = {
   NO_AUDIO: "no_audio",
   /** The provider answered, but with no speech or nothing usable. */
   NO_SPEECH: "no_speech",
+  /** The video would take the provider past its monthly minute limit. */
+  USAGE_LIMIT_REACHED: "usage_limit_reached",
   TRANSCRIPTION_FAILED: "transcription_failed",
 } as const
 
@@ -68,6 +70,8 @@ export const TRANSCRIPTION_PROVIDER_LIMITS = {
   MODEL_MAX_LENGTH: 120,
   API_KEY_MAX_LENGTH: 512,
   MAX_PER_ORGANIZATION: 20,
+  /** Highest monthly limit an owner can set, in minutes of audio: about a year of audio. */
+  MONTHLY_MINUTE_LIMIT_MAX: 1_000_000,
 } as const
 
 /** What OpenAI's API is reached at, and the model that returns the timings captions need. */

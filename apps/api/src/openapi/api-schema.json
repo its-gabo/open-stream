@@ -27,6 +27,10 @@
       "description": "Speech-to-text services libraries transcribe videos into captions with"
     },
     {
+      "name": "Chapter generation providers",
+      "description": "Language model services libraries write chapters from captions with"
+    },
+    {
       "name": "Library API",
       "description": "Server-to-server access to one library with its API key: videos, tus uploads and playback"
     }
@@ -1115,6 +1119,22 @@
           "apiKeyHint": {
             "type": ["string", "null"]
           },
+          "monthlyMinuteLimit": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "usedMinutesThisMonth": {
+            "type": "number",
+            "minimum": 0
+          },
           "libraryCount": {
             "type": "integer",
             "minimum": 0,
@@ -1138,6 +1158,8 @@
           "baseUrl",
           "model",
           "apiKeyHint",
+          "monthlyMinuteLimit",
+          "usedMinutesThisMonth",
           "libraryCount",
           "createdAt",
           "updatedAt"
@@ -1194,6 +1216,19 @@
                 "type": "string",
                 "minLength": 1,
                 "maxLength": 512
+              },
+              "monthlyMinuteLimit": {
+                "default": null,
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "exclusiveMinimum": 0,
+                    "maximum": 1000000
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             },
             "required": ["kind", "name", "model", "apiKey"]
@@ -1225,6 +1260,19 @@
                     "type": "string",
                     "minLength": 1,
                     "maxLength": 512
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "monthlyMinuteLimit": {
+                "default": null,
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "exclusiveMinimum": 0,
+                    "maximum": 1000000
                   },
                   {
                     "type": "null"
@@ -1266,6 +1314,18 @@
                 "type": "string",
                 "minLength": 1,
                 "maxLength": 512
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "monthlyMinuteLimit": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 1000000
               },
               {
                 "type": "null"
@@ -1315,6 +1375,294 @@
         "additionalProperties": false
       },
       "TranscriptionConnectionTest": {
+        "type": "object",
+        "properties": {
+          "isReachable": {
+            "type": "boolean"
+          },
+          "isAuthorized": {
+            "type": "boolean"
+          }
+        },
+        "required": ["isReachable", "isAuthorized"],
+        "additionalProperties": false
+      },
+      "ChapterGenerationProviderListSuccessResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "providers": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ChapterGenerationProvider"
+                }
+              }
+            },
+            "required": ["providers"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["code", "message", "data"],
+        "additionalProperties": false
+      },
+      "ChapterGenerationProvider": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ChapterGenerationProviderKind"
+          },
+          "baseUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "model": {
+            "type": "string"
+          },
+          "apiKeyHint": {
+            "type": ["string", "null"]
+          },
+          "monthlyTokenLimit": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "tokensUsedThisMonth": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "libraryCount": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "kind",
+          "baseUrl",
+          "model",
+          "apiKeyHint",
+          "monthlyTokenLimit",
+          "tokensUsedThisMonth",
+          "libraryCount",
+          "createdAt",
+          "updatedAt"
+        ],
+        "additionalProperties": false
+      },
+      "ChapterGenerationProviderKind": {
+        "type": "string",
+        "enum": ["openai", "openai_compatible"]
+      },
+      "ChapterGenerationProviderSuccessResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "provider": {
+                "$ref": "#/components/schemas/ChapterGenerationProvider"
+              }
+            },
+            "required": ["provider"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["code", "message", "data"],
+        "additionalProperties": false
+      },
+      "ChapterGenerationProviderCreateBody": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "openai"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              },
+              "apiKey": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "monthlyTokenLimit": {
+                "default": null,
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "exclusiveMinimum": 0,
+                    "maximum": 2000000000
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": ["kind", "name", "apiKey"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "openai_compatible"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              },
+              "baseUrl": {
+                "type": "string",
+                "maxLength": 2048
+              },
+              "apiKey": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "monthlyTokenLimit": {
+                "default": null,
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "exclusiveMinimum": 0,
+                    "maximum": 2000000000
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": ["kind", "name", "baseUrl", "apiKey"]
+          }
+        ]
+      },
+      "ChapterGenerationProviderUpdateBody": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "baseUrl": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2048
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "apiKey": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "monthlyTokenLimit": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 2000000000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": ["name"]
+      },
+      "ChapterGenerationConnectionTestSuccessResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "connection": {
+                "$ref": "#/components/schemas/ChapterGenerationConnectionTest"
+              }
+            },
+            "required": ["connection"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["code", "message", "data"],
+        "additionalProperties": false
+      },
+      "ChapterGenerationConnectionTest": {
         "type": "object",
         "properties": {
           "isReachable": {
@@ -2993,6 +3341,7 @@
           "provider_removed",
           "no_audio",
           "no_speech",
+          "usage_limit_reached",
           "transcription_failed"
         ]
       },
@@ -4183,6 +4532,103 @@
         },
         "required": ["providerId", "autoTranscribe", "language"]
       },
+      "VideoChapterSuggestionsSuccessResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "chapters": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/VideoChapter"
+                }
+              }
+            },
+            "required": ["chapters"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["code", "message", "data"],
+        "additionalProperties": false
+      },
+      "VideoChapterSuggestionRequestBody": {
+        "type": "object",
+        "properties": {
+          "captionId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          }
+        },
+        "required": ["captionId"]
+      },
+      "LibraryChapterGenerationSettingsSuccessResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "chapterGeneration": {
+                "$ref": "#/components/schemas/LibraryChapterGenerationSettings"
+              }
+            },
+            "required": ["chapterGeneration"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["code", "message", "data"],
+        "additionalProperties": false
+      },
+      "LibraryChapterGenerationSettings": {
+        "type": "object",
+        "properties": {
+          "providerId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": ["providerId"],
+        "additionalProperties": false
+      },
+      "LibraryChapterGenerationUpdateBody": {
+        "type": "object",
+        "properties": {
+          "providerId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": ["providerId"]
+      },
       "VideoEmbedSuccessResponse": {
         "type": "object",
         "properties": {
@@ -5092,6 +5538,9 @@
           "transcription_provider.created",
           "transcription_provider.updated",
           "transcription_provider.deleted",
+          "chapter_generation_provider.created",
+          "chapter_generation_provider.updated",
+          "chapter_generation_provider.deleted",
           "library.created",
           "library.updated",
           "library.storage_changed",
@@ -5099,6 +5548,7 @@
           "library.security_updated",
           "library.player_updated",
           "library.transcription_updated",
+          "library.chapter_generation_updated",
           "api_key.created",
           "api_key.updated",
           "api_key.rolled",
@@ -5146,6 +5596,7 @@
           "membership",
           "storage",
           "transcription_provider",
+          "chapter_generation_provider",
           "library",
           "api_key",
           "webhook",
@@ -8026,6 +8477,477 @@
           },
           "404": {
             "description": "Organization or transcription provider does not exist, or the user is not a member",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Libraries still use the provider",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, the provider's address is not allowed, or OpenAI was left without a key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Organization is pending deletion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organizationSlug",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "providerId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          }
+        ]
+      }
+    },
+    "/api/v1/organizations/{organizationSlug}/chapter-generation-providers": {
+      "get": {
+        "operationId": "listChapterGenerationProviders",
+        "tags": ["Chapter generation providers"],
+        "summary": "List the organization's chapter generation providers by name",
+        "responses": {
+          "200": {
+            "description": "Chapter generation providers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChapterGenerationProviderListSuccessResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Only the organization's owner manages this",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Organization does not exist, or the user is not a member",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Organization is pending deletion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organizationSlug",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ]
+      },
+      "post": {
+        "operationId": "createChapterGenerationProvider",
+        "tags": ["Chapter generation providers"],
+        "summary": "Connect OpenAI, or a server of your own speaking OpenAI's chat completions API, to write chapters with gpt-6-luna",
+        "responses": {
+          "201": {
+            "description": "Chapter generation provider created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChapterGenerationProviderSuccessResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Only the organization's owner manages this, or the origin is not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Organization does not exist, or the user is not a member",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The organization has as many providers as it may have",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the provider's address is not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Organization is pending deletion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organizationSlug",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChapterGenerationProviderCreateBody"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/organizations/{organizationSlug}/chapter-generation-providers/{providerId}": {
+      "put": {
+        "operationId": "updateChapterGenerationProvider",
+        "tags": ["Chapter generation providers"],
+        "summary": "Change a provider's name, address or API key; its kind and model stay",
+        "responses": {
+          "200": {
+            "description": "Chapter generation provider saved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChapterGenerationProviderSuccessResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Only the organization's owner manages this, or the origin is not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Organization or chapter generation provider does not exist, or the user is not a member",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Libraries still use the provider",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, the provider's address is not allowed, or OpenAI was left without a key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Organization is pending deletion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organizationSlug",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "providerId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChapterGenerationProviderUpdateBody"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteChapterGenerationProvider",
+        "tags": ["Chapter generation providers"],
+        "summary": "Delete a provider no library uses",
+        "responses": {
+          "200": {
+            "description": "Chapter generation provider deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryEmptySuccessResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Only the organization's owner manages this, or the origin is not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Organization or chapter generation provider does not exist, or the user is not a member",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Libraries still use the provider",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, the provider's address is not allowed, or OpenAI was left without a key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Organization is pending deletion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organizationSlug",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "providerId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          }
+        ]
+      }
+    },
+    "/api/v1/organizations/{organizationSlug}/chapter-generation-providers/{providerId}/connection-tests": {
+      "post": {
+        "operationId": "testChapterGenerationProvider",
+        "tags": ["Chapter generation providers"],
+        "summary": "Check a saved provider answers and takes its API key, without generating anything",
+        "responses": {
+          "200": {
+            "description": "Connection tested",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChapterGenerationConnectionTestSuccessResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Only the organization's owner manages this, or the origin is not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Organization or chapter generation provider does not exist, or the user is not a member",
             "content": {
               "application/json": {
                 "schema": {
@@ -13718,7 +14640,7 @@
             }
           },
           "409": {
-            "description": "The video is not processed yet, has no sound, is already being transcribed, or the library has no provider",
+            "description": "The video is not processed yet, has no sound, is already being transcribed, the library has no provider, or the provider's monthly minute limit would be passed",
             "content": {
               "application/json": {
                 "schema": {
@@ -13969,6 +14891,321 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/LibraryTranscriptionUpdateBody"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/videos/{videoId}/chapter-suggestions": {
+      "post": {
+        "operationId": "suggestVideoChapters",
+        "tags": ["Libraries"],
+        "summary": "Propose a processed video's chapters from one of its caption tracks with the library's provider; nothing is saved",
+        "responses": {
+          "200": {
+            "description": "Chapters suggested",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoChapterSuggestionsSuccessResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Request did not come from the web app origin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Organization, library, video or caption track does not exist, or the user is not a member",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The video is not processed yet, the track says nothing, the library has no provider, the provider's monthly token limit could be passed, or the provider refused the key or the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the provider's address is no longer allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Organization is pending deletion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "The provider or the library's storage could not be reached, or the provider answered without usable chapters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organizationSlug",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "libraryId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "videoId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VideoChapterSuggestionRequestBody"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/organizations/{organizationSlug}/libraries/{libraryId}/chapter-generation": {
+      "get": {
+        "operationId": "getLibraryChapterGenerationSettings",
+        "tags": ["Libraries"],
+        "summary": "Read which provider writes chapters for the library's videos",
+        "responses": {
+          "200": {
+            "description": "Chapter generation settings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryChapterGenerationSettingsSuccessResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Only the organization's owner manages this",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Organization or library does not exist, or the user is not a member",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request body or query is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Organization is pending deletion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organizationSlug",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "libraryId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          }
+        ]
+      },
+      "put": {
+        "operationId": "updateLibraryChapterGenerationSettings",
+        "tags": ["Libraries"],
+        "summary": "Choose the organization's provider that writes chapters for the library's videos, or none",
+        "responses": {
+          "200": {
+            "description": "Chapter generation settings saved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryChapterGenerationSettingsSuccessResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Only the organization's owner manages this, or the origin is not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Organization, library or provider does not exist, or the user is not a member",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request body or query is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Organization is pending deletion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organizationSlug",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "libraryId",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LibraryChapterGenerationUpdateBody"
               }
             }
           }
@@ -18539,7 +19776,7 @@
             }
           },
           "409": {
-            "description": "The video is not processed yet, has no sound, is already being transcribed, or the library has no provider",
+            "description": "The video is not processed yet, has no sound, is already being transcribed, the library has no provider, or the provider's monthly minute limit would be passed",
             "content": {
               "application/json": {
                 "schema": {

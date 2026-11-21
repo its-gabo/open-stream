@@ -73,6 +73,13 @@ export const transcriptionProviderBaseUrlSchema = z
   .pipe(z.url({ protocol: /^https?$/ }))
   .transform((url) => url.replace(/\/+$/, ""))
 
+/** Minutes of audio a provider may transcribe each calendar month (UTC); null for no limit. */
+const monthlyMinuteLimitSchema = z
+  .int()
+  .positive()
+  .max(TRANSCRIPTION_PROVIDER_LIMITS.MONTHLY_MINUTE_LIMIT_MAX)
+  .nullable()
+
 const providerApiKeySchema = z
   .string()
   .trim()
@@ -92,6 +99,7 @@ export const transcriptionProviderCreateInputSchema = z.discriminatedUnion(
       name: providerNameSchema,
       model: providerModelSchema,
       apiKey: providerApiKeySchema,
+      monthlyMinuteLimit: monthlyMinuteLimitSchema.default(null),
     }),
     z.object({
       kind: z.literal(TRANSCRIPTION_PROVIDER_KINDS.OPENAI_COMPATIBLE),
@@ -99,6 +107,7 @@ export const transcriptionProviderCreateInputSchema = z.discriminatedUnion(
       baseUrl: transcriptionProviderBaseUrlSchema,
       model: providerModelSchema,
       apiKey: providerApiKeySchema.nullable(),
+      monthlyMinuteLimit: monthlyMinuteLimitSchema.default(null),
     }),
   ]
 )
@@ -106,13 +115,15 @@ export const transcriptionProviderCreateInputSchema = z.discriminatedUnion(
 /**
  * Changes a provider; its kind stays. `apiKey` replaces the saved key when
  * given, removes it when null (compatible servers only), and keeps it when
- * left out.
+ * left out; `monthlyMinuteLimit` likewise replaces, removes or keeps the
+ * limit.
  */
 export const transcriptionProviderUpdateInputSchema = z.object({
   name: providerNameSchema,
   baseUrl: transcriptionProviderBaseUrlSchema.nullable().default(null),
   model: providerModelSchema,
   apiKey: providerApiKeySchema.nullable().optional(),
+  monthlyMinuteLimit: monthlyMinuteLimitSchema.optional(),
 })
 
 /**

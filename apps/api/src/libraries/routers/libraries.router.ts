@@ -6,6 +6,7 @@ import { createLibraryWebhooksRouter } from "../../webhooks/routers/library-webh
 import { createPlaylistsRouter } from "../../playlists/routers/playlists.router"
 import { createVideoCtasRouter } from "../../ctas/routers/video-ctas.router"
 import { createVideoCaptionsRouter } from "../../captions/routers/video-captions.router"
+import { createVideoChapterGenerationRouter } from "../../chapter-generation/routers/video-chapter-generation.router"
 import { createLibrariesCoreRouter } from "./libraries-core.router"
 import { createLibraryApiAccessRouter } from "./library-api-access.router"
 import { createLibraryEncodingRouter } from "./library-encoding.router"
@@ -116,6 +117,15 @@ export function createLibrariesRouter(module: LibrariesRouterDependencies) {
           module.videoCaptionsService,
           module.videoTranscriptionsService,
           module.libraryTranscriptionSettingsService
+        )
+      )
+      .route(
+        "/",
+        createVideoChapterGenerationRouter(
+          module.organizationsService,
+          module.librariesService,
+          module.videoChapterSuggestionsService,
+          module.libraryChapterGenerationSettingsService
         )
       )
       .route(

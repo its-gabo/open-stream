@@ -10,6 +10,7 @@ import {
   isNull,
   lt,
   ne,
+  sql,
   or,
 } from "drizzle-orm"
 import type {
@@ -285,6 +286,25 @@ export class VideoCaptionsRepository {
       )
 
     return active ?? null
+  }
+
+  /** Counts audio the provider answered for, while `runId` still holds the transcription. */
+  async addTranscribedAudioSeconds(
+    transcriptionId: string,
+    runId: string,
+    seconds: number
+  ) {
+    await this.db
+      .update(videoTranscriptions)
+      .set({
+        transcribedAudioSeconds: sql`${videoTranscriptions.transcribedAudioSeconds} + ${seconds}`,
+      })
+      .where(
+        and(
+          eq(videoTranscriptions.id, transcriptionId),
+          eq(videoTranscriptions.runId, runId)
+        )
+      )
   }
 
   async insertTranscription(

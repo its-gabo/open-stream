@@ -19,18 +19,21 @@ import {
   TabsTrigger,
 } from "@workspace/ui/components/tabs"
 import { FilmIcon } from "lucide-react"
+import { ClientOnly } from "@tanstack/react-router"
 import { Suspense, lazy, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { VIDEO_DETAILS_TABS, VIDEO_PLAYER_PATHS } from "../libraries.constants"
 import { buildVideoFileUrl, buildVideoPosterUrl } from "../libraries.utils"
 import { VideoChaptersSection } from "./video-chapters-section"
+import { VideoCtasSection } from "./video-ctas-section"
 import { VideoEditDialog } from "./video-edit-dialog"
 import { VideoFacts } from "./video-facts"
 import { VideoPosterSection } from "./video-poster-section"
 
 import type { Video } from "@/api/generated-api"
 import { useLibraryPlayerQuery } from "@/api/queries/libraries/useLibraryPlayerQuery"
+import { useVideoCtasQuery } from "@/api/queries/libraries/useVideoCtasQuery"
 import { VideoAnalyticsSection } from "@/modules/analytics/components/video-analytics-section"
 import { VideoEmbedSection } from "@/modules/embed/components/video-embed-section"
 
@@ -85,6 +88,13 @@ function VideoDetails({
   const libraryPlayer = useLibraryPlayerQuery(organizationSlug, libraryId, {
     enabled: isPlayable,
   })
+  // Previewed in the player, which reports nothing here.
+  const { data: ctas } = useVideoCtasQuery(
+    organizationSlug,
+    libraryId,
+    video.id,
+    { enabled: isPlayable }
+  )
   // The library's player as its embeds show it; the stock one if its settings cannot be read.
   const playerSettings =
     showsDefaultPlayer || !libraryPlayer.data
@@ -119,29 +129,40 @@ function VideoDetails({
         )}
         {isPlayable && !libraryPlayer.isPending && (
           <div className="flex flex-col gap-2">
-            <Suspense
+            <ClientOnly
               fallback={<Skeleton className="aspect-video w-full rounded-lg" />}
             >
-              <VideoPlayer
-                src={buildVideoFileUrl(
-                  organizationSlug,
-                  libraryId,
-                  video,
-                  VIDEO_PLAYER_PATHS.MASTER_PLAYLIST
-                )}
-                poster={buildVideoPosterUrl(organizationSlug, libraryId, video)}
-                storyboardUrl={buildVideoFileUrl(
-                  organizationSlug,
-                  libraryId,
-                  video,
-                  VIDEO_PLAYER_PATHS.STORYBOARD
-                )}
-                title={playerSettings.showTitle ? video.title : undefined}
-                chapters={video.chapters}
-                controls={playerSettings}
-                onTimeUpdate={setPlayerSeconds}
-              />
-            </Suspense>
+              <Suspense
+                fallback={
+                  <Skeleton className="aspect-video w-full rounded-lg" />
+                }
+              >
+                <VideoPlayer
+                  src={buildVideoFileUrl(
+                    organizationSlug,
+                    libraryId,
+                    video,
+                    VIDEO_PLAYER_PATHS.MASTER_PLAYLIST
+                  )}
+                  poster={buildVideoPosterUrl(
+                    organizationSlug,
+                    libraryId,
+                    video
+                  )}
+                  storyboardUrl={buildVideoFileUrl(
+                    organizationSlug,
+                    libraryId,
+                    video,
+                    VIDEO_PLAYER_PATHS.STORYBOARD
+                  )}
+                  title={playerSettings.showTitle ? video.title : undefined}
+                  chapters={video.chapters}
+                  ctas={ctas}
+                  controls={playerSettings}
+                  onTimeUpdate={setPlayerSeconds}
+                />
+              </Suspense>
+            </ClientOnly>
             <div className="flex items-center gap-2">
               <Switch
                 id="video-default-player"
@@ -193,6 +214,14 @@ function VideoDetails({
             )}
             {isPlayable && (
               <TabsTrigger
+                value={VIDEO_DETAILS_TABS.CTAS}
+                className="h-8 flex-none px-0 group-data-horizontal/tabs:after:bottom-0"
+              >
+                {t("videos.ctas.title")}
+              </TabsTrigger>
+            )}
+            {isPlayable && (
+              <TabsTrigger
                 value={VIDEO_DETAILS_TABS.ANALYTICS}
                 className="h-8 flex-none px-0 group-data-horizontal/tabs:after:bottom-0"
               >
@@ -227,6 +256,16 @@ function VideoDetails({
           {isPlayable && (
             <TabsContent value={VIDEO_DETAILS_TABS.CHAPTERS}>
               <VideoChaptersSection
+                organizationSlug={organizationSlug}
+                libraryId={libraryId}
+                video={video}
+                currentSeconds={playerSeconds}
+              />
+            </TabsContent>
+          )}
+          {isPlayable && (
+            <TabsContent value={VIDEO_DETAILS_TABS.CTAS}>
+              <VideoCtasSection
                 organizationSlug={organizationSlug}
                 libraryId={libraryId}
                 video={video}

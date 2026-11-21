@@ -90,6 +90,20 @@
       "too_close_to_end_many": "Rozdział musi zaczynać się co najmniej {{count}} sekund przed końcem filmu ({{time}}).",
       "too_close_to_end_other": "Rozdział musi zaczynać się co najmniej {{count}} sekundy przed końcem filmu ({{time}})."
     },
+    "cta": {
+      "heading_required": "Podaj nagłówek.",
+      "button_label_required": "Podaj etykietę przycisku.",
+      "max_length": "Użyj maksymalnie {{max}} znaków.",
+      "button_url_invalid": "Podaj link zaczynający się od https://.",
+      "consent_text_required": "Podaj treść zgody.",
+      "time_invalid": "Podaj czas, np. 1:05 lub 1:02:03.",
+      "start_too_late": "Zacznij co najmniej sekundę przed końcem filmu ({{time}}).",
+      "end_too_late": "Zakończ najpóźniej z końcem filmu ({{time}}).",
+      "end_too_early": "Wyświetlaj co najmniej przez sekundę.",
+      "random_end_required": "Losowy moment wymaga końca przedziału.",
+      "display_seconds_invalid": "Podaj co najmniej {{min}} sekundę.",
+      "window_too_short": "Przedział musi trwać co najmniej tyle, ile wyświetlanie."
+    },
     "playlist_title": {
       "required": "Wpisz tytuł.",
       "max_length": "Użyj maksymalnie {{max}} znaków."
@@ -224,7 +238,16 @@
       "playlist.videos.update.success": "Zapisano filmy playlisty.",
       "playlist.delete.success": "Usunięto playlistę.",
       "playlist.playback_url.create.success": "Utworzono adres odtwarzania playlisty.",
-      "playlist.embed.get.success": "Wczytano osadzenie playlisty."
+      "playlist.embed.get.success": "Wczytano osadzenie playlisty.",
+      "video.cta.list.success": "Pobrano wezwania do działania.",
+      "video.cta.create.success": "Dodano wezwanie do działania.",
+      "video.cta.update.success": "Zapisano wezwanie do działania.",
+      "video.cta.delete.success": "Usunięto wezwanie do działania.",
+      "video.cta.embed.list.success": "Pobrano wezwania do działania.",
+      "video.cta.event.report.success": "Zapisano.",
+      "video.cta.lead.submit.success": "Otrzymano adres e-mail.",
+      "video.cta.lead.list.success": "Pobrano leady.",
+      "video.cta.lead.delete.success": "Usunięto lead."
     },
     "error": {
       "fallback": "Ups, coś poszło nie tak..",
@@ -293,7 +316,13 @@
       "video.poster.unsupported_image": "Miniaturą może być tylko prawdziwy obraz JPEG, PNG lub WebP.",
       "video.chapters.out_of_range": "Rozdział zaczyna się mniej niż sekundę przed końcem filmu.",
       "playlist.not_found": "Ta playlista nie istnieje lub została usunięta.",
-      "playlist.video_not_in_library": "Playlista może zawierać tylko filmy z własnej biblioteki."
+      "playlist.video_not_in_library": "Playlista może zawierać tylko filmy z własnej biblioteki.",
+      "video.cta.not_found": "To wezwanie do działania nie istnieje lub zostało usunięte.",
+      "video.cta.out_of_range": "Czasy nie pasują do filmu: zacznij co najmniej sekundę przed końcem i zakończ najpóźniej z końcem filmu.",
+      "video.cta.limit_reached": "Ten film ma już maksymalną liczbę wezwań do działania.",
+      "video.cta.end_screen_taken": "Ten film ma już ekran końcowy.",
+      "video.cta.not_an_email_form": "Adresy e-mail przyjmuje tylko formularz e-mail.",
+      "video.cta.lead.not_found": "Ten lead nie istnieje lub został usunięty."
     }
   },
   "errors": {
@@ -522,6 +551,7 @@
     "tabs": {
       "videos": "Filmy",
       "analytics": "Statystyki",
+      "leads": "Leady",
       "storage": "Magazyn",
       "security": "Bezpieczeństwo",
       "api": "API",
@@ -646,6 +676,10 @@
         "analytics_read": {
           "label": "Odczyt statystyk",
           "description": "Odczytuj wyświetlenia, czas oglądania i utrzymanie widzów filmów biblioteki."
+        },
+        "leads_read": {
+          "label": "Odczyt leadów",
+          "description": "Odczytuj adresy e-mail zostawione przez widzów w wezwaniach do działania, np. aby przesłać je do CRM."
         }
       },
       "secret": {
@@ -739,7 +773,7 @@
       "owner_only_title": "Webhookami zarządza tylko właściciel",
       "owner_only_description": "Poproś właściciela organizacji o skonfigurowanie webhooka dla tej biblioteki.",
       "title": "Webhook",
-      "description": "OpenStream wysyła podpisane żądanie POST na Twój adres, gdy film zostanie utworzony, przemianowany, przesłany, przetworzony lub usunięty, więc Twoje serwery nie muszą odpytywać API.",
+      "description": "OpenStream wysyła podpisane żądanie POST na Twój adres, gdy film zostanie utworzony, przemianowany, przesłany, przetworzony lub usunięty albo widz zostawi adres e-mail, więc Twoje serwery nie muszą odpytywać API.",
       "url_label": "Adres URL",
       "create": "Dodaj webhook",
       "save": "Zapisz adres",
@@ -758,6 +792,7 @@
         "video_processing_started": "Rozpoczęło się transkodowanie. Wysyłane raz, nie przy ponowieniach.",
         "video_processing_ready": "HLS, miniatura i storyboard są gotowe do odtwarzania.",
         "video_processing_failed": "Transkodowanie nie powiodło się przy każdej próbie albo plik nie zawiera obrazu.",
+        "video_cta_submitted": "Widz zostawił adres e-mail w wezwaniu do działania. Zawiera adres i zgodę, którą wyraził.",
         "webhook_test": "Wysyłane po kliknięciu „Wyślij zdarzenie testowe” na tej stronie."
       },
       "secret_title": "Skopiuj teraz sekret podpisu",
@@ -791,6 +826,7 @@
         "videos": "Filmy",
         "uploads": "Przesyłanie",
         "processing": "Przetwarzanie",
+        "leads": "Leady",
         "testing": "Test"
       },
       "example_title": "Przykładowa treść żądania",
@@ -957,7 +993,15 @@
       "next_episode_in_few": "Następny odcinek za {{count}} sekundy",
       "next_episode_in_many": "Następny odcinek za {{count}} sekund",
       "next_episode_in_other": "Następny odcinek za {{count}} sekundy",
-      "dismiss_next_episode": "Zostań przy tym filmie"
+      "dismiss_next_episode": "Zostań przy tym filmie",
+      "cta": {
+        "close": "Zamknij",
+        "thanks": "Dziękujemy! Jesteś na liście.",
+        "email": "Adres e-mail",
+        "email_placeholder": "ty@example.com",
+        "failed": "Nie udało się wysłać. Spróbuj ponownie za chwilę.",
+        "preview": "Podgląd: adresy e-mail są zbierane tylko w osadzeniach."
+      }
     },
     "chapters": {
       "title": "Rozdziały",
@@ -991,6 +1035,87 @@
         "skipped_other": "{{count}} rozdziału zaczyna się mniej niż sekundę przed końcem filmu ({{duration}}) i zostanie pominięte."
       }
     },
+    "ctas": {
+      "title": "Wezwania do działania",
+      "description": "Przyciski i formularze e-mail wyświetlane nad filmem w trakcie odtwarzania albo na ekranie końcowym. Odtwarzacz powyżej pokazuje ich podgląd; wyświetlenia i odpowiedzi są liczone w osadzeniach.",
+      "empty": "Brak wezwań do działania. Dodaj przycisk z linkiem albo formularz zbierający adresy e-mail.",
+      "add": "Dodaj wezwanie do działania",
+      "add_title": "Dodaj wezwanie do działania",
+      "edit_title": "Edytuj wezwanie do działania",
+      "dialog_description": "O co prosi widzów, kiedy się pojawia i co mówi.",
+      "save": "Zapisz",
+      "edit": "Edytuj {{heading}}",
+      "delete": "Usuń {{heading}}",
+      "delete_title": "Usunąć to wezwanie do działania?",
+      "delete_description": "„{{heading}}” przestanie się wyświetlać, a jego statystyki zostaną usunięte. Zostawione w nim adresy e-mail zostaną na stronie Leady.",
+      "delete_confirm": "Usuń",
+      "too_many": "Film może mieć maksymalnie {{max}} wezwań do działania.",
+      "use_player_time": "Użyj {{time}}",
+      "timing": {
+        "end_screen": "Ekran końcowy",
+        "from": "Od {{start}} do końca",
+        "between": "{{start}}–{{end}}",
+        "random_one": "Losowo między {{start}} a {{end}}, przez {{count}} sekundę",
+        "random_few": "Losowo między {{start}} a {{end}}, przez {{count}} sekundy",
+        "random_many": "Losowo między {{start}} a {{end}}, przez {{count}} sekund",
+        "random_other": "Losowo między {{start}} a {{end}}, przez {{count}} sekundy"
+      },
+      "kinds": {
+        "button": {
+          "label": "Przycisk",
+          "hint": "Otwiera link w nowej karcie.",
+          "button_placeholder": "Wypróbuj za darmo"
+        },
+        "email": {
+          "label": "Formularz e-mail",
+          "hint": "Zbiera adresy e-mail za zgodą widza.",
+          "button_placeholder": "Daj mi znać"
+        }
+      },
+      "placements": {
+        "overlay": {
+          "label": "Nad filmem",
+          "hint": "Karta w rogu w trakcie odtwarzania."
+        },
+        "end_screen": {
+          "label": "Ekran końcowy",
+          "hint": "Nad ostatnią klatką; wstrzymuje następny film playlisty."
+        }
+      },
+      "fields": {
+        "kind": "Prosi widzów, aby",
+        "placement": "Wyświetla się",
+        "start": "Od",
+        "end": "Do",
+        "end_hint": "Zostaw puste, aby wyświetlać do końca filmu.",
+        "heading": "Nagłówek",
+        "heading_placeholder": "Wypróbuj za darmo przez 14 dni",
+        "body": "Tekst (opcjonalnie)",
+        "body_placeholder": "Jedno krótkie zdanie o tym, co zyskują widzowie.",
+        "button_label": "Etykieta przycisku",
+        "button_url": "Link",
+        "consent_text": "Treść zgody",
+        "consent_text_hint": "Wyświetlana obok pola wyboru, które widz musi zaznaczyć. Każdy lead zachowuje treść, na którą się zgodził.",
+        "consent_text_placeholder": "Zgadzam się na otrzymywanie e-maili od Acme. Mogę zrezygnować w każdej chwili.",
+        "dismissible": "Widzowie mogą je zamknąć",
+        "dismissible_hint": "Bez tego zostaje do końca swojego czasu albo do odpowiedzi widza.",
+        "timing": "Kiedy",
+        "window_start": "Między",
+        "window_end": "A",
+        "display_seconds": "Wyświetla się przez (sekundy)",
+        "display_seconds_hint": "Każde odtworzenie losuje własny moment, tak aby zmieścić się w przedziale."
+      },
+      "timings": {
+        "fixed": {
+          "label": "W stałym momencie",
+          "hint": "Każdy widz widzi je w tym samym momencie."
+        },
+        "random": {
+          "label": "W losowym momencie",
+          "hint": "Każdy widz widzi je w innym momencie w wybranym przedziale."
+        }
+      }
+    },
     "edit": {
       "trigger": "Edytuj tytuł i opis",
       "title": "Edytuj film",
@@ -1011,7 +1136,8 @@
       "muted": "Start bez dźwięku",
       "loop": "Zapętlenie",
       "title": "Pokaż tytuł",
-      "start": "Start od (sekundy)"
+      "start": "Start od (sekundy)",
+      "ctas": "Pokazuj wezwania do działania"
     },
     "unavailable": {
       "not_ready": "To wideo jest jeszcze przetwarzane. Spróbuj ponownie za chwilę.",
@@ -1087,6 +1213,26 @@
       "title": "Rozdziały",
       "reached": "dotarło",
       "finished": "do końca"
+    },
+    "ctas": {
+      "title": "Wezwania do działania",
+      "description": "Spośród wyświetleń, w których pojawiło się wezwanie do działania: odsetek, który na nie odpowiedział, i odsetek, który je zamknął.",
+      "columns": {
+        "cta": "Wezwanie do działania",
+        "shown": "Wyświetlono",
+        "answered": "Odpowiedzi",
+        "dismissed": "Zamknięto"
+      },
+      "answers": {
+        "button_one": "{{count}} kliknięcie",
+        "button_few": "{{count}} kliknięcia",
+        "button_many": "{{count}} kliknięć",
+        "button_other": "{{count}} kliknięcia",
+        "email_one": "{{count}} adres e-mail",
+        "email_few": "{{count}} adresy e-mail",
+        "email_many": "{{count}} adresów e-mail",
+        "email_other": "{{count}} adresu e-mail"
+      }
     }
   },
   "pagination": {
@@ -1186,7 +1332,8 @@
       "webhook": "Webhook",
       "video": "Film",
       "account": "Konto",
-      "playlist": "Playlista"
+      "playlist": "Playlista",
+      "lead": "Lead"
     },
     "columns": {
       "action": "Co się stało",
@@ -1260,7 +1407,12 @@
       "playlist_created": "Utworzono playlistę",
       "playlist_updated": "Zmieniono playlistę",
       "playlist_videos_updated": "Zmieniono filmy playlisty",
-      "playlist_deleted": "Usunięto playlistę"
+      "playlist_deleted": "Usunięto playlistę",
+      "video_cta_created": "Dodano wezwanie do działania",
+      "video_cta_updated": "Zmieniono wezwanie do działania",
+      "video_cta_deleted": "Usunięto wezwanie do działania",
+      "lead_deleted": "Usunięto lead",
+      "library_leads_exported": "Wyeksportowano leady"
     }
   },
   "account_activity": {
@@ -1340,6 +1492,32 @@
       "title": "Edytuj playlistę",
       "description": "Widzowie widzą tytuł i opis na górze menu odcinków.",
       "submit": "Zapisz zmiany"
+    }
+  },
+  "leads": {
+    "description": "Adresy e-mail zostawione przez widzów w wezwaniach do działania tej biblioteki, wraz ze zgodą, którą wyrazili. Leady zostają po usunięciu wezwania do działania lub filmu.",
+    "export": "Eksportuj CSV",
+    "search_placeholder": "Szukaj adresów e-mail",
+    "empty": {
+      "title": "Brak leadów",
+      "description": "Dodaj formularz e-mail do wezwań do działania filmu, a zostawione adresy pojawią się tutaj."
+    },
+    "no_results": {
+      "title": "Brak pasujących leadów",
+      "description": "Żaden adres e-mail nie zawiera „{{search}}”."
+    },
+    "columns": {
+      "email": "E-mail",
+      "video": "Film i wezwanie do działania",
+      "site": "Strona",
+      "consented_at": "Zgoda",
+      "actions": "Akcje"
+    },
+    "delete": {
+      "trigger": "Usuń",
+      "title": "Usunąć ten lead?",
+      "description": "{{email}} zostanie trwale usunięty, np. gdy widz poprosi o usunięcie danych. Dziennik aktywności nie zachowuje kopii adresu.",
+      "confirm": "Usuń lead"
     }
   }
 }

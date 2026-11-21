@@ -404,6 +404,8 @@ export const videoEmbedDtoSchema = z
     storyboardUrl: z.url(),
     /** Where the player starts counting a view, carrying the same signature. */
     viewsUrl: z.url(),
+    /** Where the player reads the video's calls to action, carrying the same signature. */
+    ctasUrl: z.url(),
     chapters: z.array(videoChapterDtoSchema),
     /** Hosts allowed to frame the player; empty when any site may. */
     allowedPlaybackHosts: z.array(z.string()),

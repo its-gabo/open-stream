@@ -19,6 +19,7 @@ import type {
 } from "../../storage/types/storage.types"
 import {
   CHAPTERS_TRACK_PATH,
+  EMBED_CTAS_PATH,
   LIBRARY_API_PATH,
   PLAYBACK_QUERY_KEYS,
   PLAYBACK_EXPIRES_PATTERN,
@@ -172,6 +173,7 @@ export class VideoPlaybackService {
       posterUrl: urls.posterUrl,
       storyboardUrl: urls.storyboardUrl,
       viewsUrl: urls.viewsUrl,
+      ctasUrl: urls.ctasUrl,
       chapters: video.chapters,
     }
   }
@@ -212,6 +214,7 @@ export class VideoPlaybackService {
       ),
       viewsUrl: withQuery("views"),
       chaptersUrl: withQuery(CHAPTERS_TRACK_PATH),
+      ctasUrl: withQuery(EMBED_CTAS_PATH),
     }
   }
 

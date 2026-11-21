@@ -1,8 +1,10 @@
 import { VIDEO_EMBED_QUERY_KEYS } from "@workspace/shared"
 import { CircleAlertIcon, ListVideoIcon } from "lucide-react"
+import { ClientOnly } from "@tanstack/react-router"
 import { Suspense, lazy, useCallback, useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 
+import { useEmbedCtas } from "../hooks/use-embed-ctas"
 import {
   toResumeSeconds,
   toWatchedShare,
@@ -84,6 +86,7 @@ function PlaylistPlayer({
     autoPlay: options.autoplay ?? false,
   }))
   const video = embed.videos[selection.index]
+  const ctas = useEmbedCtas(video.ctasUrl, options.ctas !== false)
   const { progressById, recordProgress } = useWatchProgress(
     embed.videos.map(({ videoId }) => videoId)
   )
@@ -164,35 +167,35 @@ function PlaylistPlayer({
     onSelectEpisode: selectEpisode,
   }
 
+  // The player needs the browser, so the server renders the poster in its place.
+  const poster = (
+    <img src={video.posterUrl} alt="" className="size-full object-contain" />
+  )
+
   return (
-    <Suspense
-      fallback={
-        <img
-          src={video.posterUrl}
-          alt=""
-          className="size-full object-contain"
+    <ClientOnly fallback={poster}>
+      <Suspense fallback={poster}>
+        <VideoPlayer
+          src={video.hlsUrl}
+          poster={video.posterUrl}
+          storyboardUrl={video.storyboardUrl}
+          title={
+            (options.title ?? embed.player.showTitle) ? video.title : undefined
+          }
+          autoPlay={selection.autoPlay}
+          muted={options.muted || options.autoplay}
+          startSeconds={selection.startSeconds}
+          fill
+          sendsCredentials={false}
+          autoFocus={false}
+          viewsUrl={video.viewsUrl}
+          chapters={video.chapters}
+          ctas={ctas}
+          controls={embed.player}
+          onTimeUpdate={handleTimeUpdate}
+          playlist={playlist}
         />
-      }
-    >
-      <VideoPlayer
-        src={video.hlsUrl}
-        poster={video.posterUrl}
-        storyboardUrl={video.storyboardUrl}
-        title={
-          (options.title ?? embed.player.showTitle) ? video.title : undefined
-        }
-        autoPlay={selection.autoPlay}
-        muted={options.muted || options.autoplay}
-        startSeconds={selection.startSeconds}
-        fill
-        sendsCredentials={false}
-        autoFocus={false}
-        viewsUrl={video.viewsUrl}
-        chapters={video.chapters}
-        controls={embed.player}
-        onTimeUpdate={handleTimeUpdate}
-        playlist={playlist}
-      />
-    </Suspense>
+      </Suspense>
+    </ClientOnly>
   )
 }

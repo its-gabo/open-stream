@@ -23,6 +23,7 @@ export const videoEmbedSearchSchema = z.object({
     .optional()
     .catch(undefined),
   [VIDEO_EMBED_QUERY_KEYS.TITLE]: embedFlagSchema,
+  [VIDEO_EMBED_QUERY_KEYS.CTAS]: embedFlagSchema,
   key: signaturePartSchema,
   expires: signaturePartSchema,
   token: signaturePartSchema,

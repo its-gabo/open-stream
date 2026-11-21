@@ -36,6 +36,7 @@ import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdIndexRouteImpor
 import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdAnalyticsRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/analytics'
 import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdApiRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/api'
 import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/encoding'
+import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdLeadsRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/leads'
 import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdPlayerRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/player'
 import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdPlaylistsRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/playlists'
 import { Route as AuthenticatedOrganizationSlugLibrariesLibraryIdSecurityRouteImport } from './routes/_authenticated/$organizationSlug/libraries/$libraryId/security'
@@ -192,6 +193,12 @@ const AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute =
     path: '/encoding',
     getParentRoute: () => AuthenticatedOrganizationSlugLibrariesLibraryIdRoute,
   } as any)
+const AuthenticatedOrganizationSlugLibrariesLibraryIdLeadsRoute =
+  AuthenticatedOrganizationSlugLibrariesLibraryIdLeadsRouteImport.update({
+    id: '/leads',
+    path: '/leads',
+    getParentRoute: () => AuthenticatedOrganizationSlugLibrariesLibraryIdRoute,
+  } as any)
 const AuthenticatedOrganizationSlugLibrariesLibraryIdPlayerRoute =
   AuthenticatedOrganizationSlugLibrariesLibraryIdPlayerRouteImport.update({
     id: '/player',
@@ -248,6 +255,7 @@ export interface FileRoutesByFullPath {
   '/$organizationSlug/libraries/$libraryId/analytics': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdAnalyticsRoute
   '/$organizationSlug/libraries/$libraryId/api': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute
   '/$organizationSlug/libraries/$libraryId/encoding': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute
+  '/$organizationSlug/libraries/$libraryId/leads': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdLeadsRoute
   '/$organizationSlug/libraries/$libraryId/player': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdPlayerRoute
   '/$organizationSlug/libraries/$libraryId/playlists': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdPlaylistsRoute
   '/$organizationSlug/libraries/$libraryId/security': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdSecurityRoute
@@ -278,6 +286,7 @@ export interface FileRoutesByTo {
   '/$organizationSlug/libraries/$libraryId/analytics': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdAnalyticsRoute
   '/$organizationSlug/libraries/$libraryId/api': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute
   '/$organizationSlug/libraries/$libraryId/encoding': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute
+  '/$organizationSlug/libraries/$libraryId/leads': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdLeadsRoute
   '/$organizationSlug/libraries/$libraryId/player': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdPlayerRoute
   '/$organizationSlug/libraries/$libraryId/playlists': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdPlaylistsRoute
   '/$organizationSlug/libraries/$libraryId/security': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdSecurityRoute
@@ -313,6 +322,7 @@ export interface FileRoutesById {
   '/_authenticated/$organizationSlug/libraries/$libraryId/analytics': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdAnalyticsRoute
   '/_authenticated/$organizationSlug/libraries/$libraryId/api': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute
   '/_authenticated/$organizationSlug/libraries/$libraryId/encoding': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute
+  '/_authenticated/$organizationSlug/libraries/$libraryId/leads': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdLeadsRoute
   '/_authenticated/$organizationSlug/libraries/$libraryId/player': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdPlayerRoute
   '/_authenticated/$organizationSlug/libraries/$libraryId/playlists': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdPlaylistsRoute
   '/_authenticated/$organizationSlug/libraries/$libraryId/security': typeof AuthenticatedOrganizationSlugLibrariesLibraryIdSecurityRoute
@@ -347,6 +357,7 @@ export interface FileRouteTypes {
     | '/$organizationSlug/libraries/$libraryId/analytics'
     | '/$organizationSlug/libraries/$libraryId/api'
     | '/$organizationSlug/libraries/$libraryId/encoding'
+    | '/$organizationSlug/libraries/$libraryId/leads'
     | '/$organizationSlug/libraries/$libraryId/player'
     | '/$organizationSlug/libraries/$libraryId/playlists'
     | '/$organizationSlug/libraries/$libraryId/security'
@@ -377,6 +388,7 @@ export interface FileRouteTypes {
     | '/$organizationSlug/libraries/$libraryId/analytics'
     | '/$organizationSlug/libraries/$libraryId/api'
     | '/$organizationSlug/libraries/$libraryId/encoding'
+    | '/$organizationSlug/libraries/$libraryId/leads'
     | '/$organizationSlug/libraries/$libraryId/player'
     | '/$organizationSlug/libraries/$libraryId/playlists'
     | '/$organizationSlug/libraries/$libraryId/security'
@@ -411,6 +423,7 @@ export interface FileRouteTypes {
     | '/_authenticated/$organizationSlug/libraries/$libraryId/analytics'
     | '/_authenticated/$organizationSlug/libraries/$libraryId/api'
     | '/_authenticated/$organizationSlug/libraries/$libraryId/encoding'
+    | '/_authenticated/$organizationSlug/libraries/$libraryId/leads'
     | '/_authenticated/$organizationSlug/libraries/$libraryId/player'
     | '/_authenticated/$organizationSlug/libraries/$libraryId/playlists'
     | '/_authenticated/$organizationSlug/libraries/$libraryId/security'
@@ -617,6 +630,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRouteImport
       parentRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdRoute
     }
+    '/_authenticated/$organizationSlug/libraries/$libraryId/leads': {
+      id: '/_authenticated/$organizationSlug/libraries/$libraryId/leads'
+      path: '/leads'
+      fullPath: '/$organizationSlug/libraries/$libraryId/leads'
+      preLoaderRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdLeadsRouteImport
+      parentRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdRoute
+    }
     '/_authenticated/$organizationSlug/libraries/$libraryId/player': {
       id: '/_authenticated/$organizationSlug/libraries/$libraryId/player'
       path: '/player'
@@ -659,6 +679,7 @@ interface AuthenticatedOrganizationSlugLibrariesLibraryIdRouteChildren {
   AuthenticatedOrganizationSlugLibrariesLibraryIdAnalyticsRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdAnalyticsRoute
   AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute
   AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute
+  AuthenticatedOrganizationSlugLibrariesLibraryIdLeadsRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdLeadsRoute
   AuthenticatedOrganizationSlugLibrariesLibraryIdPlayerRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdPlayerRoute
   AuthenticatedOrganizationSlugLibrariesLibraryIdPlaylistsRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdPlaylistsRoute
   AuthenticatedOrganizationSlugLibrariesLibraryIdSecurityRoute: typeof AuthenticatedOrganizationSlugLibrariesLibraryIdSecurityRoute
@@ -675,6 +696,8 @@ const AuthenticatedOrganizationSlugLibrariesLibraryIdRouteChildren: Authenticate
       AuthenticatedOrganizationSlugLibrariesLibraryIdApiRoute,
     AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute:
       AuthenticatedOrganizationSlugLibrariesLibraryIdEncodingRoute,
+    AuthenticatedOrganizationSlugLibrariesLibraryIdLeadsRoute:
+      AuthenticatedOrganizationSlugLibrariesLibraryIdLeadsRoute,
     AuthenticatedOrganizationSlugLibrariesLibraryIdPlayerRoute:
       AuthenticatedOrganizationSlugLibrariesLibraryIdPlayerRoute,
     AuthenticatedOrganizationSlugLibrariesLibraryIdPlaylistsRoute:

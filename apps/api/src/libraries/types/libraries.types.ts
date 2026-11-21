@@ -39,6 +39,7 @@ import type { OrganizationsService } from "../../organizations/services/organiza
 import type { AnalyticsModule } from "../../analytics/analytics.module"
 import type { WebhooksModule } from "../../webhooks/webhooks.module"
 import type { LibrariesModule } from "../libraries.module"
+import type { CtasModule } from "../../ctas/ctas.module"
 import type { PlaylistsModule } from "../../playlists/playlists.module"
 
 /** A library's own settings, without figures that need its videos counted. */
@@ -307,6 +308,7 @@ export type LibrariesRouterDependencies = LibrariesModule &
   Pick<WebhooksModule, "libraryWebhooksService"> &
   Pick<AnalyticsModule, "videoAnalyticsService"> &
   Pick<PlaylistsModule, "playlistsService"> &
+  Pick<CtasModule, "videoCtasService" | "videoCtaLeadsService"> &
   OrganizationRouterDependencies & {
     organizationsService: OrganizationsService
   }

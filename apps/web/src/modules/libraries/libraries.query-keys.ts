@@ -92,3 +92,28 @@ export const libraryWebhookDeliveryPageQueryKey = (
 /** A storyboard never changes for a URL: reprocessing changes the URL. */
 export const videoStoryboardQueryKey = (vttUrl: string) =>
   [...LIBRARIES_QUERY_KEY, "storyboard", vttUrl] as const
+
+export const videoCtasQueryKey = (
+  organizationSlug: string,
+  libraryId: string,
+  videoId: string
+) =>
+  [
+    ...LIBRARIES_QUERY_KEY,
+    "ctas",
+    organizationSlug,
+    libraryId,
+    videoId,
+  ] as const
+
+/** Prefix of every page of the library's leads. */
+export const libraryLeadsQueryKey = (
+  organizationSlug: string,
+  libraryId: string
+) => [...LIBRARIES_QUERY_KEY, "leads", organizationSlug, libraryId] as const
+
+export const libraryLeadPageQueryKey = (
+  organizationSlug: string,
+  libraryId: string,
+  params: ListPageParams
+) => [...libraryLeadsQueryKey(organizationSlug, libraryId), params] as const

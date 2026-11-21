@@ -9,10 +9,24 @@ import type { AuthUserSession } from "../../auth/types/auth.types"
 import { readConfig } from "../../config/app.config"
 import type { LibraryProfile } from "../../libraries/types/libraries.types"
 import type { OrganizationAccess } from "../../organizations/types/organizations.types"
-import { users, videoViews, videos, type NewVideoViewRecord } from "../schema"
+import { VIDEO_CTA_KINDS, VIDEO_CTA_PLACEMENTS } from "@workspace/shared"
+import {
+  users,
+  videoCtaLeads,
+  videoCtas,
+  videoViewCtas,
+  videoViews,
+  videos,
+  type NewVideoCtaLeadRecord,
+  type NewVideoViewRecord,
+  type VideoCtaRecord,
+  type VideoViewRecord,
+} from "../schema"
 import { ensureSeedBucket } from "./seed-bucket"
 import {
   SEED_API_KEY,
+  SEED_CTA_ANSWER_SHARE,
+  SEED_CTA_DISMISS_SHARE,
   SEED_DEVICE_TYPES,
   SEED_LIBRARIES,
   SEED_ORGANIZATION,
@@ -253,10 +267,24 @@ async function createSeedVideo(
     })
   }
 
-  if (!seedVideo.file) return video
+  if (!seedVideo.file) return { video, ctas: [] }
+
+  const ctas = seedVideo.ctas?.length
+    ? await appModule.db
+        .insert(videoCtas)
+        .values(
+          seedVideo.ctas.map((cta) => ({
+            ...cta,
+            organizationId: library.organizationId,
+            libraryId: library.id,
+            videoId: video.id,
+            createdById: owner.userId,
+          }))
+        )
+        .returning()
+    : []
 
   if (seedVideo.chapters) {
-    // Chapters are saved through the API once a video is processed; the worker processes these later.
     await appModule.db
       .update(videos)
       .set({ chapters: seedVideo.chapters })
@@ -281,7 +309,7 @@ async function createSeedVideo(
     { uploadOffset: 0, bytes }
   )
 
-  return video
+  return { video, ctas }
 }
 
 /** Views as the player would have recorded them, from the last `SEED_VIEW_DAYS` days. */
@@ -315,6 +343,72 @@ function buildSeedViews(
       lastReportedAt: new Date(startedAt.getTime() + watchedSeconds * 1000),
     }
   })
+}
+
+/**
+ * What the seeded views did with the video's calls to action: each view
+ * that got to one showed it, and some of those answered or closed it.
+ * Views that left an email address leave a lead.
+ */
+function buildSeedCtaActivity(
+  views: VideoViewRecord[],
+  ctas: VideoCtaRecord[],
+  seedVideo: SeedVideo
+) {
+  const durationSeconds = seedVideo.file?.seconds ?? 0
+  const viewCtas: (typeof videoViewCtas.$inferInsert)[] = []
+  const leads: NewVideoCtaLeadRecord[] = []
+
+  for (const cta of ctas) {
+    const showsAtSeconds =
+      cta.placement === VIDEO_CTA_PLACEMENTS.END_SCREEN
+        ? durationSeconds
+        : (cta.startSeconds ?? 0)
+
+    for (const view of views) {
+      if (view.furthestPositionSeconds < showsAtSeconds) continue
+
+      const shownAt = new Date(view.startedAt.getTime() + showsAtSeconds * 1000)
+      const answeredAt = new Date(shownAt.getTime() + 4000)
+      const chance = random()
+      const isAnswered = chance < SEED_CTA_ANSWER_SHARE
+      const isEmail = cta.kind === VIDEO_CTA_KINDS.EMAIL
+
+      viewCtas.push({
+        viewId: view.id,
+        ctaId: cta.id,
+        videoId: view.videoId,
+        organizationId: view.organizationId,
+        libraryId: view.libraryId,
+        shownAt,
+        clickedAt: isAnswered && !isEmail ? answeredAt : null,
+        submittedAt: isAnswered && isEmail ? answeredAt : null,
+        dismissedAt:
+          !isAnswered && chance < SEED_CTA_ANSWER_SHARE + SEED_CTA_DISMISS_SHARE
+            ? answeredAt
+            : null,
+      })
+
+      if (isAnswered && isEmail && cta.consentText) {
+        leads.push({
+          organizationId: view.organizationId,
+          libraryId: view.libraryId,
+          videoId: view.videoId,
+          ctaId: cta.id,
+          viewId: view.id,
+          email: `viewer${leads.length + 1}.${cta.id.slice(0, 4)}@example.com`,
+          consentText: cta.consentText,
+          consentedAt: answeredAt,
+          ctaHeading: cta.heading,
+          videoTitle: seedVideo.title,
+          embeddingHost: view.embeddingHost,
+          createdAt: answeredAt,
+        })
+      }
+    }
+  }
+
+  return { viewCtas, leads }
 }
 
 async function seed(appModule: AppModule) {
@@ -357,10 +451,30 @@ async function seed(appModule: AppModule) {
     const videoIdsByTitle = new Map<string, string>()
 
     for (const seedVideo of seedLibrary.videos) {
-      const video = await createSeedVideo(appModule, library, owner, seedVideo)
+      const { video, ctas } = await createSeedVideo(
+        appModule,
+        library,
+        owner,
+        seedVideo
+      )
       const views = buildSeedViews(library, video.id, seedLibrary, seedVideo)
+      const insertedViews =
+        views.length > 0
+          ? await appModule.db.insert(videoViews).values(views).returning()
+          : []
+      const { viewCtas, leads } = buildSeedCtaActivity(
+        insertedViews,
+        ctas,
+        seedVideo
+      )
 
-      if (views.length > 0) await appModule.db.insert(videoViews).values(views)
+      if (viewCtas.length > 0) {
+        await appModule.db.insert(videoViewCtas).values(viewCtas)
+      }
+
+      if (leads.length > 0) {
+        await appModule.db.insert(videoCtaLeads).values(leads)
+      }
 
       videoIdsByTitle.set(seedVideo.title, video.id)
       console.log(`  ${seedLibrary.name} / ${seedVideo.title}`)

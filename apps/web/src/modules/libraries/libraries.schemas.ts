@@ -8,7 +8,12 @@ import {
   PLAYER_ACCENT_COLOR_PATTERN,
   PLAYLIST_LIMITS,
   VIDEO_CHAPTER_LIMITS,
+  VIDEO_CTA_KINDS,
+  VIDEO_CTA_LIMITS,
+  VIDEO_CTA_PLACEMENTS,
+  VIDEO_CTA_TIMINGS,
   VIDEO_FIELD_LIMITS,
+  videoCtaButtonUrlSchema,
   latestChapterStartSeconds,
   libraryPlayerSettingsSchema,
   webhookUrlSchema,
@@ -18,6 +23,7 @@ import { z } from "zod"
 import { formatChapterTime, parseChapterTime } from "./libraries.utils"
 
 import type { TranslationFunction } from "@/i18n/i18n.types"
+import type { VideoCtaBody } from "@/api/generated-api"
 
 export const libraryFormSchema = (t: TranslationFunction) =>
   z.object({
@@ -309,3 +315,167 @@ export const videoChaptersFormSchema = (
           .sort((left, right) => left.startSeconds - right.startSeconds)
       ),
   })
+
+/**
+ * A call to action as its dialog edits it, with times typed like chapter
+ * starts; an empty end keeps an overlay until the video ends. Its times must
+ * fit the video's `durationSeconds`.
+ */
+export const videoCtaFormSchema = (
+  t: TranslationFunction,
+  durationSeconds: number
+) =>
+  z
+    .object({
+      kind: z.enum(VIDEO_CTA_KINDS),
+      placement: z.enum(VIDEO_CTA_PLACEMENTS),
+      startTime: z.string(),
+      endTime: z.string(),
+      timing: z.enum(VIDEO_CTA_TIMINGS),
+      /** Whole seconds a random overlay shows, as typed. */
+      displaySeconds: z.string(),
+      heading: z
+        .string()
+        .trim()
+        .min(1, t("validation.cta.heading_required"))
+        .max(
+          VIDEO_CTA_LIMITS.HEADING_MAX_LENGTH,
+          t("validation.cta.max_length", {
+            max: VIDEO_CTA_LIMITS.HEADING_MAX_LENGTH,
+          })
+        ),
+      body: z
+        .string()
+        .trim()
+        .max(
+          VIDEO_CTA_LIMITS.BODY_MAX_LENGTH,
+          t("validation.cta.max_length", {
+            max: VIDEO_CTA_LIMITS.BODY_MAX_LENGTH,
+          })
+        ),
+      buttonLabel: z
+        .string()
+        .trim()
+        .min(1, t("validation.cta.button_label_required"))
+        .max(
+          VIDEO_CTA_LIMITS.BUTTON_LABEL_MAX_LENGTH,
+          t("validation.cta.max_length", {
+            max: VIDEO_CTA_LIMITS.BUTTON_LABEL_MAX_LENGTH,
+          })
+        ),
+      buttonUrl: z.string().trim(),
+      consentText: z
+        .string()
+        .trim()
+        .max(
+          VIDEO_CTA_LIMITS.CONSENT_TEXT_MAX_LENGTH,
+          t("validation.cta.max_length", {
+            max: VIDEO_CTA_LIMITS.CONSENT_TEXT_MAX_LENGTH,
+          })
+        ),
+      dismissible: z.boolean(),
+    })
+    .superRefine((values, context) => {
+      const addIssue = (path: string, message: string) =>
+        context.addIssue({ code: "custom", path: [path], message })
+
+      if (
+        values.kind === VIDEO_CTA_KINDS.BUTTON &&
+        !videoCtaButtonUrlSchema.safeParse(values.buttonUrl).success
+      ) {
+        addIssue("buttonUrl", t("validation.cta.button_url_invalid"))
+      }
+
+      if (values.kind === VIDEO_CTA_KINDS.EMAIL && !values.consentText) {
+        addIssue("consentText", t("validation.cta.consent_text_required"))
+      }
+
+      if (values.placement !== VIDEO_CTA_PLACEMENTS.OVERLAY) return
+
+      const start = parseChapterTime(values.startTime)
+      const end = values.endTime.trim()
+        ? parseChapterTime(values.endTime)
+        : undefined
+
+      if (start === null) {
+        addIssue("startTime", t("validation.cta.time_invalid"))
+      } else if (
+        start >
+        durationSeconds - VIDEO_CTA_LIMITS.MIN_LENGTH_SECONDS
+      ) {
+        addIssue(
+          "startTime",
+          t("validation.cta.start_too_late", {
+            time: formatChapterTime(durationSeconds),
+          })
+        )
+      }
+
+      if (end === null) {
+        addIssue("endTime", t("validation.cta.time_invalid"))
+      } else if (end !== undefined && end > durationSeconds) {
+        addIssue(
+          "endTime",
+          t("validation.cta.end_too_late", {
+            time: formatChapterTime(durationSeconds),
+          })
+        )
+      } else if (
+        end !== undefined &&
+        start !== null &&
+        end - start < VIDEO_CTA_LIMITS.MIN_LENGTH_SECONDS
+      ) {
+        addIssue("endTime", t("validation.cta.end_too_early"))
+      }
+
+      if (values.timing !== VIDEO_CTA_TIMINGS.RANDOM) return
+
+      const displaySeconds = Number(values.displaySeconds)
+
+      if (end === undefined) {
+        addIssue("endTime", t("validation.cta.random_end_required"))
+      }
+
+      if (
+        !values.displaySeconds.trim() ||
+        !Number.isFinite(displaySeconds) ||
+        displaySeconds < VIDEO_CTA_LIMITS.MIN_LENGTH_SECONDS
+      ) {
+        addIssue(
+          "displaySeconds",
+          t("validation.cta.display_seconds_invalid", {
+            min: VIDEO_CTA_LIMITS.MIN_LENGTH_SECONDS,
+          })
+        )
+      } else if (
+        start !== null &&
+        end !== null &&
+        end !== undefined &&
+        end - start < displaySeconds
+      ) {
+        addIssue("displaySeconds", t("validation.cta.window_too_short"))
+      }
+    })
+    .transform((values): VideoCtaBody => {
+      const isButton = values.kind === VIDEO_CTA_KINDS.BUTTON
+      const isOverlay = values.placement === VIDEO_CTA_PLACEMENTS.OVERLAY
+      const isRandom = isOverlay && values.timing === VIDEO_CTA_TIMINGS.RANDOM
+
+      return {
+        kind: values.kind,
+        placement: values.placement,
+        startSeconds: isOverlay ? parseChapterTime(values.startTime) : null,
+        endSeconds:
+          isOverlay && values.endTime.trim()
+            ? parseChapterTime(values.endTime)
+            : null,
+        timing: isRandom ? VIDEO_CTA_TIMINGS.RANDOM : VIDEO_CTA_TIMINGS.FIXED,
+        durationSeconds: isRandom ? Number(values.displaySeconds) : null,
+        heading: values.heading,
+        body: values.body || null,
+        buttonLabel: values.buttonLabel,
+        buttonUrl: isButton ? values.buttonUrl : null,
+        consentText: isButton ? null : values.consentText,
+        dismissible: values.dismissible,
+      }
+    })

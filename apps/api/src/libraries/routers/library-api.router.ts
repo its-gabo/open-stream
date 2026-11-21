@@ -8,6 +8,9 @@ import {
   publicVideoUploadParamSchema,
 } from "../dto/libraries.schemas"
 import type { AnalyticsModule } from "../../analytics/analytics.module"
+import type { CtasModule } from "../../ctas/ctas.module"
+import { createLibraryApiCtasRouter } from "../../ctas/routers/library-api-ctas.router"
+import { createVideoCtaPlaybackRouter } from "../../ctas/routers/video-cta-playback.router"
 import type { PlaylistsModule } from "../../playlists/playlists.module"
 import { createLibraryApiPlaylistsRouter } from "../../playlists/routers/library-api-playlists.router"
 import { createPlaylistPlaybackRouter } from "../../playlists/routers/playlist-playback.router"
@@ -25,7 +28,7 @@ import { createVideoPlaybackRouter } from "./video-playback.router"
  * the API root.
  */
 export function createLibraryApiRouter(
-  module: LibrariesModule & AnalyticsModule & PlaylistsModule
+  module: LibrariesModule & AnalyticsModule & PlaylistsModule & CtasModule
 ) {
   return new Hono().route(
     LIBRARY_API_PATH,
@@ -67,6 +70,10 @@ export function createLibraryApiRouter(
       .route("/", createVideoViewsRouter(module.videoViewsService))
       .route(
         "/",
+        createVideoCtaPlaybackRouter(module.videoCtaPlaybackService)
+      )
+      .route(
+        "/",
         createLibraryApiAnalyticsRouter(
           module.libraryApiAccessService,
           module.videoAnalyticsService
@@ -89,6 +96,14 @@ export function createLibraryApiRouter(
           module.libraryApiAccessService,
           module.playlistsService,
           module.playlistPlaybackService
+        )
+      )
+      .route(
+        "/",
+        createLibraryApiCtasRouter(
+          module.libraryApiAccessService,
+          module.videoCtasService,
+          module.videoCtaLeadsService
         )
       )
       .route(

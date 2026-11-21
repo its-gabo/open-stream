@@ -2,6 +2,8 @@ import {
   ANALYTICS_PERIODS_DAYS,
   DEFAULT_ANALYTICS_PERIOD_DAYS,
   PLAYBACK_HOST_PATTERN,
+  VIDEO_CTA_KINDS,
+  VIDEO_CTA_PLACEMENTS,
   VIEWER_DEVICE_TYPES,
 } from "@workspace/shared"
 import { z } from "zod"
@@ -141,6 +143,22 @@ export const chapterAnalyticsDtoSchema = z
   })
   .meta({ id: "ChapterAnalytics" })
 
+export const ctaAnalyticsDtoSchema = z
+  .object({
+    ctaId: z.uuid(),
+    heading: z.string(),
+    kind: z.enum(VIDEO_CTA_KINDS),
+    placement: z.enum(VIDEO_CTA_PLACEMENTS),
+    /** Views that showed the call to action. */
+    shownViews: z.int().nonnegative(),
+    /** Views that opened a button's link. */
+    clickedViews: z.int().nonnegative(),
+    /** Views that left an email address in an email form. */
+    submittedViews: z.int().nonnegative(),
+    dismissedViews: z.int().nonnegative(),
+  })
+  .meta({ id: "CtaAnalytics" })
+
 export const libraryAnalyticsDtoSchema = z
   .object({
     period: analyticsPeriodDtoSchema,
@@ -168,6 +186,8 @@ export const videoAnalyticsDtoSchema = z
     retention: z.array(retentionPointDtoSchema),
     /** How far views got through each chapter, in playback order; empty when the video has none. */
     chapters: z.array(chapterAnalyticsDtoSchema),
+    /** What views did with each call to action, in playback order; empty when the video has none. */
+    ctas: z.array(ctaAnalyticsDtoSchema),
     devices: z.array(analyticsDeviceDtoSchema),
     embeddingHosts: z.array(analyticsEmbeddingHostDtoSchema),
   })

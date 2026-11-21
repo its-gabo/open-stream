@@ -86,6 +86,20 @@
       "too_close_to_end_one": "Start at least {{count}} second before the video ends at {{time}}.",
       "too_close_to_end_other": "Start at least {{count}} seconds before the video ends at {{time}}."
     },
+    "cta": {
+      "heading_required": "Enter a heading.",
+      "button_label_required": "Enter a button label.",
+      "max_length": "Use at most {{max}} characters.",
+      "button_url_invalid": "Enter a link starting with https://.",
+      "consent_text_required": "Enter the text viewers agree to.",
+      "time_invalid": "Enter a time, e.g. 1:05 or 1:02:03.",
+      "start_too_late": "Start at least a second before the video ends ({{time}}).",
+      "end_too_late": "End at the latest when the video ends ({{time}}).",
+      "end_too_early": "Show it for at least a second.",
+      "random_end_required": "A random time needs the end of its window.",
+      "display_seconds_invalid": "Enter at least {{min}} second.",
+      "window_too_short": "The window must be at least as long as it stays."
+    },
     "playlist_title": {
       "required": "Enter a title.",
       "max_length": "Use at most {{max}} characters."
@@ -220,7 +234,16 @@
       "playlist.videos.update.success": "Playlist videos saved.",
       "playlist.delete.success": "Playlist deleted.",
       "playlist.playback_url.create.success": "Playlist playback URL created.",
-      "playlist.embed.get.success": "Playlist embed loaded."
+      "playlist.embed.get.success": "Playlist embed loaded.",
+      "video.cta.list.success": "Calls to action fetched.",
+      "video.cta.create.success": "Call to action added.",
+      "video.cta.update.success": "Call to action saved.",
+      "video.cta.delete.success": "Call to action deleted.",
+      "video.cta.embed.list.success": "Calls to action fetched.",
+      "video.cta.event.report.success": "Recorded.",
+      "video.cta.lead.submit.success": "Email address received.",
+      "video.cta.lead.list.success": "Leads fetched.",
+      "video.cta.lead.delete.success": "Lead deleted."
     },
     "error": {
       "fallback": "Oops something went wrong..",
@@ -289,7 +312,13 @@
       "video.poster.unsupported_image": "Only real JPEG, PNG and WebP images can be posters.",
       "video.chapters.out_of_range": "A chapter starts less than a second before the end of the video.",
       "playlist.not_found": "This playlist doesn't exist or was deleted.",
-      "playlist.video_not_in_library": "A playlist can only hold videos of its own library."
+      "playlist.video_not_in_library": "A playlist can only hold videos of its own library.",
+      "video.cta.not_found": "This call to action doesn't exist or was deleted.",
+      "video.cta.out_of_range": "The times don't fit the video: start at least a second before it ends, and end by its end.",
+      "video.cta.limit_reached": "This video has as many calls to action as it can have.",
+      "video.cta.end_screen_taken": "This video already has an end screen.",
+      "video.cta.not_an_email_form": "Only an email form takes email addresses.",
+      "video.cta.lead.not_found": "This lead doesn't exist or was deleted."
     }
   },
   "errors": {
@@ -518,6 +547,7 @@
     "tabs": {
       "videos": "Videos",
       "analytics": "Analytics",
+      "leads": "Leads",
       "storage": "Storage",
       "security": "Security",
       "api": "API",
@@ -640,6 +670,10 @@
         "analytics_read": {
           "label": "Read analytics",
           "description": "Read view counts, watch time and retention of the library's videos."
+        },
+        "leads_read": {
+          "label": "Read leads",
+          "description": "List the email addresses viewers left in calls to action, e.g. to sync them to a CRM."
         }
       },
       "secret": {
@@ -733,7 +767,7 @@
       "owner_only_title": "Only the owner can manage webhooks",
       "owner_only_description": "Ask the organization owner to set up a webhook for this library.",
       "title": "Webhook",
-      "description": "OpenStream sends a signed POST request to your URL whenever a video is created, renamed, uploaded, processed or deleted, so your servers don’t have to poll.",
+      "description": "OpenStream sends a signed POST request to your URL whenever a video is created, renamed, uploaded, processed or deleted, or a viewer leaves an email address, so your servers don’t have to poll.",
       "url_label": "Endpoint URL",
       "create": "Add webhook",
       "save": "Save URL",
@@ -752,6 +786,7 @@
         "video_processing_started": "Transcoding started. Sent once, not again on retries.",
         "video_processing_ready": "HLS, poster and storyboard are ready to play.",
         "video_processing_failed": "Transcoding failed on every attempt, or the file has no picture.",
+        "video_cta_submitted": "A viewer left their email address in a call to action. Carries the address and the consent they gave.",
         "webhook_test": "Sent when you click \"Send test event\" on this page."
       },
       "secret_title": "Copy the signing secret now",
@@ -783,6 +818,7 @@
         "videos": "Videos",
         "uploads": "Uploads",
         "processing": "Processing",
+        "leads": "Leads",
         "testing": "Testing"
       },
       "example_title": "Example request body",
@@ -947,7 +983,15 @@
       "next_episode_named": "Next episode: {{title}}",
       "next_episode_in_one": "Next episode in {{count}} second",
       "next_episode_in_other": "Next episode in {{count}} seconds",
-      "dismiss_next_episode": "Stay on this video"
+      "dismiss_next_episode": "Stay on this video",
+      "cta": {
+        "close": "Close",
+        "thanks": "Thanks! You're on the list.",
+        "email": "Email address",
+        "email_placeholder": "you@example.com",
+        "failed": "That didn't go through. Try again in a moment.",
+        "preview": "A preview: email addresses are taken in embeds only."
+      }
     },
     "chapters": {
       "title": "Chapters",
@@ -975,6 +1019,85 @@
         "skipped_other": "{{count}} chapters start less than a second before the video ends at {{duration}} and are left out."
       }
     },
+    "ctas": {
+      "title": "Calls to action",
+      "description": "Buttons and email forms shown over the video while it plays, or on its end screen once it ends. The player above previews them; views and answers are counted in embeds.",
+      "empty": "No calls to action yet. Add a button that opens a link, or a form that collects email addresses.",
+      "add": "Add call to action",
+      "add_title": "Add a call to action",
+      "edit_title": "Edit call to action",
+      "dialog_description": "What it asks of viewers, when it shows and what it says.",
+      "save": "Save",
+      "edit": "Edit {{heading}}",
+      "delete": "Delete {{heading}}",
+      "delete_title": "Delete this call to action?",
+      "delete_description": "\"{{heading}}\" no longer shows, and its view counts are deleted. Email addresses left in it stay on the Leads page.",
+      "delete_confirm": "Delete",
+      "too_many": "A video can have up to {{max}} calls to action.",
+      "use_player_time": "Use {{time}}",
+      "timing": {
+        "end_screen": "End screen",
+        "from": "From {{start}} to the end",
+        "between": "{{start}}–{{end}}",
+        "random_one": "Random between {{start}} and {{end}}, for {{count}} second",
+        "random_other": "Random between {{start}} and {{end}}, for {{count}} seconds"
+      },
+      "kinds": {
+        "button": {
+          "label": "Button",
+          "hint": "Opens a link in a new tab.",
+          "button_placeholder": "Start free trial"
+        },
+        "email": {
+          "label": "Email form",
+          "hint": "Collects email addresses, with consent.",
+          "button_placeholder": "Keep me posted"
+        }
+      },
+      "placements": {
+        "overlay": {
+          "label": "Over the video",
+          "hint": "A card in the corner while the video plays."
+        },
+        "end_screen": {
+          "label": "End screen",
+          "hint": "Over the last frame; holds a playlist's next video back."
+        }
+      },
+      "fields": {
+        "kind": "Asks viewers to",
+        "placement": "Shows",
+        "start": "From",
+        "end": "Until",
+        "end_hint": "Leave empty to keep it until the video ends.",
+        "heading": "Heading",
+        "heading_placeholder": "Try it free for 14 days",
+        "body": "Text (optional)",
+        "body_placeholder": "One short line about what viewers get.",
+        "button_label": "Button label",
+        "button_url": "Link",
+        "consent_text": "Consent text",
+        "consent_text_hint": "Shown next to a checkbox viewers must tick. Each lead keeps the text they agreed to.",
+        "consent_text_placeholder": "I agree to receive emails from Acme. I can unsubscribe at any time.",
+        "dismissible": "Viewers can close it",
+        "dismissible_hint": "Without this, it stays until its time is up, or until the viewer answers it.",
+        "timing": "When",
+        "window_start": "Between",
+        "window_end": "And",
+        "display_seconds": "Stays for (seconds)",
+        "display_seconds_hint": "Each playback picks its own moment, so it fits inside the window."
+      },
+      "timings": {
+        "fixed": {
+          "label": "At a fixed time",
+          "hint": "Every viewer sees it at the same moment."
+        },
+        "random": {
+          "label": "At a random time",
+          "hint": "Each viewer sees it at a different moment inside a window."
+        }
+      }
+    },
     "edit": {
       "trigger": "Edit title and description",
       "title": "Edit video",
@@ -995,7 +1118,8 @@
       "muted": "Start muted",
       "loop": "Loop",
       "title": "Show title",
-      "start": "Start at (seconds)"
+      "start": "Start at (seconds)",
+      "ctas": "Show calls to action"
     },
     "unavailable": {
       "not_ready": "This video is still being processed. Try again in a moment.",
@@ -1065,6 +1189,22 @@
       "title": "Chapters",
       "reached": "reached",
       "finished": "finished"
+    },
+    "ctas": {
+      "title": "Calls to action",
+      "description": "Of the views that showed each call to action, the share that answered it and the share that closed it.",
+      "columns": {
+        "cta": "Call to action",
+        "shown": "Shown",
+        "answered": "Answered",
+        "dismissed": "Closed"
+      },
+      "answers": {
+        "button_one": "{{count}} click",
+        "button_other": "{{count}} clicks",
+        "email_one": "{{count}} email address",
+        "email_other": "{{count}} email addresses"
+      }
     }
   },
   "pagination": {
@@ -1164,7 +1304,8 @@
       "webhook": "Webhook",
       "video": "Video",
       "account": "Account",
-      "playlist": "Playlist"
+      "playlist": "Playlist",
+      "lead": "Lead"
     },
     "columns": {
       "action": "What happened",
@@ -1238,7 +1379,12 @@
       "playlist_created": "Created a playlist",
       "playlist_updated": "Updated a playlist",
       "playlist_videos_updated": "Changed a playlist's videos",
-      "playlist_deleted": "Deleted a playlist"
+      "playlist_deleted": "Deleted a playlist",
+      "video_cta_created": "Added a call to action",
+      "video_cta_updated": "Changed a call to action",
+      "video_cta_deleted": "Deleted a call to action",
+      "lead_deleted": "Deleted a lead",
+      "library_leads_exported": "Exported leads"
     }
   },
   "account_activity": {
@@ -1308,6 +1454,32 @@
       "title": "Edit playlist",
       "description": "Viewers see the title and description at the top of the episodes menu.",
       "submit": "Save changes"
+    }
+  },
+  "leads": {
+    "description": "Email addresses viewers left in the library's calls to action, with the consent they gave. Leads stay when their call to action or video is deleted.",
+    "export": "Export CSV",
+    "search_placeholder": "Search email addresses",
+    "empty": {
+      "title": "No leads yet",
+      "description": "Add an email form to a video's calls to action, and addresses viewers leave show up here."
+    },
+    "no_results": {
+      "title": "No matching leads",
+      "description": "No email address contains \"{{search}}\"."
+    },
+    "columns": {
+      "email": "Email",
+      "video": "Video and call to action",
+      "site": "Site",
+      "consented_at": "Consented",
+      "actions": "Actions"
+    },
+    "delete": {
+      "trigger": "Delete",
+      "title": "Delete this lead?",
+      "description": "{{email}} is deleted for good, e.g. when the viewer asks to be forgotten. The activity log keeps no copy of the address.",
+      "confirm": "Delete lead"
     }
   }
 }

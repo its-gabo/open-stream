@@ -74,7 +74,7 @@ export class VideoAnalyticsService {
       durationSeconds === null
         ? []
         : toChapterSpans(video.chapters, durationSeconds)
-    const [shared, reached, chapterReach] = await Promise.all([
+    const [shared, reached, chapterReach, ctas] = await Promise.all([
       this.readSharedFigures(filter, period),
       durationSeconds === null
         ? Promise.resolve(null)
@@ -93,6 +93,7 @@ export class VideoAnalyticsService {
               reachedEndSeconds,
             ])
           ),
+      this.videoViewsRepository.countCtaViews(filter),
     ])
 
     return {
@@ -114,6 +115,7 @@ export class VideoAnalyticsService {
             completedViews: chapterReach[index * 2 + 1]!,
           })
         ),
+        ctas,
       },
     }
   }

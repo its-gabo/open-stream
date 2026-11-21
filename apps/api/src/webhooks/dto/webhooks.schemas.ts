@@ -12,6 +12,7 @@ import {
   apiEmptyDataSchema,
   createApiSuccessResponseSchema,
 } from "../../common/http/response/response.schemas"
+import { videoCtaLeadDtoSchema } from "../../ctas/dto/ctas.schemas"
 import {
   libraryParamSchema,
   videoStatusDetailsDtoSchema,
@@ -48,8 +49,12 @@ export const webhookEventDtoSchema = z
     type: webhookEventTypeSchema,
     /** When the event happened; retries keep it. */
     timestamp: z.iso.datetime(),
-    /** The video as it is after the change for `video.*`, as it was for `video.deleted`; the library for `webhook.test`. */
-    data: z.union([videoStatusDetailsDtoSchema, webhookTestEventDataDtoSchema]),
+    /** The video as it is after the change for `video.*`, as it was for `video.deleted`; the lead for `video.cta.submitted`; the library for `webhook.test`. */
+    data: z.union([
+      videoStatusDetailsDtoSchema,
+      videoCtaLeadDtoSchema,
+      webhookTestEventDataDtoSchema,
+    ]),
   })
   .meta({ id: "WebhookEvent" })
 

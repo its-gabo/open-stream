@@ -18,6 +18,23 @@ import type {
   StorageMultipartPart,
 } from "../types/storage.types"
 
+/**
+ * Bun's virtual-hosted-style client expects the bucket in the endpoint's host
+ * and leaves it out of the URL otherwise, so it is added here, the way the AWS
+ * SDK addresses the bucket for every other call.
+ */
+function toPresignEndpoint({
+  endpoint,
+  bucket,
+  forcePathStyle,
+}: StorageLocation) {
+  if (forcePathStyle) return endpoint
+
+  const url = new URL(endpoint)
+  url.hostname = `${bucket}.${url.hostname}`
+  return url.origin + url.pathname.replace(/\/$/, "")
+}
+
 /** Object storage on any S3-compatible server (AWS S3, RustFS, MinIO, R2, …). */
 export class S3ObjectStorageService implements ObjectStorage {
   async checkBucketAccess(location: StorageLocation) {
@@ -225,7 +242,7 @@ export class S3ObjectStorageService implements ObjectStorage {
     expiresInSeconds: number
   ) {
     return new Bun.S3Client({
-      endpoint: location.endpoint,
+      endpoint: toPresignEndpoint(location),
       region: location.region,
       bucket: location.bucket,
       accessKeyId: location.credentials.accessKeyId,

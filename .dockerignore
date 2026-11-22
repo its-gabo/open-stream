@@ -1,0 +1,12 @@
+.git
+**/node_modules
+**/dist
+**/.turbo
+**/.tanstack
+**/.astro
+**/coverage
+**/.DS_Store
+
+**/.env
+**/.env.*
+!**/.env.example

@@ -1,14 +1,14 @@
 ---
 import Signet from "./Signet.astro"
 
-const words = ["Upload", "Transcode", "Store", "Play", "Measure", "Integrate", "Audit"]
+const words = ["Upload", "Transcode", "Caption", "Play", "Engage", "Measure", "Integrate"]
 const rows = [
   { id: "a", direction: -1 },
   { id: "b", direction: 1 },
 ]
 ---
 
-<section class="marquee" aria-label="Upload, transcode, store, play, measure, integrate, audit">
+<section class="marquee" aria-label="Upload, transcode, caption, play, engage, measure, integrate">
   {
     rows.map((row) => (
       <div class="marquee__row" data-marquee={row.direction} aria-hidden="true">

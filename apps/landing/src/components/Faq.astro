@@ -17,8 +17,20 @@ const questions = [
     answer: "A view counts once playback starts, and watch time is measured as people actually watch. Viewers are never identified.",
   },
   {
+    question: "Do captions and chapters need an AI service?",
+    answer: "No. You can upload WebVTT or SRT captions and write chapters yourself. To generate them, connect OpenAI or any OpenAI-compatible server with your own key. You set a monthly limit for each provider.",
+  },
+  {
+    question: "Can I collect leads from my videos?",
+    answer: "Yes. Add an email form over the video or on its end screen. Viewers tick a consent box, and you find the addresses on the Leads page, as a CSV export, or by webhook.",
+  },
+  {
+    question: "How do I run it in production?",
+    answer: "Use the production Docker Compose file. It runs ready-made images of the API, web app and proxy from the GitHub container registry, alongside PostgreSQL and Redis, and applies database migrations on start.",
+  },
+  {
     question: "Can I upload from my own backend?",
-    answer: "Yes. Create an API key with upload access and send files from your backend with the API.",
+    answer: "Yes. Create an API key with upload access and send files from your backend with the API, or pass a link and the server downloads the file.",
   },
   {
     question: "What does it cost?",

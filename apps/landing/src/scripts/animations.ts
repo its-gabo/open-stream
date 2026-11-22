@@ -459,7 +459,12 @@ function animatePanel(panel: HTMLElement, trigger: ScrollTrigger.Vars) {
   const cueWords = $$("[data-cue-word]", panel)
   if (cueWords.length > 0) {
     timeline
-      .from(cueWords, { autoAlpha: 0, duration: 0.2, ease: "none", stagger: 0.09 })
+      .from(cueWords, {
+        autoAlpha: 0,
+        duration: 0.2,
+        ease: "none",
+        stagger: 0.09,
+      })
       .from(
         $$("[data-chapter]", panel),
         { autoAlpha: 0, x: -24, duration: 0.7, ease: EASE, stagger: 0.14 },
@@ -492,7 +497,6 @@ function animatePipeline() {
     if (!current || index === active) return
     const direction = index > active ? 1 : -1
     active = index
-    // A quick change cuts the running roll short, so two never fight over the number
     counter?.kill()
     counter = gsap
       .timeline()
@@ -507,7 +511,6 @@ function animatePipeline() {
       .fromTo(
         current,
         { yPercent: 100 * direction },
-        // Rendered right away, the start value would move the old number below before it rolls out
         { yPercent: 0, duration: 0.45, ease: EASE, immediateRender: false }
       )
   }

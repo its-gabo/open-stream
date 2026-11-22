@@ -1,0 +1,163 @@
+---
+import Icon from "./Icon.astro"
+import type { IconName } from "../lib/icons"
+
+const items: { icon: IconName; title: string; text: string }[] = [
+  {
+    icon: "bookmark",
+    title: "Chapters",
+    text: "Split the seek bar into chapters viewers can jump between. Add them at the playhead or paste a list from a video description, then see how many viewers reach and finish each one.",
+  },
+  {
+    icon: "captions",
+    title: "Captions",
+    text: "Upload WebVTT or SRT tracks in any language, or transcribe videos on demand or as soon as they're processed. Viewers pick a track in the player.",
+  },
+  {
+    icon: "sparkles",
+    title: "AI you plug in",
+    text: "Connect OpenAI or any OpenAI-compatible server with your own key. It writes captions and suggests chapters you review before saving, within monthly limits you set.",
+  },
+  {
+    icon: "list-video",
+    title: "Playlists",
+    text: "Group videos into a playlist that plays in one embed, with an episodes menu and the next video starting after a short countdown.",
+  },
+  {
+    icon: "mouse-pointer-click",
+    title: "Calls to action",
+    text: "Show a button over the video at the moment you choose, or on its end screen. Analytics show how often each one was answered or closed.",
+  },
+  {
+    icon: "mail",
+    title: "Leads",
+    text: "Collect email addresses in the player with a consent checkbox. Find them on the Leads page, export them as CSV, or receive each one by webhook.",
+  },
+]
+---
+
+<section class="engage container" id="player">
+  <div class="engage__head">
+    <p class="eyebrow">Player</p>
+    <h2 class="section-title" data-reveal="lines">More than a play button</h2>
+    <p class="engage__lead" data-reveal="fade">
+      Help viewers find their way through long videos, reach everyone with
+      captions, and turn views into sign-ups.
+    </p>
+  </div>
+  <div class="engage__grid">
+    {
+      items.map((item) => (
+        <article class="engage__card" data-spotlight data-reveal="card">
+          <span class="engage__icon">
+            <Icon name={item.icon} />
+          </span>
+          <h3>{item.title}</h3>
+          <p>{item.text}</p>
+        </article>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .engage {
+    display: grid;
+    gap: clamp(2.5rem, 5vw, 4rem);
+    padding-block: clamp(6rem, 12vw, 10rem);
+  }
+
+  .engage__head {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .engage__head h2 {
+    max-width: 14ch;
+  }
+
+  .engage__lead {
+    max-width: 48ch;
+    color: var(--fg-dim);
+  }
+
+  .engage__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  .engage__card {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 1rem;
+    min-height: 280px;
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    background: var(--bg-raised);
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  /* A soft light that follows the pointer */
+  .engage__card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(
+      420px circle at var(--x, 50%) var(--y, -20%),
+      rgb(236 235 230 / 0.09),
+      transparent 60%
+    );
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+
+  .engage__card:hover::before {
+    opacity: 1;
+  }
+
+  .engage__icon {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border: 1px solid var(--line-strong);
+    border-radius: 14px;
+  }
+
+  .engage__icon :global(svg) {
+    width: 22px;
+    height: 22px;
+  }
+
+  .engage__card h3 {
+    margin-top: 2rem;
+    font-family: var(--font-heading);
+    font-size: clamp(1.4rem, 2.2vw, 1.8rem);
+    letter-spacing: -0.01em;
+  }
+
+  .engage__card p {
+    color: var(--fg-dim);
+  }
+
+  @media (max-width: 1100px) {
+    .engage__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 760px) {
+    .engage__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .engage__card {
+      min-height: 0;
+    }
+  }
+</style>

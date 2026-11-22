@@ -1,5 +1,12 @@
 ---
 const bars = [42, 38, 41, 41, 36, 44, 47, 37, 33, 47, 42, 40, 52, 53, 37, 45, 43, 41, 52, 64, 59, 50, 48, 44, 52, 52, 72, 66, 44, 50]
+const cue = "Big Buck Bunny wakes up to a beautiful morning".split(" ")
+const chapters = [
+  { time: "0:00", title: "A quiet morning" },
+  { time: "1:52", title: "Three troublemakers" },
+  { time: "4:37", title: "Setting the traps" },
+  { time: "7:48", title: "Payback" },
+]
 const sites = [
   { host: "aurora-pictures.test", allowed: true },
   { host: "blog.aurora-pictures.test", allowed: true },
@@ -16,7 +23,7 @@ const sites = [
       </div>
       <p class="pipeline__counter" aria-hidden="true">
         <span class="pipeline__counter-current"><span data-pipeline-current>01</span></span>
-        <span class="pipeline__counter-total">/ 04</span>
+        <span class="pipeline__counter-total">/ 05</span>
       </p>
     </div>
 
@@ -26,8 +33,9 @@ const sites = [
           <span class="panel__index">01</span>
           <h3>Upload</h3>
           <p>
-            Drop in an MP4 or MOV of up to 20 GiB. Uploads are resumable, so a
-            dropped connection picks up where it left off.
+            Drop in an MP4 or MOV of up to 20 GiB, or paste a link and the
+            server downloads it. Uploads are resumable, so a dropped connection
+            picks up where it left off.
           </p>
         </div>
         <div class="panel__visual upload">
@@ -41,7 +49,7 @@ const sites = [
           <div class="upload__chunks">
             {Array.from({ length: 40 }, () => <span data-chunk></span>)}
           </div>
-          <p class="panel__caption">Resumable upload</p>
+          <p class="panel__caption">Resumable upload · import from a URL</p>
         </div>
       </li>
 
@@ -83,10 +91,41 @@ const sites = [
       <li class="panel" data-panel>
         <div class="panel__copy">
           <span class="panel__index">03</span>
+          <h3>Enrich</h3>
+          <p>
+            Upload captions, or have your AI provider transcribe the video. Then
+            let it suggest chapters from the captions, and review them before
+            you save.
+          </p>
+        </div>
+        <div class="panel__visual enrich">
+          <div class="enrich__screen">
+            <img src="/media/bbb-poster.jpg" alt="" width="1280" height="720" loading="lazy" />
+            <p class="enrich__cue">
+              {cue.map((word) => <span data-cue-word>{word} </span>)}
+            </p>
+          </div>
+          <ol class="enrich__chapters">
+            {
+              chapters.map((chapter) => (
+                <li data-chapter>
+                  <span>{chapter.time}</span>
+                  {chapter.title}
+                </li>
+              ))
+            }
+          </ol>
+          <p class="panel__caption">Captions · chapters suggested from them</p>
+        </div>
+      </li>
+
+      <li class="panel" data-panel>
+        <div class="panel__copy">
+          <span class="panel__index">04</span>
           <h3>Play</h3>
           <p>
-            Paste one embed code on your site. Only the sites you allow can play
-            your videos, and signed links can make them expire.
+            Paste one embed code for a video or a whole playlist. Only the sites
+            you allow can play your videos, and signed links can make them expire.
           </p>
         </div>
         <div class="panel__visual player">
@@ -112,11 +151,11 @@ const sites = [
 
       <li class="panel" data-panel>
         <div class="panel__copy">
-          <span class="panel__index">04</span>
+          <span class="panel__index">05</span>
           <h3>Measure</h3>
           <p>
-            See views, watch time, completion and retention for every video,
-            along with the devices and sites your viewers watch on.
+            See views, watch time and retention for every video, how far viewers
+            get through each chapter, and who answers your calls to action.
           </p>
         </div>
         <div class="panel__visual chart">
@@ -334,6 +373,57 @@ const sites = [
     border-radius: 4px;
     background-image: url("/media/bbb-storyboard.jpg");
     background-size: 800% 100%;
+  }
+
+  /* Enrich */
+  .enrich__screen {
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+  }
+
+  .enrich__screen img {
+    width: 100%;
+    height: auto;
+  }
+
+  .enrich__cue {
+    position: absolute;
+    inset: auto 8% 0.9rem;
+    margin: 0 auto;
+    width: fit-content;
+    padding: 0.3rem 0.65rem;
+    border-radius: 6px;
+    background: rgb(0 0 0 / 0.72);
+    color: #fff !important;
+    font-size: clamp(0.7rem, 1.1vw, 0.85rem);
+    text-align: center;
+  }
+
+  .enrich__chapters {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.85rem;
+  }
+
+  .enrich__chapters li {
+    display: flex;
+    gap: 0.9rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+  }
+
+  .enrich__chapters span {
+    min-width: 2.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.6;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
   }
 
   /* Play */

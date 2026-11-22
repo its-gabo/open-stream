@@ -7,7 +7,7 @@ interface Props {
 }
 
 const { title, description } = Astro.props
-const ogImage = new URL("/media/feature-embed.png", Astro.site)
+const ogImage = new URL("/media/openstream-banner.jpg", Astro.site)
 ---
 
 <!doctype html>
@@ -25,6 +25,8 @@ const ogImage = new URL("/media/feature-embed.png", Astro.site)
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="2560" />
+    <meta property="og:image:height" content="1280" />
     <meta name="twitter:card" content="summary_large_image" />
     <script is:inline>
       document.documentElement.classList.add("js")

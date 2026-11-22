@@ -2,6 +2,15 @@ name: API tests
 
 on:
   pull_request:
+    paths:
+      - "apps/api/**"
+      - "packages/shared/**"
+      - "packages/email-templates/**"
+      - "package.json"
+      - "bun.lock"
+      - "turbo.json"
+      - "tsconfig.json"
+      - ".github/workflows/api-tests.yml"
   push:
     branches: [main]
 

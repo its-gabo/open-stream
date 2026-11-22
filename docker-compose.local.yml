@@ -1,0 +1,98 @@
+name: open-stream-local
+
+x-local-api: &local-api
+  build:
+    context: .
+    dockerfile: docker/api/Dockerfile
+  logging: { driver: json-file }
+  extra_hosts:
+    - "storage.localhost:host-gateway"
+
+x-local-logging: &local-logging
+  logging: { driver: json-file }
+
+services:
+  db: *local-logging
+  redis: *local-logging
+
+  migrate:
+    <<: *local-api
+    depends_on:
+      rustfs-create-bucket:
+        condition: service_completed_successfully
+
+  app: *local-api
+
+  worker: *local-api
+
+  web:
+    <<: *local-logging
+    build:
+      context: .
+      dockerfile: docker/web/Dockerfile
+      target: web
+
+  frontend:
+    <<: *local-logging
+    build:
+      context: .
+      dockerfile: docker/web/Dockerfile
+      target: nginx
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "8443:8443"
+    volumes:
+      - ./docker/local/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+    depends_on:
+      - app
+      - frontend
+
+  rustfs:
+    image: rustfs/rustfs:latest
+    restart: unless-stopped
+    environment:
+      RUSTFS_ACCESS_KEY: rustfsadmin
+      RUSTFS_SECRET_KEY: rustfsadmin
+    command: /data
+    ports:
+      - "9100:9000"
+    volumes:
+      - rustfs_data:/data
+    healthcheck:
+      test:
+        ["CMD-SHELL", "curl -fsS http://localhost:9000/health/ready >/dev/null"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  rustfs-create-bucket:
+    image: amazon/aws-cli:latest
+    restart: "no"
+    depends_on:
+      rustfs:
+        condition: service_healthy
+    environment:
+      OBJECT_STORAGE_ENDPOINT: http://rustfs:9000
+      OBJECT_STORAGE_BUCKET: open-stream
+      OBJECT_STORAGE_ACCESS_KEY_ID: rustfsadmin
+      OBJECT_STORAGE_SECRET_ACCESS_KEY: rustfsadmin
+    volumes:
+      - ./docker/rustfs/create-bucket.sh:/create-bucket.sh:ro
+    entrypoint: ["/bin/sh", "/create-bucket.sh"]
+
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    ports:
+      - "8125:8025"
+
+volumes:
+  caddy_data:
+  rustfs_data:

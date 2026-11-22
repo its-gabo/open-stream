@@ -1,0 +1,14 @@
+localhost:8443 {
+	tls internal
+
+	@api path /api/*
+	handle @api {
+		reverse_proxy http://app:3001 {
+			header_up X-Forwarded-For {remote_host}
+		}
+	}
+
+	handle {
+		reverse_proxy http://frontend:8080
+	}
+}
